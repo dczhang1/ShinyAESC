@@ -1,0 +1,12 @@
+name: expectancyApp
+title: expectancyApp
+username:
+account: dczhang
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 263769
+bundleId: 1201180
+url: https://dczhang.shinyapps.io/expectancyApp/
+when: 1517410908.30088
+asMultiple: FALSE
+asStatic: FALSE
