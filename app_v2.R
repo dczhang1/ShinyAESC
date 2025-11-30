@@ -1,0 +1,461 @@
+# ShinyAESC v2.0
+# Don Zhang, 2018 (Original), Updated 2025
+# A modern, efficient tool for alternative effect size calculations.
+
+library(shiny)
+library(bslib)
+library(tidyverse)
+library(readr)
+library(readxl)
+library(haven)
+library(psych)
+library(mosaic)
+library(plotly)
+library(DT)
+
+# Define UI
+ui <- page_sidebar(
+    title = "ShinyAESC v2.0",
+    theme = bs_theme(version = 5, bootswatch = "flatly"),
+    sidebar = sidebar(
+        title = "Data & Settings",
+        fileInput("file1", "Upload Data (csv, xlsx, sav, sas7bdat)",
+            accept = c(".csv", ".xlsx", ".sav", ".sas7bdat")
+        ),
+        checkboxInput("header", "Header", TRUE),
+        hr(),
+        h4("Variables"),
+        selectInput("predictorVar", "Predictor (X)", choices = NULL),
+        selectInput("criterionVar", "Criterion (Y)", choices = NULL),
+        hr(),
+        h4("Parameters"),
+        numericInput("bins", "Number of bins", value = 5, min = 4, max = 12, step = 1),
+        numericInput("cutoffInput", "Criterion Cut-off (Y)", value = 3.5, step = 0.1),
+        actionButton("setmean", "Set to Mean (Y)"),
+        sliderInput("cutoff.X", "Predictor Cut-off (X %-ile)", min = 0.01, max = 0.99, value = 0.5, step = 0.01),
+        hr(),
+        downloadButton("report", "Generate Report")
+    ),
+    navset_card_underline(
+        nav_panel(
+            "Raw Data",
+            DTOutput("contents")
+        ),
+        nav_panel(
+            "Expectancy Chart",
+            plotlyOutput("expectancyPlot"),
+            h4("Expectancy Table"),
+            tableOutput("expectancyTable")
+        ),
+        nav_panel(
+            "Traditional Stats",
+            layout_columns(
+                col_widths = c(6, 6),
+                card(card_header("Descriptive Statistics"), tableOutput("descriptable")),
+                card(card_header("Correlation"), textOutput("validity"))
+            ),
+            layout_columns(
+                col_widths = c(6, 6),
+                plotlyOutput("histogram.X"),
+                plotlyOutput("histogram.Y")
+            ),
+            plotlyOutput("corplot"),
+            h4("Effect Size Indices"),
+            tableOutput("cles")
+        ),
+        nav_panel(
+            "Alternative Effect Sizes",
+            h4("Common Language Effect Size (CLES)"),
+            textOutput("cles.verbal"),
+            plotlyOutput("histogram.overlap"),
+            h5("Group Statistics"),
+            tableOutput("clestable"),
+            hr(),
+            h4("Binomial Effect Size Display (BESD)"),
+            tableOutput("besd")
+        ),
+        nav_panel(
+            "Help",
+            htmlOutput("instructions")
+        )
+    )
+)
+
+# Define Server
+server <- function(input, output, session) {
+    # --- Data Loading & Processing ---
+
+    data_set <- reactive({
+        inFile <- input$file1
+
+        if (is.null(inFile)) {
+            if (file.exists("sampleData.csv")) {
+                return(read.csv("sampleData.csv", header = TRUE))
+            } else {
+                return(NULL)
+            }
+        }
+
+        ext <- tools::file_ext(inFile$name)
+        tryCatch(
+            {
+                df <- switch(ext,
+                    csv = read.csv(inFile$datapath, header = input$header),
+                    xlsx = readxl::read_excel(inFile$datapath),
+                    sav = haven::read_sav(inFile$datapath),
+                    sas7bdat = haven::read_sas(inFile$datapath),
+                    NULL
+                )
+                return(df)
+            },
+            error = function(e) {
+                showNotification(paste("Error loading file:", e$message), type = "error")
+                return(NULL)
+            }
+        )
+    })
+
+    observe({
+        df <- data_set()
+        if (!is.null(df)) {
+            dsnames <- names(df)
+            current_pred <- input$predictorVar
+            current_crit <- input$criterionVar
+            selected_pred <- if (current_pred %in% dsnames) current_pred else dsnames[1]
+            selected_crit <- if (current_crit %in% dsnames) current_crit else dsnames[min(2, length(dsnames))]
+            updateSelectInput(session, "predictorVar", choices = dsnames, selected = selected_pred)
+            updateSelectInput(session, "criterionVar", choices = dsnames, selected = selected_crit)
+        }
+    })
+
+    selected_data <- reactive({
+        req(data_set(), input$predictorVar, input$criterionVar)
+        df <- data_set()
+        req(input$predictorVar %in% names(df), input$criterionVar %in% names(df))
+        df %>%
+            select(Predictor = !!sym(input$predictorVar), Criterion = !!sym(input$criterionVar)) %>%
+            na.omit()
+    })
+
+    # --- Statistics & Calculations ---
+
+    validity_stats <- reactive({
+        df <- selected_data()
+        r_val <- cor(df$Predictor, df$Criterion)
+        list(r = r_val, r2 = r_val^2)
+    })
+
+    output$validity <- renderText({
+        stats <- validity_stats()
+        paste0("r = ", round(stats$r, 4), " (r² = ", round(stats$r2 * 100, 2), "%)")
+    })
+
+    observeEvent(input$setmean, {
+        df <- selected_data()
+        mean_val <- round(mean(df$Criterion, na.rm = TRUE), 2)
+        updateNumericInput(session, "cutoffInput", value = mean_val)
+    })
+
+    df_exp <- reactive({
+        df <- selected_data()
+        bins <- input$bins
+        co_Y <- input$cutoffInput
+
+        df %>%
+            mutate(
+                ntile_X = ntile(Predictor, bins),
+                dicho_Y = as.numeric(Criterion > co_Y)
+            ) %>%
+            group_by(ntile_X) %>%
+            summarise(
+                lowerBound = min(Predictor),
+                upperBound = max(Predictor),
+                proportion = mean(dicho_Y),
+                frequency = sum(dicho_Y),
+                n = n(),
+                .groups = "drop"
+            ) %>%
+            mutate(
+                xlabels = paste(round(lowerBound, 1), "to", round(upperBound, 1))
+            )
+    })
+
+    cutoff_X_val <- reactive({
+        df <- selected_data()
+        quantile(df$Predictor, probs = input$cutoff.X, na.rm = TRUE)
+    })
+
+    df_cles <- reactive({
+        df <- selected_data()
+        co_X <- cutoff_X_val()
+        df %>%
+            mutate(
+                Group = case_when(
+                    Predictor < co_X ~ "Below",
+                    Predictor > co_X ~ "Above",
+                    TRUE ~ NA_character_
+                )
+            ) %>%
+            filter(!is.na(Group))
+    })
+
+    # --- Outputs: Tables ---
+
+  output$contents <- renderDT({
+    req(data_set())
+    datatable(data_set(), options = list(scrollX = TRUE, pageLength = 10))
+  })
+
+  output$expectancyTable <- renderTable({
+    df_exp() %>%
+      select(Bin = ntile_X, Range = xlabels, "Proportion > Cutoff" = proportion, "Count > Cutoff" = frequency, Total = n)
+  })
+
+  output$descriptable <- renderTable({
+    selected_data() %>% 
+      psych::describe() %>%
+      as.data.frame() %>%
+      select(n, mean, sd, median, min, max, skew, kurtosis)
+  }, rownames = TRUE)
+
+  output$clestable <- renderTable({
+    df_cles() %>%
+      group_by(Group) %>%
+      summarise(
+        Mean = mean(Criterion),
+        SD = sd(Criterion),
+        n = n()
+      )
+  })
+
+  output$cles <- renderTable({
+    stats <- df_cles() %>%
+      group_by(Group) %>%
+      summarise(m = mean(Criterion), s = sd(Criterion), n = n())
+    
+    if(nrow(stats) < 2) return(NULL)
+    
+    s_above <- stats %>% filter(Group == "Above")
+    s_below <- stats %>% filter(Group == "Below")
+    
+    if(nrow(s_above) == 0 || nrow(s_below) == 0) return(NULL)
+    
+    m1 <- s_above$m; s1 <- s_above$s; n1 <- s_above$n
+    m2 <- s_below$m; s2 <- s_below$s; n2 <- s_below$n
+    
+    sd_pooled <- sqrt(((n1 - 1) * s1^2 + (n2 - 1) * s2^2) / (n1 + n2 - 2))
+    hedges_g <- abs(m1 - m2) / sd_pooled
+    cohen_d <- abs(m1 - m2) / sqrt((s1^2 + s2^2) / 2)
+    
+    # Confidence Intervals for d
+    se_d <- sqrt((n1 + n2) / (n1 * n2) + cohen_d^2 / (2 * (n1 + n2)))
+    d_ci_lower <- cohen_d - 1.96 * se_d
+    d_ci_upper <- cohen_d + 1.96 * se_d
+    
+    z_dif <- abs(m1 - m2) / sqrt(s1^2 + s2^2)
+    cles <- pnorm(z_dif)
+    
+    data.frame(
+      Metric = c("Pearson's r", "Hedges' g", "Cohen's d", "Cohen's d [95% CI]", "CLES (Probability)"),
+      Value = c(
+        paste0(round(validity_stats()$r, 3)),
+        paste0(round(hedges_g, 3)),
+        paste0(round(cohen_d, 3)),
+        paste0("[", round(d_ci_lower, 3), ", ", round(d_ci_upper, 3), "]"),
+        paste0(round(cles, 3))
+      )
+    )
+  })
+
+  output$cles.verbal <- renderText({
+    co_X <- round(cutoff_X_val(), 2)
+    cl_val <- round(pnorm(abs(diff(tapply(selected_data()$Criterion, df_cles()$Group, mean))) / 
+                            sqrt(sum(tapply(selected_data()$Criterion, df_cles()$Group, var)))), 2) * 100
+    
+    paste0("A randomly chosen person with ", input$predictorVar, " > ", co_X, 
+           " has a ", cl_val, "% chance of obtaining a higher ", input$criterionVar, 
+           " than a randomly chosen person with ", input$predictorVar, " < ", co_X, ".")
+  })
+
+  output$besd <- renderTable({
+    df <- selected_data()
+    co_Y <- input$cutoffInput
+    co_X <- cutoff_X_val()
+    
+    df <- df %>% mutate(dicho_Y = as.numeric(Criterion > co_Y))
+    
+    prob_Y_above <- mean(df$dicho_Y[df$Predictor > co_X], na.rm = TRUE)
+    prob_Y_below <- mean(df$dicho_Y[df$Predictor < co_X], na.rm = TRUE)
+    
+    matrix(
+      c(prob_Y_above, prob_Y_below, 1 - prob_Y_above, 1 - prob_Y_below),
+      nrow = 2, ncol = 2,
+      dimnames = list(
+        c(paste(input$predictorVar, ">", round(co_X, 2)), paste(input$predictorVar, "<", round(co_X, 2))),
+        c(paste("p(", input$criterionVar, ") > ", round(co_Y, 2)), paste("p(", input$criterionVar, ") < ", round(co_Y, 2)))
+      )
+    )
+  }, rownames = TRUE)
+
+  # --- Outputs: Plots ---
+  
+  # Reactive Plot Objects (for Report)
+  plot_exp <- reactive({
+    df <- df_exp()
+    ggplot(df, aes(x = xlabels, y = proportion, text = paste("Range:", xlabels, "<br>Prop:", round(proportion, 2)))) +
+      geom_bar(stat = "identity", fill = "#2c3e50") +
+      ylim(0, 1) +
+      labs(x = input$predictorVar, y = paste("Proportion above", input$cutoffInput)) +
+      theme_minimal()
+  })
+  
+  plot_x <- reactive({
+    ggplot(selected_data(), aes(x = Predictor)) +
+      geom_histogram(bins = 15, fill = "#18bc9c", color = "white") +
+      labs(title = paste("Distribution of", input$predictorVar)) +
+      theme_minimal()
+  })
+  
+  plot_y <- reactive({
+    ggplot(selected_data(), aes(x = Criterion)) +
+      geom_histogram(bins = 15, fill = "#3498db", color = "white") +
+      labs(title = paste("Distribution of", input$criterionVar)) +
+      theme_minimal()
+  })
+  
+  plot_scatter <- reactive({
+    ggplot(selected_data(), aes(x = Predictor, y = Criterion)) +
+      geom_point(alpha = 0.6) +
+      geom_smooth(method = "lm", se = TRUE, color = "#e74c3c") +
+      labs(title = "Scatterplot") +
+      theme_minimal()
+  })
+  
+  plot_overlap <- reactive({
+    df <- df_cles()
+    co_X <- round(cutoff_X_val(), 2)
+    ggplot(df, aes(x = Criterion, fill = Group)) +
+      geom_density(alpha = 0.5) +
+      labs(title = paste("Density of", input$criterionVar, "by", input$predictorVar, "Group"),
+           fill = paste("Predictor Cutoff:", co_X)) +
+      theme_minimal()
+  })
+
+  output$expectancyPlot <- renderPlotly({ ggplotly(plot_exp(), tooltip = "text") })
+  output$histogram.X <- renderPlotly({ ggplotly(plot_x()) })
+  output$histogram.Y <- renderPlotly({ ggplotly(plot_y()) })
+  output$corplot <- renderPlotly({ ggplotly(plot_scatter()) })
+  output$histogram.overlap <- renderPlotly({ ggplotly(plot_overlap()) })
+
+  output$instructions <- renderText({
+    if (file.exists("shinyInstructions.html")) {
+      readLines("shinyInstructions.html")
+    } else {
+      "Instructions file not found."
+    }
+  })
+  
+  # --- Report Generation ---
+  output$report <- downloadHandler(
+    filename = function() {
+      paste("ShinyAESC_Report_", Sys.Date(), ".html", sep = "")
+    },
+    content = function(file) {
+      # Create a temporary Rmd file
+      tempReport <- file.path(tempdir(), "report.Rmd")
+      
+      # Write Rmd content
+      rmd_content <- "
+---
+title: \"ShinyAESC Analysis Report\"
+date: \"`r Sys.Date()`\"
+output: html_document
+params:
+  predictor: NA
+  criterion: NA
+  stats_desc: NA
+  stats_cles: NA
+  plot_scatter: NA
+  plot_exp: NA
+---
+
+## Analysis Summary
+
+**Predictor:** `r params$predictor`  
+**Criterion:** `r params$criterion`
+
+### Descriptive Statistics
+`r knitr::kable(params$stats_desc)`
+
+### Effect Size Indices
+`r knitr::kable(params$stats_cles)`
+
+### Scatterplot
+```{r, echo=FALSE}
+params$plot_scatter
+```
+
+### Expectancy Chart
+```{r, echo=FALSE}
+params$plot_exp
+```
+"
+      writeLines(rmd_content, tempReport)
+      
+      # Render
+      rmarkdown::render(tempReport, output_file = file,
+        params = list(
+          predictor = input$predictorVar,
+          criterion = input$criterionVar,
+          stats_desc = psych::describe(selected_data()) %>% as.data.frame() %>% select(n, mean, sd, median, min, max),
+          stats_cles = {
+             # Re-calculate CLES stats for report
+             df <- selected_data()
+             co_X <- quantile(df$Predictor, probs = input$cutoff.X, na.rm = TRUE)
+             
+             df_grouped <- df %>%
+               mutate(Group = case_when(
+                 Predictor < co_X ~ "Below",
+                 Predictor > co_X ~ "Above",
+                 TRUE ~ NA_character_
+               )) %>%
+               filter(!is.na(Group))
+             
+             stats <- df_grouped %>% group_by(Group) %>% summarise(m = mean(Criterion), s = sd(Criterion), n = n())
+             
+             if(nrow(stats) < 2) {
+                data.frame(Message = "Insufficient data for Effect Sizes")
+             } else {
+                 s_above <- stats %>% filter(Group == "Above")
+                 s_below <- stats %>% filter(Group == "Below")
+                 
+                 if(nrow(s_above) == 0 || nrow(s_below) == 0) {
+                   data.frame(Message = "Insufficient data in one or both groups")
+                 } else {
+                   m1 <- s_above$m; s1 <- s_above$s; n1 <- s_above$n
+                   m2 <- s_below$m; s2 <- s_below$s; n2 <- s_below$n
+                   
+                   sd_pooled <- sqrt(((n1 - 1) * s1^2 + (n2 - 1) * s2^2) / (n1 + n2 - 2))
+                   hedges_g <- abs(m1 - m2) / sd_pooled
+                   cohen_d <- abs(m1 - m2) / sqrt((s1^2 + s2^2) / 2)
+                   z_dif <- abs(m1 - m2) / sqrt(s1^2 + s2^2)
+                   cles <- pnorm(z_dif)
+                   
+                   data.frame(
+                     Metric = c("Pearson's r", "Hedges' g", "Cohen's d", "CLES"),
+                     Value = c(cor(df$Predictor, df$Criterion), hedges_g, cohen_d, cles)
+                   )
+                 }
+             }
+          },
+          plot_scatter = plot_scatter(),
+          plot_exp = plot_exp()
+        ),
+        envir = new.env(parent = globalenv())
+      )
+    }
+  )
+}
+
+shinyApp(ui = ui, server = server)
+```
