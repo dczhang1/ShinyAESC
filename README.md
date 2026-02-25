@@ -1,43 +1,73 @@
 # ShinyAESC: Shiny Alternative Effect Size Calculator
 
 ## Overview
-ShinyAESC is a web-based tool designed to help researchers and practitioners calculate and visualize alternative effect size statistics. It focuses on making statistical results more interpretable by providing indices such as the **Common Language Effect Size (CLES)** and the **Binomial Effect Size Display (BESD)**, alongside traditional statistics like Pearson's correlation and Cohen's d (implied via CLES conversions).
+
+ShinyAESC is a web-based SaaS tool that helps researchers and practitioners calculate and visualize alternative effect size statistics. It makes statistical results more interpretable by providing indices such as the **Common Language Effect Size (CLES)** and the **Binomial Effect Size Display (BESD)**, alongside traditional statistics like Pearson's correlation and Cohen's d (implied via CLES conversions).
 
 This tool was developed to accompany the paper:
+
 > **Zhang, D. C. (2018).** Utility of alternative effect size statistics and the development of a web-based calculator: Shiny-AESC. *Frontiers in Psychology, 9*, 1221. [doi:10.3389/fpsyg.2018.01221](https://doi.org/10.3389/fpsyg.2018.01221)
 
-## Features
-- **Data Upload**: Upload your own CSV datasets (up to 30MB).
-- **Variable Selection**: Dynamically select predictor and criterion variables.
-- **Expectancy Charts**: Visualize the probability of success/failure across different bins of the predictor.
-- **Alternative Effect Sizes**:
-  - **Common Language Effect Size (CLES)**: Probability that a randomly selected score from one group is higher than a randomly selected score from another.
-  - **Binomial Effect Size Display (BESD)**: Shows the change in success rate as a function of the predictor.
-- **Visualizations**: Histograms, scatterplots with regression lines, and overlapping density plots.
-- **Interactive Cutoffs**: Adjust cutoffs for both predictor and criterion variables to see how they impact effect size estimates.
+The app has been modernized with a Linear-inspired UI, landing page, and modular architecture suitable for deployment as a Shiny SaaS application.
 
-## Installation & Usage
-You can run this app locally using R and RStudio.
+## Features
+
+- **Landing page**: Hero section with sample data or upload options (CSV, Excel, SPSS, SAS).
+- **Data upload**: Support for CSV, XLSX, .sav, and .sas7bdat (up to 30MB).
+- **Variable selection**: Dynamically select predictor and criterion variables.
+- **Expectancy charts**: Visualize the probability of success/failure across predictor bins.
+- **Alternative effect sizes**:
+  - **Common Language Effect Size (CLES)**: Probability that a randomly selected score from one group is higher than from another.
+  - **Binomial Effect Size Display (BESD)**: Change in success rate as a function of the predictor.
+- **Visualizations**: Histograms, scatterplots with regression lines, overlapping density plots (including Plotly interactivity where applicable).
+- **Interactive cutoffs**: Adjust cutoffs for predictor and criterion to see impact on effect size estimates.
+- **Modern UI**: bslib theme, custom CSS (landing and main), and Lucide icons.
+
+## Installation & usage
+
+Run the app locally with R and RStudio.
 
 ### Prerequisites
-Ensure you have the following R packages installed:
+
+Install required R packages:
+
 ```r
-install.packages(c("tidyverse", "readr", "psych", "shiny", "mosaic"))
+install.packages(c(
+  "shiny", "bslib", "tidyverse", "readxl", "haven",
+  "psych", "DT", "rmarkdown", "knitr"
+))
 ```
 
-### Running the App
-1. Clone this repository.
-2. Open `appv2.r` in RStudio.
-3. Click the "Run App" button or run:
-   ```r
-   shiny::runApp("appv2.r")
-   ```
+Report export requires `rmarkdown` and `knitr`.
 
-## Structure
-- `appv2.r`: The main Shiny application source code (UI and Server).
-- `shinyInstructions.html`: The help documentation displayed within the app.
-- `sampleData.csv`: A sample dataset for demonstration purposes.
+### Running the app
+
+1. Clone this repository.
+2. Open `app.R` in RStudio.
+3. Click **Run App** or run:
+
+```r
+shiny::runApp("app.R")
+```
+
+For deployment (e.g. Shiny Server, ShinyApps.io, RStudio Connect), deploy the project root with `app.R` as the application file.
+
+## Project structure
+
+| Path | Description |
+|------|-------------|
+| `app.R` | Main Shiny application (UI and server); entry point for the SaaS app. |
+| `R/utils_theme.R` | Theme and UI styling utilities. |
+| `R/utils_stats.R` | Effect size and statistical computation utilities. |
+| `R/utils_plots.R` | Plotting and visualization utilities. |
+| `www/css/` | Stylesheets (e.g. `landing.css`, `main.css`). |
+| `www/js/` | Client-side JavaScript (e.g. `main.js`). |
+| `data/sampleData.csv` | Sample dataset for demonstration. |
+| `shinyInstructions.html` | In-app help documentation. |
+| `archive/` | Deprecated single-file app versions (`appv2.r`, `app_v2.R`, `app_v3.R`) kept for reference. |
 
 ## Citation
+
 If you use this tool in your research, please cite:
+
 Zhang, D. C. (2018). Utility of alternative effect size statistics and the development of a web-based calculator: Shiny-AESC. *Frontiers in Psychology, 9*, 1221.

@@ -1,0 +1,1044 @@
+# ShinyAESC - Alternative Effect Size Calculator
+# Modernized version with Linear-inspired design
+# Features: Landing page, modern UI, comprehensive effect size analysis
+
+# Load packages
+library(shiny)
+library(bslib)
+library(tidyverse)
+library(readxl)
+library(haven)
+library(psych)
+library(DT)
+
+# Source utility modules
+source("R/utils_theme.R")
+source("R/utils_stats.R")
+source("R/utils_plots.R")
+
+# Resolve sample data path (works from project root or app dir)
+get_sample_data_path <- function() {
+  app_dir <- tryCatch(
+    getShinyOption("appDir", getwd()),
+    error = function(e) getwd()
+  )
+  candidates <- c(
+    "data/sampleData.csv",
+    "sampleData.csv",
+    file.path(app_dir, "data/sampleData.csv"),
+    file.path(app_dir, "sampleData.csv")
+  )
+  for (path in candidates) {
+    if (length(path) && !is.na(path) && file.exists(path)) return(path)
+  }
+  NULL
+}
+
+# ============================================
+# UI COMPONENTS
+# ============================================
+
+# Landing Page Component
+landing_page_ui <- function() {
+  div(
+    class = "landing-page",
+
+    # Hero Section
+    div(
+      class = "hero-section",
+      div(
+        class = "hero-content",
+        div(
+          class = "hero-badge",
+          tags$i(`data-lucide` = "sparkles", style = "width: 14px; height: 14px;"),
+          "Free & Open Source"
+        ),
+        h1(class = "hero-title", "Understand Your Effect Sizes"),
+        p(
+          class = "hero-subtitle",
+          "Transform correlation coefficients into intuitive, actionable insights. ",
+          "Calculate Cohen's d, CLES, expectancy charts, and more."
+        ),
+        div(
+          class = "hero-actions",
+          actionButton(
+            "try_sample",
+            label = tagList(
+              tags$i(`data-lucide` = "play", style = "width: 16px; height: 16px;"),
+              "Try with Sample Data"
+            ),
+            class = "btn-primary btn-lg"
+          ),
+          fileInput(
+            "landing_file",
+            label = NULL,
+            accept = c(".csv", ".xlsx", ".sav", ".sas7bdat"),
+            buttonLabel = tagList(
+              tags$i(`data-lucide` = "upload", style = "width: 16px; height: 16px;"),
+              "Upload Your Data"
+            ),
+            placeholder = NULL
+          )
+        )
+      ),
+
+      # Hero Visual
+      div(
+        class = "hero-visual",
+        div(
+          class = "preview-card",
+          div(class = "preview-header",
+            span(class = "preview-dot red"),
+            span(class = "preview-dot yellow"),
+            span(class = "preview-dot green")
+          ),
+          div(
+            class = "preview-content",
+            div(class = "preview-stat",
+              span(class = "preview-label", "Correlation"),
+              span(class = "preview-value", "r = 0.548")
+            ),
+            div(class = "preview-stat",
+              span(class = "preview-label", "Effect Size"),
+              span(class = "preview-value", "d = 0.72")
+            ),
+            div(class = "preview-stat",
+              span(class = "preview-label", "CLES"),
+              span(class = "preview-value", "69.2%")
+            )
+          )
+        )
+      )
+    ),
+
+    # Features Section
+    div(
+      class = "features-section",
+      h2(class = "section-title", "Everything you need for effect size analysis"),
+      div(
+        class = "features-grid",
+        feature_card(
+          "bar-chart-3",
+          "Expectancy Charts",
+          "Visualize the probability of success across different score ranges with intuitive bar charts."
+        ),
+        feature_card(
+          "layers",
+          "Multiple Effect Sizes",
+          "Calculate Cohen's d, Hedges' g, CLES, and BESD from a single dataset automatically."
+        ),
+        feature_card(
+          "trending-up",
+          "Traditional Statistics",
+          "View descriptive statistics, correlations, histograms, and scatterplots with regression."
+        ),
+        feature_card(
+          "download",
+          "Export Reports",
+          "Generate professional HTML reports with all your analyses ready to share."
+        ),
+        feature_card(
+          "file-spreadsheet",
+          "Multiple Formats",
+          "Import data from CSV, Excel (.xlsx), SPSS (.sav), and SAS (.sas7bdat) files."
+        ),
+        feature_card(
+          "shield-check",
+          "Privacy First",
+          "All analysis happens in your browser. Your data never leaves your computer."
+        )
+      )
+    ),
+
+    # Sample Data Preview
+    div(
+      class = "sample-section",
+      h2(class = "section-title", "See it in action"),
+      p(class = "section-subtitle", "Our sample dataset shows the relationship between ACT scores and college GPA"),
+      div(
+        class = "sample-preview",
+        div(
+          class = "sample-table-container",
+          tags$table(
+            class = "sample-table",
+            tags$thead(
+              tags$tr(
+                tags$th("ACT Score"),
+                tags$th("College GPA")
+              )
+            ),
+            tags$tbody(
+              tags$tr(tags$td("28"), tags$td("3.42")),
+              tags$tr(tags$td("24"), tags$td("3.15")),
+              tags$tr(tags$td("31"), tags$td("3.78")),
+              tags$tr(tags$td("22"), tags$td("2.89")),
+              tags$tr(tags$td("26"), tags$td("3.31")),
+              tags$tr(class = "sample-more", tags$td(colspan = "2", "...and 177 more rows"))
+            )
+          )
+        ),
+        div(
+          class = "sample-insight",
+          tags$i(`data-lucide` = "lightbulb", class = "insight-icon"),
+          div(
+            tags$strong("Key Insight"),
+            p("Students scoring in the top 25% on ACT have a 69% chance of achieving above-average GPA, compared to 42% for those in the bottom 75%.")
+          )
+        )
+      ),
+      actionButton(
+        "try_sample_bottom",
+        label = tagList(
+          tags$i(`data-lucide` = "arrow-right", style = "width: 16px; height: 16px;"),
+          "Explore This Dataset"
+        ),
+        class = "btn-primary"
+      )
+    ),
+
+    # Footer
+    div(
+      class = "landing-footer",
+      p(
+        "Built with ",
+        tags$i(`data-lucide` = "heart", style = "width: 14px; height: 14px; color: #F87171;"),
+        " using R Shiny"
+      )
+    )
+  )
+}
+
+# Feature Card Helper
+feature_card <- function(icon, title, description) {
+  div(
+    class = "feature-card",
+    div(
+      class = "feature-icon",
+      tags$i(`data-lucide` = icon)
+    ),
+    h3(class = "feature-title", title),
+    p(class = "feature-description", description)
+  )
+}
+
+# Analysis Interface Component - Redesigned layout: content-driven height, no fill collapse
+analysis_ui <- function() {
+  page_sidebar(
+    title = tags$span(
+      class = "d-flex align-items-center gap-2",
+      tags$i(`data-lucide` = "bar-chart-2", style = "width: 20px; height: 20px;"),
+      "ShinyAESC"
+    ),
+    theme = app_theme,
+    fillable = FALSE,
+
+    sidebar = sidebar(
+      width = 280,
+
+      # Back to Landing
+      actionButton(
+        "back_to_landing",
+        label = tagList(
+          tags$i(`data-lucide` = "arrow-left", style = "width: 14px; height: 14px;"),
+          "New Analysis"
+        ),
+        class = "btn-ghost btn-sm w-100 mb-4"
+      ),
+
+      # Data Info
+      uiOutput("data_info"),
+
+      hr(),
+
+      # File Upload Section
+      h4(
+        tags$i(`data-lucide` = "upload", style = "width: 14px; height: 14px; margin-right: 6px;"),
+        "Data"
+      ),
+      fileInput(
+        "file1",
+        label = NULL,
+        accept = c(".csv", ".xlsx", ".sav", ".sas7bdat"),
+        placeholder = "Drop file or click",
+        buttonLabel = tags$span(
+          tags$i(`data-lucide` = "folder-open", style = "width: 14px; height: 14px;")
+        )
+      ),
+
+      hr(),
+
+      # Variables Section
+      h4(
+        tags$i(`data-lucide` = "sliders", style = "width: 14px; height: 14px; margin-right: 6px;"),
+        "Variables"
+      ),
+      selectInput("predictorVar", "Predictor (X)", choices = NULL),
+      selectInput("criterionVar", "Criterion (Y)", choices = NULL),
+
+      hr(),
+
+      # Parameters Section
+      h4(
+        tags$i(`data-lucide` = "settings", style = "width: 14px; height: 14px; margin-right: 6px;"),
+        "Parameters"
+      ),
+      numericInput("bins", "Number of bins", value = 5, min = 3, max = 12, step = 1),
+      numericInput("cutoffInput", "Criterion cutoff (Y)", value = 3.5, step = 0.1),
+      actionButton(
+        "setmean",
+        label = tags$span(
+          tags$i(`data-lucide` = "target", style = "width: 12px; height: 12px; margin-right: 4px;"),
+          "Set to mean"
+        ),
+        class = "btn-secondary btn-sm w-100 mb-3"
+      ),
+      sliderInput(
+        "cutoff.X",
+        "Predictor percentile (X)",
+        min = 0.01, max = 0.99, value = 0.5, step = 0.01
+      ),
+
+      hr(),
+
+      # Export Section
+      downloadButton(
+        "report",
+        label = tags$span(
+          tags$i(`data-lucide` = "download", style = "width: 14px; height: 14px; margin-right: 6px;"),
+          "Export Report"
+        ),
+        class = "btn-primary w-100"
+      )
+    ),
+
+    # Main Content - Tabbed Navigation or Empty State
+    div(
+      style = "display: none;",
+      textOutput("data_ready", inline = TRUE)
+    ),
+    conditionalPanel(
+      condition = "output.data_ready !== 'yes'",
+      card(
+        card_body(
+          class = "d-flex flex-column align-items-center justify-content-center py-5",
+          tags$i(`data-lucide` = "database", style = "width: 48px; height: 48px; color: var(--bs-secondary); margin-bottom: 1rem;"),
+          p(class = "mb-0 text-muted", "Load a dataset or use sample data to get started.")
+        )
+      )
+    ),
+    conditionalPanel(
+      condition = "output.data_ready === 'yes'",
+      navset_card_underline(
+        id = "main_tabs",
+
+        # ---- Tab 1: Summary ----
+        nav_panel(
+          title = tags$span(
+            tags$i(`data-lucide` = "layout-dashboard", style = "width: 14px; height: 14px; margin-right: 6px;"),
+            "Summary"
+          ),
+          value = "overview",
+          div(
+            class = "analysis-page",
+            layout_columns(
+              col_widths = c(4, 4, 4),
+              value_box(
+                title = "Correlation",
+                value = textOutput("overview_r", inline = TRUE),
+                showcase = tags$i(`data-lucide` = "trending-up", style = "width: 32px; height: 32px; color: var(--color-primary);"),
+                theme = "light"
+              ),
+              value_box(
+                title = "Cohen's d",
+                value = textOutput("overview_d", inline = TRUE),
+                showcase = tags$i(`data-lucide` = "layers", style = "width: 32px; height: 32px; color: var(--color-success);"),
+                theme = "light"
+              ),
+              value_box(
+                title = "CLES",
+                value = textOutput("overview_cles", inline = TRUE),
+                showcase = tags$i(`data-lucide` = "percent", style = "width: 32px; height: 32px; color: var(--color-warning);"),
+                theme = "light"
+              )
+            ),
+            layout_columns(
+              col_widths = c(7, 5),
+              card(
+                card_header("Scatterplot"),
+                card_body(class = "analysis-plot-wrap", style = "height: 340px;", plotOutput("overview_scatter", width = "100%", height = "340px"))
+              ),
+              card(
+                card_header("Key Insight"),
+                card_body(class = "analysis-insight-wrap", uiOutput("overview_insight"))
+              )
+            )
+          )
+        ),
+
+        # ---- Tab 2: Data & Descriptives ----
+        nav_panel(
+          title = tags$span(
+            tags$i(`data-lucide` = "table", style = "width: 14px; height: 14px; margin-right: 6px;"),
+            "Data & Descriptives"
+          ),
+          value = "data",
+          div(
+            class = "analysis-page",
+            card(
+              card_header("Raw Data"),
+              card_body(style = "overflow-x: auto;", DTOutput("contents"))
+            ),
+            card(
+              card_header("Descriptive Statistics & Correlation"),
+              card_body(
+                tableOutput("descriptable"),
+                div(
+                class = "correlation-line mt-3 pt-3",
+                tags$span(class = "correlation-r", textOutput("validity_r", inline = TRUE)),
+                tags$span(class = "text-muted ms-2", textOutput("validity_r2", inline = TRUE))
+              )
+            )
+            ),
+            layout_columns(
+              col_widths = c(6, 6),
+              card(
+                card_header(textOutput("hist_x_title", inline = TRUE)),
+                card_body(class = "analysis-plot-wrap", style = "height: 340px;", plotOutput("histogram.X", width = "100%", height = "340px"))
+              ),
+              card(
+                card_header(textOutput("hist_y_title", inline = TRUE)),
+                card_body(class = "analysis-plot-wrap", style = "height: 340px;", plotOutput("histogram.Y", width = "100%", height = "340px"))
+              )
+            )
+          )
+        ),
+
+        # ---- Tab 3: Expectancy ----
+        nav_panel(
+          title = tags$span(
+            tags$i(`data-lucide` = "bar-chart-3", style = "width: 14px; height: 14px; margin-right: 6px;"),
+            "Expectancy"
+          ),
+          value = "expectancy",
+          div(
+            class = "analysis-page",
+            card(
+              card_header("Expectancy Chart"),
+              card_body(class = "analysis-plot-wrap", style = "height: 420px;", plotOutput("expectancyPlot", width = "100%", height = "420px"))
+            ),
+            card(
+              card_header("Expectancy Table"),
+              card_body(tableOutput("expectancyTable"))
+            )
+          )
+        ),
+
+        # ---- Tab 4: Effect Sizes ----
+        nav_panel(
+          title = tags$span(
+            tags$i(`data-lucide` = "layers", style = "width: 14px; height: 14px; margin-right: 6px;"),
+            "Effect Sizes"
+          ),
+          value = "effects",
+          div(
+            class = "analysis-page",
+            layout_columns(
+              col_widths = c(6, 6),
+              card(
+                card_header("Effect Size Indices"),
+                card_body(tableOutput("cles"))
+              ),
+              card(
+                card_header("Group Statistics"),
+                card_body(tableOutput("clestable"))
+              )
+            ),
+            card(
+              card_header("Common Language Effect Size (CLES)"),
+              card_body(
+                tags$p(class = "mb-3", textOutput("cles.verbal")),
+                div(class = "analysis-plot-wrap", style = "height: 380px;", plotOutput("histogram.overlap", width = "100%", height = "380px"))
+              )
+            ),
+            card(
+              card_header("Binomial Effect Size Display (BESD)"),
+              card_body(tableOutput("besd"))
+            )
+          )
+        ),
+
+        # ---- Tab 5: Help ----
+        nav_panel(
+          title = tags$span(
+            tags$i(`data-lucide` = "help-circle", style = "width: 14px; height: 14px; margin-right: 6px;"),
+            "Help"
+          ),
+          value = "help",
+          div(
+            class = "analysis-page analysis-page--help",
+            card(
+              card_body(class = "help-body", htmlOutput("instructions"))
+            )
+          )
+        )
+      )
+    )
+  )
+}
+
+# ============================================
+# MAIN UI
+# ============================================
+
+ui <- page_fillable(
+  theme = app_theme,
+
+  tags$head(
+    tags$link(rel = "stylesheet", href = "css/main.css"),
+    tags$link(rel = "stylesheet", href = "css/landing.css"),
+    tags$link(
+      rel = "stylesheet",
+      href = "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+    ),
+    tags$script(src = "https://unpkg.com/lucide@latest/dist/umd/lucide.js"),
+    tags$script(src = "js/main.js")
+  ),
+
+  uiOutput("main_ui")
+)
+
+# ============================================
+# SERVER LOGIC
+# ============================================
+
+server <- function(input, output, session) {
+
+  # --- App State ---
+  app_state <- reactiveValues(
+    view = "landing",  # "landing" or "analysis"
+    data_source = NULL,  # "sample" or "uploaded"
+    landing_file = NULL   # preserved file from landing upload (lost when DOM switches)
+  )
+
+  # --- Navigation ---
+
+  # Try sample data buttons
+  observeEvent(input$try_sample, {
+    app_state$view <- "analysis"
+    app_state$data_source <- "sample"
+  })
+
+  observeEvent(input$try_sample_bottom, {
+    app_state$view <- "analysis"
+    app_state$data_source <- "sample"
+  })
+
+  # File upload from landing page (store file so it survives UI switch)
+  observeEvent(input$landing_file, {
+    req(input$landing_file)
+    app_state$landing_file <- input$landing_file
+    app_state$view <- "analysis"
+    app_state$data_source <- "uploaded"
+  })
+
+  # Back to landing
+  observeEvent(input$back_to_landing, {
+    app_state$view <- "landing"
+    app_state$data_source <- NULL
+    app_state$landing_file <- NULL
+  })
+
+  # Render main UI based on state
+  output$main_ui <- renderUI({
+    if (app_state$view == "landing") {
+      landing_page_ui()
+    } else {
+      analysis_ui()
+    }
+  })
+
+  # Re-initialize Lucide icons after UI switch
+  observe({
+    invalidateLater(100)
+    session$sendCustomMessage("initIcons", list())
+  }) |> bindEvent(app_state$view)
+
+  # --- Data Loading ---
+
+  data_set <- reactive({
+    # Prefer preserved landing upload, then sidebar file
+    if (!is.null(app_state$data_source) && app_state$data_source == "uploaded" && !is.null(app_state$landing_file)) {
+      inFile <- app_state$landing_file
+    } else if (!is.null(input$file1)) {
+      inFile <- input$file1
+    } else {
+      inFile <- NULL
+    }
+
+    if (is.null(inFile)) {
+      # Use sample data if in analysis view
+      if (app_state$view == "analysis") {
+        sample_path <- get_sample_data_path()
+        if (!is.null(sample_path)) {
+          return(read.csv(sample_path, header = TRUE))
+        }
+      }
+      return(NULL)
+    }
+
+    ext <- tools::file_ext(inFile$name)
+
+    tryCatch({
+      df <- switch(ext,
+        csv = read.csv(inFile$datapath, header = TRUE),
+        xlsx = readxl::read_excel(inFile$datapath),
+        sav = haven::read_sav(inFile$datapath),
+        sas7bdat = haven::read_sas(inFile$datapath),
+        NULL
+      )
+
+      session$sendCustomMessage("showToast", list(
+        message = paste("Loaded", nrow(df), "rows from", inFile$name),
+        type = "success",
+        duration = 3000
+      ))
+
+      return(df)
+    }, error = function(e) {
+      session$sendCustomMessage("showToast", list(
+        message = paste("Error loading file:", e$message),
+        type = "error",
+        duration = 5000
+      ))
+      return(NULL)
+    })
+  })
+
+  # Hidden output for empty-state conditionalPanel (only in analysis view)
+  output$data_ready <- renderText({
+    if (app_state$view != "analysis") return("no")
+    if (is.null(data_set())) return("no")
+    "yes"
+  })
+  outputOptions(output, "data_ready", suspendWhenHidden = FALSE)
+
+  # Data info display
+  output$data_info <- renderUI({
+    df <- data_set()
+    if (is.null(df)) return(NULL)
+
+    source_text <- if (!is.null(app_state$data_source) && app_state$data_source == "sample") {
+      "Sample Data"
+    } else {
+      "Your Data"
+    }
+
+    div(
+      class = "data-info-card",
+      div(class = "data-info-badge", source_text),
+      div(
+        class = "data-info-stats",
+        tags$span(paste(nrow(df), "rows")),
+        tags$span(class = "data-info-dot", "\u2022"),
+        tags$span(paste(ncol(df), "columns"))
+      )
+    )
+  })
+
+  # Effective predictor/criterion (default to first two columns when inputs not yet valid)
+  effective_vars <- reactive({
+    df <- data_set()
+    if (is.null(df) || ncol(df) < 2) return(list(predictor = NULL, criterion = NULL))
+    dsnames <- names(df)
+    pred <- input$predictorVar
+    crit <- input$criterionVar
+    if (is.null(pred) || !pred %in% dsnames) pred <- dsnames[1]
+    if (is.null(crit) || !crit %in% dsnames) crit <- dsnames[min(2, length(dsnames))]
+    list(predictor = pred, criterion = crit)
+  })
+
+  # Keep sidebar selectors in sync with effective vars
+  observe({
+    ev <- effective_vars()
+    df <- data_set()
+    if (is.null(df) || is.null(ev$predictor)) return(NULL)
+    dsnames <- names(df)
+    updateSelectInput(session, "predictorVar", choices = dsnames, selected = ev$predictor)
+    updateSelectInput(session, "criterionVar", choices = dsnames, selected = ev$criterion)
+  })
+
+  # Selected data (filtered); uses effective vars so chain never blocks on first paint
+  selected_data <- reactive({
+    req(data_set())
+    ev <- effective_vars()
+    req(ev$predictor, ev$criterion)
+    df <- data_set()
+    df %>%
+      select(Predictor = !!sym(ev$predictor), Criterion = !!sym(ev$criterion)) %>%
+      na.omit()
+  })
+
+  # --- Calculations ---
+
+  validity_stats <- reactive({
+    df <- selected_data()
+    calc_correlation(df$Predictor, df$Criterion)
+  })
+
+  cutoff_X_val <- reactive({
+    df <- selected_data()
+    quantile(df$Predictor, probs = input$cutoff.X, na.rm = TRUE)
+  })
+
+  df_exp <- reactive({
+    df <- selected_data()
+    calc_expectancy(df, input$bins, input$cutoffInput)
+  })
+
+  df_cles <- reactive({
+    df <- selected_data()
+    co_X <- cutoff_X_val()
+    df %>%
+      mutate(
+        Group = case_when(
+          Predictor < co_X ~ "Below",
+          Predictor > co_X ~ "Above",
+          TRUE ~ NA_character_
+        )
+      ) %>%
+      filter(!is.na(Group))
+  })
+
+  effect_sizes <- reactive({
+    df <- df_cles()
+    above_vals <- df %>% filter(Group == "Above") %>% pull(Criterion)
+    below_vals <- df %>% filter(Group == "Below") %>% pull(Criterion)
+
+    if (length(above_vals) < 2 || length(below_vals) < 2) {
+      return(list(d = NA, cles = NA))
+    }
+
+    list(
+      d = calc_cohens_d(above_vals, below_vals),
+      cles = calc_cles(above_vals, below_vals)
+    )
+  })
+
+  # Set mean button
+  observeEvent(input$setmean, {
+    df <- selected_data()
+    mean_val <- round(mean(df$Criterion, na.rm = TRUE), 2)
+    updateNumericInput(session, "cutoffInput", value = mean_val)
+  })
+
+  # Default criterion cutoff to mean when criterion variable changes
+  last_criterion_var <- reactiveVal(NULL)
+  observeEvent(effective_vars(), {
+    ev <- effective_vars()
+    if (is.null(ev$criterion)) return(NULL)
+    if (identical(ev$criterion, last_criterion_var())) return(NULL)
+    last_criterion_var(ev$criterion)
+    sd <- selected_data()
+    if (!is.null(sd) && nrow(sd) > 0) {
+      updateNumericInput(session, "cutoffInput", value = round(mean(sd$Criterion, na.rm = TRUE), 2))
+    }
+  })
+
+  # --- Overview Tab Outputs ---
+
+  output$overview_r <- renderText({
+    r <- validity_stats()$r
+    paste0("r = ", round(r, 3))
+  })
+
+  output$overview_d <- renderText({
+    d <- effect_sizes()$d
+    if (is.na(d)) return("--")
+    paste0("d = ", round(d, 2))
+  })
+
+  output$overview_cles <- renderText({
+    cles <- effect_sizes()$cles
+    if (is.na(cles)) return("--")
+    paste0(round(cles * 100, 1), "%")
+  })
+
+  output$overview_scatter <- renderPlot({
+    ev <- effective_vars()
+    p <- plot_scatter(selected_data(), ev$predictor, ev$criterion)
+    print(p)
+  }, width = 560, height = 340, res = 96)
+
+  output$overview_insight <- renderUI({
+    ev <- effective_vars()
+    r <- validity_stats()$r
+    cles <- effect_sizes()$cles
+    d <- effect_sizes()$d
+
+    r_strength <- interpret_correlation(r)
+    d_magnitude <- if (!is.na(d)) interpret_cohens_d(d) else "unknown"
+
+    cles_text <- if (!is.na(cles)) {
+      paste0(
+        "A randomly selected person from the top ",
+        round(input$cutoff.X * 100), "% on ",
+        ev$predictor, " has a ",
+        tags$strong(paste0(round(cles * 100, 1), "%")),
+        " probability of scoring higher on ",
+        ev$criterion, " than someone from the bottom ",
+        round((1 - input$cutoff.X) * 100), "%."
+      )
+    } else {
+      "Adjust the cutoff percentile to see CLES insights."
+    }
+
+    div(
+      class = "insight-content",
+      div(
+        class = "insight-row",
+        tags$i(`data-lucide` = "info", class = "insight-icon-small"),
+        p(paste0(r_strength, " (r = ", round(r, 3), ") with ", d_magnitude, " effect size."))
+      ),
+      div(
+        class = "insight-row highlight",
+        tags$i(`data-lucide` = "lightbulb", class = "insight-icon-small"),
+        p(HTML(cles_text))
+      )
+    )
+  })
+
+  # --- Data Tab Outputs ---
+
+  output$contents <- renderDT({
+    req(data_set())
+    datatable(
+      data_set(),
+      options = list(
+        scrollX = TRUE,
+        pageLength = 10,
+        dom = 'frtip',
+        language = list(search = "", searchPlaceholder = "Search...")
+      ),
+      class = "display compact"
+    )
+  })
+
+  # --- Expectancy Tab Outputs ---
+
+  output$expectancyPlot <- renderPlot({
+    ev <- effective_vars()
+    p <- plot_expectancy(df_exp(), ev$predictor, input$cutoffInput)
+    print(p)
+  }, width = 720, height = 420, res = 96)
+
+  output$expectancyTable <- renderTable({
+    df_exp() %>%
+      select(Bin = ntile_X, Range = xlabels, Proportion = proportion, Count = frequency, Total = n)
+  }, digits = 3)
+
+  # --- Statistics Tab Outputs ---
+
+  output$descriptable <- renderTable({
+    selected_data() %>%
+      psych::describe() %>%
+      as.data.frame() %>%
+      select(n, mean, sd, median, min, max, skew, kurtosis)
+  }, rownames = TRUE, digits = 3)
+
+  output$validity_r <- renderText({
+    paste0("r = ", validity_stats()$r_formatted)
+  })
+
+  output$validity_r2 <- renderText({
+    paste0("(", validity_stats()$r2_pct, "% variance explained)")
+  })
+
+  output$hist_x_title <- renderText({
+    ev <- effective_vars()
+    paste("Distribution of", ev$predictor)
+  })
+
+  output$hist_y_title <- renderText({
+    ev <- effective_vars()
+    paste("Distribution of", ev$criterion)
+  })
+
+  output$histogram.X <- renderPlot({
+    p <- plot_histogram(selected_data()$Predictor, fill_color = plot_colors$primary)
+    print(p)
+  }, width = 560, height = 340, res = 96)
+
+  output$histogram.Y <- renderPlot({
+    p <- plot_histogram(selected_data()$Criterion, fill_color = plot_colors$success)
+    print(p)
+  }, width = 560, height = 340, res = 96)
+
+  output$corplot <- renderPlot({
+    ev <- effective_vars()
+    p <- plot_scatter(selected_data(), ev$predictor, ev$criterion)
+    print(p)
+  }, width = 720, height = 480, res = 96)
+
+  # --- Effect Sizes Tab Outputs ---
+
+  output$clestable <- renderTable({
+    df_cles() %>%
+      group_by(Group) %>%
+      summarise(Mean = mean(Criterion), SD = sd(Criterion), n = n(), .groups = "drop")
+  }, digits = 3)
+
+  output$cles <- renderTable({
+    stats <- df_cles() %>%
+      group_by(Group) %>%
+      summarise(m = mean(Criterion), s = sd(Criterion), n = n(), .groups = "drop")
+
+    if (nrow(stats) < 2) return(NULL)
+
+    above_vals <- df_cles() %>% filter(Group == "Above") %>% pull(Criterion)
+    below_vals <- df_cles() %>% filter(Group == "Below") %>% pull(Criterion)
+
+    if (length(above_vals) < 2 || length(below_vals) < 2) return(NULL)
+
+    calc_all_effect_sizes(above_vals, below_vals, validity_stats()$r)
+  })
+
+  output$cles.verbal <- renderText({
+    ev <- effective_vars()
+    df <- df_cles()
+    above_vals <- df %>% filter(Group == "Above") %>% pull(Criterion)
+    below_vals <- df %>% filter(Group == "Below") %>% pull(Criterion)
+
+    if (length(above_vals) < 2 || length(below_vals) < 2) {
+      return("Insufficient data for CLES calculation.")
+    }
+
+    cles_val <- calc_cles(above_vals, below_vals)
+    cles_verbal(ev$predictor, ev$criterion, cutoff_X_val(), round(cles_val * 100, 1))
+  })
+
+  output$histogram.overlap <- renderPlot({
+    ev <- effective_vars()
+    p <- plot_density_overlap(df_cles(), ev$criterion, ev$predictor, cutoff_X_val())
+    print(p)
+  }, width = 680, height = 380, res = 96)
+
+  output$besd <- renderTable({
+    ev <- effective_vars()
+    df <- selected_data()
+    calc_besd(df, cutoff_X_val(), input$cutoffInput, ev$predictor, ev$criterion)
+  }, rownames = TRUE, digits = 3)
+
+  # --- Help Content ---
+
+  output$instructions <- renderUI({
+    if (file.exists("shinyInstructions.html")) {
+      includeHTML("shinyInstructions.html")
+    } else {
+      div(
+        class = "help-content",
+        h3("Getting Started"),
+        tags$ol(
+          tags$li("Upload your data file (CSV, Excel, SPSS, or SAS format)"),
+          tags$li("Select your predictor (X) and criterion (Y) variables"),
+          tags$li("Adjust the cutoff percentile to define your comparison groups"),
+          tags$li("Explore the tabs for different analyses")
+        ),
+        h3("Understanding Effect Sizes"),
+        tags$dl(
+          tags$dt("Cohen's d"),
+          tags$dd("Standardized difference between two group means. Small: 0.2, Medium: 0.5, Large: 0.8"),
+          tags$dt("CLES"),
+          tags$dd("The probability that a randomly selected person from one group will score higher than someone from the other group."),
+          tags$dt("BESD"),
+          tags$dd("Binomial Effect Size Display - shows success rates for each group in a 2x2 table.")
+        )
+      )
+    }
+  })
+
+  # --- Report Generation ---
+
+  output$report <- downloadHandler(
+    filename = function() {
+      paste0("ShinyAESC_Report_", Sys.Date(), ".html")
+    },
+    content = function(file) {
+      req(selected_data())
+      tempReport <- file.path(tempdir(), "report.Rmd")
+
+      rmd_content <- '
+---
+title: "ShinyAESC Analysis Report"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    theme: flatly
+    toc: true
+---
+
+## Analysis Summary
+
+**Predictor:** `r params$predictor`
+**Criterion:** `r params$criterion`
+
+### Correlation
+
+`r paste0("r = ", round(params$r, 3), " (", round(params$r^2 * 100, 1), "% variance explained)")`
+
+### Descriptive Statistics
+
+```{r, echo=FALSE}
+knitr::kable(params$desc_stats, digits = 3)
+```
+
+### Effect Size Indices
+
+```{r, echo=FALSE}
+knitr::kable(params$effect_sizes, digits = 3)
+```
+
+### Scatterplot
+
+```{r, echo=FALSE, fig.width=8, fig.height=5}
+params$scatter_plot
+```
+
+### Expectancy Chart
+
+```{r, echo=FALSE, fig.width=8, fig.height=4}
+params$exp_plot
+```
+
+---
+*Generated by ShinyAESC*
+'
+      writeLines(rmd_content, tempReport)
+
+      df <- selected_data()
+      df_grouped <- df_cles()
+      above_vals <- df_grouped %>% filter(Group == "Above") %>% pull(Criterion)
+      below_vals <- df_grouped %>% filter(Group == "Below") %>% pull(Criterion)
+
+      rmarkdown::render(
+        tempReport,
+        output_file = file,
+        params = list(
+          predictor = effective_vars()$predictor,
+          criterion = effective_vars()$criterion,
+          r = validity_stats()$r,
+          desc_stats = psych::describe(df) %>% as.data.frame() %>% select(n, mean, sd, median, min, max),
+          effect_sizes = calc_all_effect_sizes(above_vals, below_vals, validity_stats()$r),
+          scatter_plot = plot_scatter(df, effective_vars()$predictor, effective_vars()$criterion),
+          exp_plot = plot_expectancy(df_exp(), effective_vars()$predictor, input$cutoffInput)
+        ),
+        envir = new.env(parent = globalenv())
+      )
+    }
+  )
+}
+
+# ============================================
+# RUN APP
+# ============================================
+
+shinyApp(ui = ui, server = server)
