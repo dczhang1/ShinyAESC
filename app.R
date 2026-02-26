@@ -1,4 +1,4 @@
-# ShinyAESC - Alternative Effect Size Calculator
+# ESCAPE - Effect Size Calculator for Practical Effects
 # Modernized version with Linear-inspired design
 # Features: Landing page, modern UI, comprehensive effect size analysis
 
@@ -46,19 +46,19 @@ landing_page_ui <- function() {
     # Hero Section
     div(
       class = "hero-section",
-      div(
-        class = "hero-content",
         div(
-          class = "hero-badge",
-          tags$i(`data-lucide` = "sparkles", style = "width: 14px; height: 14px;"),
-          "Translate statistics, not people"
-        ),
-        h1(class = "hero-title", "Translate Statistics into Everyday Impact"),
-        p(
-          class = "hero-subtitle",
-          "Turn traditional indices like r and d into user-friendly probabilities, success rates, ",
-          "and plain-language effect sizes that drive real-world decisions."
-        ),
+          class = "hero-content",
+          div(
+            class = "app-name-badge",
+            tags$strong("ESCAPE"),
+            " — Effect Size Calculator for Practical Effects"
+          ),
+          h1(class = "hero-title", "Translate Statistics into Everyday Impact"),
+          p(
+            class = "hero-subtitle",
+            "Traditional effect sizes like correlations are hard to understand. ESCAPE transforms abstract coefficients ",
+            "into intuitive probabilities, success rates, and plain-language metrics that anyone can use to make informed decisions."
+          ),
         div(
           class = "hero-actions",
           actionButton(
@@ -195,6 +195,46 @@ landing_page_ui <- function() {
       )
     ),
 
+    # Use Cases Section
+    div(
+      class = "use-cases-section",
+      h2(class = "section-title", "Real-World Use Cases"),
+      p(class = "section-subtitle", "See how researchers and practitioners use ESCAPE to make data-driven decisions"),
+      div(
+        class = "use-cases-grid",
+        use_case_card(
+          "user-check",
+          "Selection Tool Validity",
+          "HR departments assess whether pre-employment tests predict job performance. Instead of reporting r = 0.35, ESCAPE shows that 67% of high-scoring applicants outperform low-scoring applicants—helping hiring managers make informed decisions."
+        ),
+        use_case_card(
+          "heart-pulse",
+          "Health Intervention Effectiveness",
+          "Clinical trials evaluate treatment outcomes. A correlation of r = 0.42 becomes: \"Patients receiving the new treatment have a 71% chance of better outcomes compared to standard care.\" This makes results accessible to patients and policymakers."
+        ),
+        use_case_card(
+          "graduation-cap",
+          "Educational Assessment",
+          "Schools analyze whether entrance exams predict academic success. Rather than abstract correlations, educators can say: \"Students scoring above the 75th percentile are 2.3 times more likely to graduate on time.\""
+        ),
+        use_case_card(
+          "scale",
+          "Psychological Scale Validation",
+          "Researchers validate new measurement instruments. Instead of technical metrics, they can demonstrate: \"The new anxiety scale correctly identifies 78% of individuals who need clinical intervention.\""
+        ),
+        use_case_card(
+          "target",
+          "Program Evaluation",
+          "Nonprofits and government agencies evaluate program impact. A correlation of r = 0.28 translates to: \"Participants are 64% more likely to achieve positive outcomes than non-participants.\""
+        ),
+        use_case_card(
+          "trending-up",
+          "Predictive Analytics",
+          "Business analysts forecast customer behavior. Rather than r = 0.45, stakeholders understand: \"Customers with high engagement scores are 73% more likely to make repeat purchases.\""
+        )
+      )
+    ),
+
     # Sample Data Preview
     div(
       class = "sample-section",
@@ -245,6 +285,8 @@ landing_page_ui <- function() {
     div(
       class = "landing-footer",
       p(
+        tags$strong("ESCAPE"), " — Effect Size Calculator for Practical Effects",
+        tags$br(),
         "Built with ",
         tags$i(`data-lucide` = "heart", style = "width: 14px; height: 14px; color: #F87171;"),
         " using R Shiny"
@@ -266,13 +308,29 @@ feature_card <- function(icon, title, description) {
   )
 }
 
+# Use Case Card Helper
+use_case_card <- function(icon, title, description) {
+  div(
+    class = "use-case-card",
+    div(
+      class = "use-case-icon",
+      tags$i(`data-lucide` = icon)
+    ),
+    div(
+      class = "use-case-content",
+      h3(class = "use-case-title", title),
+      p(class = "use-case-description", description)
+    )
+  )
+}
+
 # Analysis Interface Component - Redesigned layout: content-driven height, no fill collapse
 analysis_ui <- function() {
   page_sidebar(
     title = tags$span(
       class = "d-flex align-items-center gap-2",
       tags$i(`data-lucide` = "bar-chart-2", style = "width: 20px; height: 20px;"),
-      "ShinyAESC"
+      "ESCAPE"
     ),
     theme = app_theme,
     fillable = FALSE,
@@ -1165,7 +1223,7 @@ server <- function(input, output, session) {
     filename = function() {
       ev <- effective_vars()
       paste0(
-        "ShinyAESC_Scatter_",
+        "ESCAPE_Scatter_",
         sanitize_filename(ev$predictor),
         "_vs_",
         sanitize_filename(ev$criterion),
@@ -1192,7 +1250,7 @@ server <- function(input, output, session) {
     filename = function() {
       ev <- effective_vars()
       paste0(
-        "ShinyAESC_Histogram_",
+        "ESCAPE_Histogram_",
         sanitize_filename(ev$predictor),
         "_",
         Sys.Date(),
@@ -1216,7 +1274,7 @@ server <- function(input, output, session) {
     filename = function() {
       ev <- effective_vars()
       paste0(
-        "ShinyAESC_Histogram_",
+        "ESCAPE_Histogram_",
         sanitize_filename(ev$criterion),
         "_",
         Sys.Date(),
@@ -1240,7 +1298,7 @@ server <- function(input, output, session) {
     filename = function() {
       ev <- effective_vars()
       paste0(
-        "ShinyAESC_Expectancy_",
+        "ESCAPE_Expectancy_",
         sanitize_filename(ev$predictor),
         "_",
         Sys.Date(),
@@ -1265,7 +1323,7 @@ server <- function(input, output, session) {
     filename = function() {
       ev <- effective_vars()
       paste0(
-        "ShinyAESC_CLES_Overlap_",
+        "ESCAPE_CLES_Overlap_",
         sanitize_filename(ev$predictor),
         "_",
         sanitize_filename(ev$criterion),
@@ -1347,7 +1405,7 @@ server <- function(input, output, session) {
     filename = function() {
       ev <- effective_vars()
       paste0(
-        "ShinyAESC_IconArray_",
+        "ESCAPE_IconArray_",
         sanitize_filename(ev$predictor),
         "_",
         sanitize_filename(ev$criterion),
@@ -1418,7 +1476,7 @@ server <- function(input, output, session) {
 
   output$report <- downloadHandler(
     filename = function() {
-      paste0("ShinyAESC_Report_", Sys.Date(), ".html")
+      paste0("ESCAPE_Report_", Sys.Date(), ".html")
     },
     content = function(file) {
       req(selected_data())
@@ -1426,7 +1484,7 @@ server <- function(input, output, session) {
 
       rmd_content <- '
 ---
-title: "ShinyAESC Analysis Report"
+title: "ESCAPE Analysis Report"
 date: "`r Sys.Date()`"
 output:
   html_document:
@@ -1468,7 +1526,7 @@ params$exp_plot
 ```
 
 ---
-*Generated by ShinyAESC*
+*Generated by ESCAPE*
 '
       writeLines(rmd_content, tempReport)
 
