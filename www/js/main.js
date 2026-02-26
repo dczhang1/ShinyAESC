@@ -1,4 +1,4 @@
-/* main.js - JavaScript enhancements for ShinyAESC */
+/* main.js - JavaScript enhancements for ESCAPE */
 
 (function() {
   'use strict';
@@ -11,6 +11,7 @@
     initLucideIcons();
     initToastContainer();
     initDragDropEnhancement();
+    initCarousel();
   });
 
   // Re-initialize after Shiny updates
@@ -205,6 +206,164 @@
   }
 
   window.animateNumber = animateNumber;
+
+  /* ============================================
+     CAROUSEL FOR USE CASES
+     ============================================ */
+
+  let carouselInitialized = false;
+  
+  function initCarousel(retryCount = 0) {
+    if (carouselInitialized) {
+      console.log('Carousel already initialized, skipping');
+      return;
+    }
+    const carousel = document.querySelector('.use-cases-carousel');
+    if (!carousel) {
+      if (retryCount < 10) {
+        console.log('Carousel not found, retrying in 500ms... (attempt ' + (retryCount + 1) + '/10)');
+        setTimeout(function() {
+          initCarousel(retryCount + 1);
+        }, 500);
+      } else {
+        console.log('Carousel not found after 10 attempts, giving up');
+      }
+      return;
+    }
+
+    const slidesContainer = carousel.querySelector('.carousel-slides');
+    if (!slidesContainer) {
+      console.log('Slides container not found');
+      return;
+    }
+
+    const slides = Array.from(slidesContainer.querySelectorAll('.use-case-card'));
+    const prevBtn = carousel.querySelector('.carousel-prev');
+    const nextBtn = carousel.querySelector('.carousel-next');
+    const indicators = Array.from(carousel.querySelectorAll('.carousel-indicator'));
+
+    carouselInitialized = true;
+    console.log('Carousel init:', {
+      slides: slides.length,
+      prevBtn: !!prevBtn,
+      nextBtn: !!nextBtn,
+      indicators: indicators.length
+    });
+
+    if (slides.length === 0) {
+      console.log('No slides found');
+      return;
+    }
+
+    let currentSlide = 0;
+    const totalSlides = slides.length;
+
+    // Wrap each slide in a carousel-slide div
+    slides.forEach(function(slide, index) {
+      slide.classList.add('carousel-slide');
+      if (index === 0) {
+        slide.classList.add('active');
+      }
+    });
+
+    function updateCarousel() {
+      console.log('Updating carousel to slide:', currentSlide);
+      // Update slides
+      slides.forEach(function(slide, index) {
+        if (index === currentSlide) {
+          slide.classList.add('active');
+        } else {
+          slide.classList.remove('active');
+        }
+      });
+
+      // Update indicators
+      indicators.forEach(function(indicator, index) {
+        if (index === currentSlide) {
+          indicator.classList.add('active');
+        } else {
+          indicator.classList.remove('active');
+        }
+      });
+    }
+
+    function nextSlide() {
+      console.log('Next slide clicked, current:', currentSlide, 'total:', totalSlides);
+      currentSlide = (currentSlide + 1) % totalSlides;
+      updateCarousel();
+    }
+
+    function prevSlide() {
+      console.log('Prev slide clicked, current:', currentSlide, 'total:', totalSlides);
+      currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+      updateCarousel();
+    }
+
+    function goToSlide(index) {
+      console.log('Go to slide:', index);
+      currentSlide = index;
+      updateCarousel();
+    }
+
+    // Event listeners
+    if (prevBtn) {
+      console.log('Attaching prev button listener');
+      prevBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('Prev button clicked');
+        prevSlide();
+      });
+    } else {
+      console.log('Prev button not found');
+    }
+
+    if (nextBtn) {
+      console.log('Attaching next button listener');
+      nextBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('Next button clicked');
+        nextSlide();
+      });
+    } else {
+      console.log('Next button not found');
+    }
+
+    indicators.forEach(function(indicator, index) {
+      console.log('Attaching indicator listener for slide', index);
+      indicator.addEventListener('click', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const slideIndex = parseInt(this.getAttribute('data-slide'), 10);
+        console.log('Indicator clicked for slide', slideIndex);
+        goToSlide(slideIndex);
+      });
+    });
+
+    // Auto-advance every 5 seconds
+    let autoAdvance = setInterval(nextSlide, 5000);
+
+    // Pause on hover
+    carousel.addEventListener('mouseenter', function() {
+      clearInterval(autoAdvance);
+    });
+
+    carousel.addEventListener('mouseleave', function() {
+      autoAdvance = setInterval(nextSlide, 5000);
+    });
+
+    // Keyboard navigation
+    document.addEventListener('keydown', function(e) {
+      if (document.activeElement.closest('.use-cases-carousel')) {
+        if (e.key === 'ArrowLeft') {
+          prevSlide();
+        } else if (e.key === 'ArrowRight') {
+          nextSlide();
+        }
+      }
+    });
+  }
 
   /* ============================================
      INTERSECTION OBSERVER FOR ANIMATIONS

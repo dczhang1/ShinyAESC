@@ -82,75 +82,53 @@ landing_page_ui <- function() {
         )
       ),
 
-      # Hero Visual
+      # Hero Visual - Simplified Icon Array Component
       div(
         class = "hero-visual",
         div(
-          class = "effect-hero-card",
-          # Top metric pills
+          class = "icon-array-card",
+          # Header - simplified context
           div(
-            class = "effect-hero-header",
+            class = "icon-array-header",
+            p(class = "icon-array-subtitle", "Employee Selection Example")
+          ),
+          # Icon array visualization
+          div(
+            class = "icon-array-container",
+            # 69 high performer icons
+            tagList(lapply(1:69, function(i) {
+              div(
+                class = paste0("array-icon success-icon delay-", ((i - 1) %% 10) + 1),
+                tags$i(`data-lucide` = "user-check")
+              )
+            })),
+            # 31 low performer icons
+            tagList(lapply(1:31, function(i) {
+              div(
+                class = paste0("array-icon neutral-icon delay-", ((i - 1) %% 10) + 1),
+                tags$i(`data-lucide` = "user")
+              )
+            }))
+          ),
+          # Legend
+          div(
+            class = "icon-array-legend",
             div(
-              class = "effect-pill",
-              span(class = "effect-pill-label", "Correlation"),
-              span(class = "effect-pill-value", "r = 0.548")
+              class = "legend-item",
+              div(class = "legend-dot success-dot"),
+              span("High performer")
             ),
             div(
-              class = "effect-pill pill-secondary",
-              span(class = "effect-pill-label", "CLES"),
-              span(class = "effect-pill-value", "69.2%")
-            ),
-            div(
-              class = "effect-pill pill-tertiary",
-              span(class = "effect-pill-label", "BESD"),
-              span(class = "effect-pill-value", "+14 pp")
+              class = "legend-item",
+              div(class = "legend-dot neutral-dot"),
+              span("Low performer")
             )
           ),
-          # Middle: animated CLES bar
+          # Footer metric
           div(
-            class = "effect-hero-body",
-            div(
-              class = "effect-cles",
-              div(
-                class = "effect-cles-header",
-                span(class = "effect-cles-title", "Out of 100 people"),
-                span(class = "effect-cles-caption", "About 69 would meet the outcome")
-              ),
-              div(
-                class = "effect-cles-bar",
-                div(class = "effect-cles-bar-bg"),
-                div(class = "effect-cles-fill"),
-                div(class = "effect-cles-marker", `data-label` = "Cutoff")
-              ),
-              div(
-                class = "effect-cles-ticks",
-                span("0"),
-                span("25"),
-                span("50"),
-                span("75"),
-                span("100")
-              )
-            ),
-            # Bottom: two expectancy buckets
-            div(
-              class = "effect-buckets",
-              div(
-                class = "effect-bucket high",
-                span(class = "bucket-label", "Higher predictor group"),
-                span(class = "bucket-value", "76% succeed")
-              ),
-              div(
-                class = "effect-bucket low",
-                span(class = "bucket-label", "Lower predictor group"),
-                span(class = "bucket-value", "62% succeed")
-              )
-            )
-          ),
-          # Footer
-          div(
-            class = "effect-hero-footer",
-            tags$i(`data-lucide` = "sparkles", class = "effect-hero-icon"),
-            span("Real values update from your uploaded data.")
+            class = "icon-array-footer",
+            span(class = "footer-label", "Test correlation:"),
+            span(class = "footer-value", "r = 0.548")
           )
         )
       )
@@ -201,36 +179,70 @@ landing_page_ui <- function() {
       h2(class = "section-title", "Real-World Use Cases"),
       p(class = "section-subtitle", "See how researchers and practitioners use ESCAPE to make data-driven decisions"),
       div(
-        class = "use-cases-grid",
-        use_case_card(
-          "user-check",
-          "Selection Tool Validity",
-          "HR departments assess whether pre-employment tests predict job performance. Instead of reporting r = 0.35, ESCAPE shows that 67% of high-scoring applicants outperform low-scoring applicants—helping hiring managers make informed decisions."
+        class = "use-cases-carousel",
+        # Carousel navigation
+        tags$button(
+          type = "button",
+          class = "carousel-nav carousel-prev",
+          `aria-label` = "Previous",
+          tags$i(`data-lucide` = "chevron-left")
         ),
-        use_case_card(
-          "heart-pulse",
-          "Health Intervention Effectiveness",
-          "Clinical trials evaluate treatment outcomes. A correlation of r = 0.42 becomes: \"Patients receiving the new treatment have a 71% chance of better outcomes compared to standard care.\" This makes results accessible to patients and policymakers."
+        # Carousel slides container
+        div(
+          class = "carousel-slides",
+          use_case_card(
+            "user-check",
+            "Selection Tool Validity",
+            "HR departments assess whether pre-employment tests predict job performance. Instead of reporting r = 0.35, ESCAPE shows that 67% of high-scoring applicants outperform low-scoring applicants—helping hiring managers make informed decisions.",
+            "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=600&h=400&fit=crop"
+          ),
+          use_case_card(
+            "heart-pulse",
+            "Health Intervention Effectiveness",
+            "Clinical trials evaluate treatment outcomes. A correlation of r = 0.42 becomes: \"Patients receiving the new treatment have a 71% chance of better outcomes compared to standard care.\" This makes results accessible to patients and policymakers.",
+            "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600&h=400&fit=crop"
+          ),
+          use_case_card(
+            "graduation-cap",
+            "Educational Assessment",
+            "Schools analyze whether entrance exams predict academic success. Rather than abstract correlations, educators can say: \"Students scoring above the 75th percentile are 2.3 times more likely to graduate on time.\"",
+            "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&h=400&fit=crop"
+          ),
+          use_case_card(
+            "scale",
+            "Psychological Scale Validation",
+            "Researchers validate new measurement instruments. Instead of technical metrics, they can demonstrate: \"The new anxiety scale correctly identifies 78% of individuals who need clinical intervention.\"",
+            "https://images.unsplash.com/photo-1576091160550-217358c7e618?w=600&h=400&fit=crop"
+          ),
+          use_case_card(
+            "target",
+            "Program Evaluation",
+            "Nonprofits and government agencies evaluate program impact. A correlation of r = 0.28 translates to: \"Participants are 64% more likely to achieve positive outcomes than non-participants.\"",
+            "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&h=400&fit=crop"
+          ),
+          use_case_card(
+            "trending-up",
+            "Predictive Analytics",
+            "Business analysts forecast customer behavior. Rather than r = 0.45, stakeholders understand: \"Customers with high engagement scores are 73% more likely to make repeat purchases.\"",
+            "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop"
+          )
         ),
-        use_case_card(
-          "graduation-cap",
-          "Educational Assessment",
-          "Schools analyze whether entrance exams predict academic success. Rather than abstract correlations, educators can say: \"Students scoring above the 75th percentile are 2.3 times more likely to graduate on time.\""
+        # Carousel navigation
+        tags$button(
+          type = "button",
+          class = "carousel-nav carousel-next",
+          `aria-label` = "Next",
+          tags$i(`data-lucide` = "chevron-right")
         ),
-        use_case_card(
-          "scale",
-          "Psychological Scale Validation",
-          "Researchers validate new measurement instruments. Instead of technical metrics, they can demonstrate: \"The new anxiety scale correctly identifies 78% of individuals who need clinical intervention.\""
-        ),
-        use_case_card(
-          "target",
-          "Program Evaluation",
-          "Nonprofits and government agencies evaluate program impact. A correlation of r = 0.28 translates to: \"Participants are 64% more likely to achieve positive outcomes than non-participants.\""
-        ),
-        use_case_card(
-          "trending-up",
-          "Predictive Analytics",
-          "Business analysts forecast customer behavior. Rather than r = 0.45, stakeholders understand: \"Customers with high engagement scores are 73% more likely to make repeat purchases.\""
+        # Carousel indicators
+        div(
+          class = "carousel-indicators",
+          tags$button(class = "carousel-indicator active", `data-slide` = "0", `aria-label` = "Slide 1"),
+          tags$button(class = "carousel-indicator", `data-slide` = "1", `aria-label` = "Slide 2"),
+          tags$button(class = "carousel-indicator", `data-slide` = "2", `aria-label` = "Slide 3"),
+          tags$button(class = "carousel-indicator", `data-slide` = "3", `aria-label` = "Slide 4"),
+          tags$button(class = "carousel-indicator", `data-slide` = "4", `aria-label` = "Slide 5"),
+          tags$button(class = "carousel-indicator", `data-slide` = "5", `aria-label` = "Slide 6")
         )
       )
     ),
@@ -309,15 +321,19 @@ feature_card <- function(icon, title, description) {
 }
 
 # Use Case Card Helper
-use_case_card <- function(icon, title, description) {
+use_case_card <- function(icon, title, description, image) {
   div(
     class = "use-case-card",
     div(
-      class = "use-case-icon",
-      tags$i(`data-lucide` = icon)
+      class = "use-case-image",
+      tags$img(src = image, alt = title, class = "use-case-img")
     ),
     div(
       class = "use-case-content",
+      div(
+        class = "use-case-icon-badge",
+        tags$i(`data-lucide` = icon)
+      ),
       h3(class = "use-case-title", title),
       p(class = "use-case-description", description)
     )
