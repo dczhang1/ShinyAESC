@@ -86,26 +86,71 @@ landing_page_ui <- function() {
       div(
         class = "hero-visual",
         div(
-          class = "preview-card",
-          div(class = "preview-header",
-            span(class = "preview-dot red"),
-            span(class = "preview-dot yellow"),
-            span(class = "preview-dot green")
-          ),
+          class = "effect-hero-card",
+          # Top metric pills
           div(
-            class = "preview-content",
-            div(class = "preview-stat",
-              span(class = "preview-label", "Correlation"),
-              span(class = "preview-value", "r = 0.548")
+            class = "effect-hero-header",
+            div(
+              class = "effect-pill",
+              span(class = "effect-pill-label", "Correlation"),
+              span(class = "effect-pill-value", "r = 0.548")
             ),
-            div(class = "preview-stat",
-              span(class = "preview-label", "Effect Size"),
-              span(class = "preview-value", "d = 0.72")
+            div(
+              class = "effect-pill pill-secondary",
+              span(class = "effect-pill-label", "CLES"),
+              span(class = "effect-pill-value", "69.2%")
             ),
-            div(class = "preview-stat",
-              span(class = "preview-label", "CLES"),
-              span(class = "preview-value", "69.2%")
+            div(
+              class = "effect-pill pill-tertiary",
+              span(class = "effect-pill-label", "BESD"),
+              span(class = "effect-pill-value", "+14 pp")
             )
+          ),
+          # Middle: animated CLES bar
+          div(
+            class = "effect-hero-body",
+            div(
+              class = "effect-cles",
+              div(
+                class = "effect-cles-header",
+                span(class = "effect-cles-title", "Out of 100 people"),
+                span(class = "effect-cles-caption", "About 69 would meet the outcome")
+              ),
+              div(
+                class = "effect-cles-bar",
+                div(class = "effect-cles-bar-bg"),
+                div(class = "effect-cles-fill"),
+                div(class = "effect-cles-marker", `data-label` = "Cutoff")
+              ),
+              div(
+                class = "effect-cles-ticks",
+                span("0"),
+                span("25"),
+                span("50"),
+                span("75"),
+                span("100")
+              )
+            ),
+            # Bottom: two expectancy buckets
+            div(
+              class = "effect-buckets",
+              div(
+                class = "effect-bucket high",
+                span(class = "bucket-label", "Higher predictor group"),
+                span(class = "bucket-value", "76% succeed")
+              ),
+              div(
+                class = "effect-bucket low",
+                span(class = "bucket-label", "Lower predictor group"),
+                span(class = "bucket-value", "62% succeed")
+              )
+            )
+          ),
+          # Footer
+          div(
+            class = "effect-hero-footer",
+            tags$i(`data-lucide` = "sparkles", class = "effect-hero-icon"),
+            span("Real values update from your uploaded data.")
           )
         )
       )

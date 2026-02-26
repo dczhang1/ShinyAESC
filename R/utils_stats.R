@@ -190,16 +190,14 @@ interpret_correlation <- function(r) {
   r_abs <- abs(r)
   direction <- if (r >= 0) "positive" else "negative"
 
-  strength <- if (r_abs < 0.1) {
-    "negligible"
-  } else if (r_abs < 0.3) {
-    "weak"
-  } else if (r_abs < 0.5) {
+  strength <- if (r_abs < 0.15) {
+    "small"
+  } else if (r_abs < 0.25) {
     "moderate"
-  } else if (r_abs < 0.7) {
-    "strong"
+  } else if (r_abs < 0.4) {
+    "large"
   } else {
-    "very strong"
+    "very large"
   }
 
   paste0("A ", strength, " ", direction, " correlation")
