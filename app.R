@@ -364,8 +364,22 @@ analysis_ui <- function() {
             layout_columns(
               col_widths = c(7, 5),
               card(
-                card_header("Scatterplot"),
-                card_body(class = "analysis-plot-wrap", style = "height: 340px;", plotOutput("overview_scatter", width = "100%", height = "340px"))
+                card_header(
+                  div(
+                    class = "d-flex justify-content-between align-items-center w-100",
+                    span("Scatterplot"),
+                    downloadButton(
+                      "download_overview_scatter",
+                      label = "Download",
+                      class = "btn-ghost btn-sm"
+                    )
+                  )
+                ),
+                card_body(
+                  class = "analysis-plot-wrap",
+                  style = "height: 340px;",
+                  plotOutput("overview_scatter", width = "100%", height = "340px")
+                )
               ),
               card(
                 card_header("Key Insight"),
@@ -402,12 +416,40 @@ analysis_ui <- function() {
             layout_columns(
               col_widths = c(6, 6),
               card(
-                card_header(textOutput("hist_x_title", inline = TRUE)),
-                card_body(class = "analysis-plot-wrap", style = "height: 340px;", plotOutput("histogram.X", width = "100%", height = "340px"))
+                card_header(
+                  div(
+                    class = "d-flex justify-content-between align-items-center w-100",
+                    span(textOutput("hist_x_title", inline = TRUE)),
+                    downloadButton(
+                      "download_histogram_x",
+                      label = "Download",
+                      class = "btn-ghost btn-sm"
+                    )
+                  )
+                ),
+                card_body(
+                  class = "analysis-plot-wrap",
+                  style = "height: 340px;",
+                  plotOutput("histogram.X", width = "100%", height = "340px")
+                )
               ),
               card(
-                card_header(textOutput("hist_y_title", inline = TRUE)),
-                card_body(class = "analysis-plot-wrap", style = "height: 340px;", plotOutput("histogram.Y", width = "100%", height = "340px"))
+                card_header(
+                  div(
+                    class = "d-flex justify-content-between align-items-center w-100",
+                    span(textOutput("hist_y_title", inline = TRUE)),
+                    downloadButton(
+                      "download_histogram_y",
+                      label = "Download",
+                      class = "btn-ghost btn-sm"
+                    )
+                  )
+                ),
+                card_body(
+                  class = "analysis-plot-wrap",
+                  style = "height: 340px;",
+                  plotOutput("histogram.Y", width = "100%", height = "340px")
+                )
               )
             )
           )
@@ -423,8 +465,22 @@ analysis_ui <- function() {
           div(
             class = "analysis-page",
             card(
-              card_header("Expectancy Chart"),
-              card_body(class = "analysis-plot-wrap", style = "height: 420px;", plotOutput("expectancyPlot", width = "100%", height = "420px"))
+              card_header(
+                div(
+                  class = "d-flex justify-content-between align-items-center w-100",
+                  span("Expectancy Chart"),
+                  downloadButton(
+                    "download_expectancy_plot",
+                    label = "Download",
+                    class = "btn-ghost btn-sm"
+                  )
+                )
+              ),
+              card_body(
+                class = "analysis-plot-wrap",
+                style = "height: 420px;",
+                plotOutput("expectancyPlot", width = "100%", height = "420px")
+              )
             ),
             card(
               card_header("Expectancy Table"),
@@ -454,10 +510,24 @@ analysis_ui <- function() {
               )
             ),
             card(
-              card_header("Common Language Effect Size (CLES)"),
+              card_header(
+                div(
+                  class = "d-flex justify-content-between align-items-center w-100",
+                  span("Common Language Effect Size (CLES)"),
+                  downloadButton(
+                    "download_cles_plot",
+                    label = "Download",
+                    class = "btn-ghost btn-sm"
+                  )
+                )
+              ),
               card_body(
                 tags$p(class = "mb-3", textOutput("cles.verbal")),
-                div(class = "analysis-plot-wrap", style = "height: 380px;", plotOutput("histogram.overlap", width = "100%", height = "380px"))
+                div(
+                  class = "analysis-plot-wrap",
+                  style = "height: 380px;",
+                  plotOutput("histogram.overlap", width = "100%", height = "380px")
+                )
               )
             ),
             card(
@@ -498,7 +568,7 @@ ui <- page_fillable(
     tags$link(rel = "stylesheet", href = "css/landing.css"),
     tags$link(
       rel = "stylesheet",
-      href = "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      href = "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;500&display=swap"
     ),
     tags$script(src = "https://unpkg.com/lucide@latest/dist/umd/lucide.js"),
     tags$script(src = "js/main.js")
@@ -927,6 +997,142 @@ server <- function(input, output, session) {
     df <- selected_data()
     calc_besd(df, cutoff_X_val(), input$cutoffInput, ev$predictor, ev$criterion)
   }, rownames = TRUE, digits = 3)
+
+  # --- Figure Downloads ---
+
+  sanitize_filename <- function(x) {
+    x <- gsub("[^A-Za-z0-9]+", "_", x)
+    x <- gsub("_+", "_", x)
+    x <- gsub("^_|_$", "", x)
+    ifelse(nzchar(x), x, "figure")
+  }
+
+  output$download_overview_scatter <- downloadHandler(
+    filename = function() {
+      ev <- effective_vars()
+      paste0(
+        "ShinyAESC_Scatter_",
+        sanitize_filename(ev$predictor),
+        "_vs_",
+        sanitize_filename(ev$criterion),
+        "_",
+        Sys.Date(),
+        ".png"
+      )
+    },
+    content = function(file) {
+      ev <- effective_vars()
+      p <- plot_scatter(selected_data(), ev$predictor, ev$criterion)
+      ggplot2::ggsave(
+        filename = file,
+        plot = p,
+        width = 7,
+        height = 5,
+        dpi = 300,
+        bg = "white"
+      )
+    }
+  )
+
+  output$download_histogram_x <- downloadHandler(
+    filename = function() {
+      ev <- effective_vars()
+      paste0(
+        "ShinyAESC_Histogram_",
+        sanitize_filename(ev$predictor),
+        "_",
+        Sys.Date(),
+        ".png"
+      )
+    },
+    content = function(file) {
+      p <- plot_histogram(selected_data()$Predictor, fill_color = plot_colors$primary)
+      ggplot2::ggsave(
+        filename = file,
+        plot = p,
+        width = 7,
+        height = 5,
+        dpi = 300,
+        bg = "white"
+      )
+    }
+  )
+
+  output$download_histogram_y <- downloadHandler(
+    filename = function() {
+      ev <- effective_vars()
+      paste0(
+        "ShinyAESC_Histogram_",
+        sanitize_filename(ev$criterion),
+        "_",
+        Sys.Date(),
+        ".png"
+      )
+    },
+    content = function(file) {
+      p <- plot_histogram(selected_data()$Criterion, fill_color = plot_colors$success)
+      ggplot2::ggsave(
+        filename = file,
+        plot = p,
+        width = 7,
+        height = 5,
+        dpi = 300,
+        bg = "white"
+      )
+    }
+  )
+
+  output$download_expectancy_plot <- downloadHandler(
+    filename = function() {
+      ev <- effective_vars()
+      paste0(
+        "ShinyAESC_Expectancy_",
+        sanitize_filename(ev$predictor),
+        "_",
+        Sys.Date(),
+        ".png"
+      )
+    },
+    content = function(file) {
+      ev <- effective_vars()
+      p <- plot_expectancy(df_exp(), ev$predictor, input$cutoffInput)
+      ggplot2::ggsave(
+        filename = file,
+        plot = p,
+        width = 7,
+        height = 5,
+        dpi = 300,
+        bg = "white"
+      )
+    }
+  )
+
+  output$download_cles_plot <- downloadHandler(
+    filename = function() {
+      ev <- effective_vars()
+      paste0(
+        "ShinyAESC_CLES_Overlap_",
+        sanitize_filename(ev$predictor),
+        "_",
+        sanitize_filename(ev$criterion),
+        "_",
+        Sys.Date(),
+        ".png"
+      )
+    },
+    content = function(file) {
+      ev <- effective_vars()
+      p <- plot_density_overlap(df_cles(), ev$criterion, ev$predictor, cutoff_X_val())
+      ggplot2::ggsave(
+        filename = file,
+        plot = p,
+        width = 7,
+        height = 5,
+        dpi = 300,
+        bg = "white"
+      )
+    }
+  )
 
   # --- Help Content ---
 

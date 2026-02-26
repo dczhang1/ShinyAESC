@@ -1,38 +1,63 @@
-/* main.css - Linear-inspired design system for ShinyAESC */
+/* main.css - Soft stone & sage analysis environment for ShinyAESC */
 
 /* ============================================
-   DESIGN TOKENS
+   DESIGN TOKENS – STONE & SAGE PALETTE
    ============================================ */
 
 :root {
-  /* Colors - Linear-inspired palette */
-  --color-primary: #5E6AD2;
-  --color-primary-hover: #4850A8;
-  --color-primary-light: #5E6AD220;
+  /* Core palette inspired by Data Studio mock */
+  --color-stone-50: #fafaf9;
+  --color-stone-100: #f5f5f4;
+  --color-stone-200: #e7e5e4;
+  --color-stone-300: #d6d3d1;
+  --color-stone-400: #a8a29e;
+  --color-stone-800: #292524;
+  --color-stone-900: #1c1917;
 
-  --color-success: #3CCB7F;
-  --color-warning: #FFBB38;
-  --color-danger: #F87171;
+  --color-sage-50: #f4f7f4;
+  --color-sage-100: #e3ebe3;
+  --color-sage-500: #6b8e6b;
+  --color-sage-600: #5a7a5a;
+  --color-sage-900: #2d3b2d;
 
-  /* Grays */
-  --color-gray-50: #FAFAFA;
-  --color-gray-100: #F4F4F5;
-  --color-gray-200: #E4E4E7;
-  --color-gray-300: #D4D4D8;
-  --color-gray-400: #A1A1AA;
-  --color-gray-500: #71717A;
-  --color-gray-600: #52525B;
-  --color-gray-700: #3F3F46;
-  --color-gray-800: #27272A;
-  --color-gray-900: #18181B;
+  /* Legacy token map used across app */
+  --color-paper: var(--color-stone-50);
+  --color-ink: var(--color-stone-900);
+  --color-muted: var(--color-stone-400);
 
-  --color-background: #FAFAFA;
-  --color-surface: #FFFFFF;
-  --color-border: #D4D4D8;
+  /* Backwards-compatible accent tokens */
+  --color-accent: var(--color-sage-600);
+  --color-accent-dim: var(--color-sage-100);
+  --color-highlight: #fef3c7;
+  --color-grid: var(--color-stone-200);
 
-  /* Typography */
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-mono: 'JetBrains Mono', 'Fira Code', 'Monaco', monospace;
+  --color-primary: var(--color-sage-600);
+  --color-primary-hover: #4e6a4e;
+  --color-primary-light: var(--color-sage-100);
+
+  --color-success: #16a34a;
+  --color-warning: #fbbf24;
+  --color-danger: #ef4444;
+
+  --color-gray-50: var(--color-stone-50);
+  --color-gray-100: var(--color-stone-100);
+  --color-gray-200: var(--color-stone-200);
+  --color-gray-300: var(--color-stone-300);
+  --color-gray-400: var(--color-stone-400);
+  --color-gray-500: #78716c;
+  --color-gray-600: #57534e;
+  --color-gray-700: #44403c;
+  --color-gray-800: var(--color-stone-800);
+  --color-gray-900: var(--color-stone-900);
+
+  --color-background: var(--color-stone-50);
+  --color-surface: #ffffff;
+  --color-border: var(--color-stone-200);
+
+  /* Typography – Inter + Source Serif 4 + JetBrains Mono */
+  --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-serif: 'Source Serif 4', 'Georgia', serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
 
   --text-xs: 0.75rem;
   --text-sm: 0.8125rem;
@@ -52,34 +77,114 @@
   --space-8: 2rem;
   --space-10: 2.5rem;
   --space-12: 3rem;
+  --space-16: 4rem;
 
-  /* Borders & Radius */
+  /* Radii */
   --radius-sm: 0.25rem;
   --radius-md: 0.375rem;
-  --radius-lg: 0.5rem;
-  --radius-xl: 0.75rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
 
-  /* Shadows - Very subtle for Linear aesthetic */
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-md: 0 2px 4px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+  /* Shadows – soft, atmospheric */
+  --shadow-sm: 0 2px 4px rgba(15, 23, 42, 0.06);
+  --shadow-md: 0 10px 25px rgba(15, 23, 42, 0.10);
 
   /* Transitions */
-  --transition-fast: 100ms ease-out;
-  --transition-base: 150ms ease-out;
-  --transition-slow: 200ms ease-out;
+  --transition-fast: 120ms ease-out;
+  --transition-base: 180ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 260ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ============================================
-   BASE STYLES
+   BASE STYLES, TEXTURE & SCROLL
    ============================================ */
+
+html {
+  scroll-behavior: smooth;
+}
 
 body {
   font-family: var(--font-sans);
   font-size: var(--text-base);
   color: var(--color-gray-900);
   background-color: var(--color-background);
+  position: relative;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Subtle grain texture overlay */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.04;
+  z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+::selection {
+  background-color: var(--color-sage-100);
+  color: var(--color-stone-900);
+}
+
+/* Custom focus states */
+*:focus-visible {
+  outline: 2px solid var(--color-sage-500);
+  outline-offset: 2px;
+}
+
+/* Smooth transitions */
+.transition-smooth {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Reading width constraint */
+.measure {
+  max-width: 65ch;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-gray-200);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-gray-300);
+}
+
+/* Utility font for handwritten notes (kept subtle) */
+.handwritten {
+  font-family: 'Brush Script MT', cursive;
+  transform: rotate(-1deg);
+}
+
+/* ============================================
+   INTERACTION UTILITIES
+   ============================================ */
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+/* Generic hover slide for rows (used by tables) */
+.row-slide {
+  transition: background-color 0.15s ease, transform 0.15s ease;
+}
+
+.row-slide:hover {
+  transform: translateX(4px);
 }
 
 /* ============================================
@@ -187,9 +292,11 @@ body {
    ============================================ */
 
 .bslib-sidebar-layout > .sidebar {
-  background: var(--color-surface);
-  border-right: 1px solid var(--color-border);
+  background: rgba(245, 245, 244, 0.82);
+  border-right: 1px solid rgba(148, 163, 184, 0.55);
   padding: var(--space-6);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
+  backdrop-filter: blur(18px);
 }
 
 .bslib-sidebar-layout > .sidebar .sidebar-title {
@@ -220,28 +327,32 @@ body {
    ============================================ */
 
 .nav-underline {
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-gray-200);
   gap: var(--space-1);
 }
 
 .nav-underline .nav-link {
   font-size: var(--text-sm);
-  font-weight: 500;
+  font-weight: 600;
   color: var(--color-gray-500);
   padding: var(--space-3) var(--space-4);
   border-bottom: 2px solid transparent;
   margin-bottom: -1px;
-  transition: color var(--transition-fast), border-color var(--transition-fast);
+  text-transform: none;
+  letter-spacing: 0.02em;
+  transition: color var(--transition-fast), border-color var(--transition-fast), background-color var(--transition-fast);
 }
 
 .nav-underline .nav-link:hover {
-  color: var(--color-gray-700);
-  border-bottom-color: var(--color-gray-300);
+  color: var(--color-gray-900);
+  background-color: var(--color-sage-50);
+  border-bottom-color: var(--color-sage-200, #d4e0d4);
 }
 
 .nav-underline .nav-link.active {
   color: var(--color-gray-900);
-  border-bottom-color: var(--color-primary);
+  background-color: #ffffff;
+  border-bottom-color: var(--color-sage-600);
 }
 
 /* ============================================
@@ -249,24 +360,30 @@ body {
    ============================================ */
 
 .card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
+  background: rgba(255, 255, 255, 0.82);
+  border: 1px solid rgba(148, 163, 184, 0.7);
   border-radius: var(--radius-lg);
-  box-shadow: none;
-  transition: border-color var(--transition-fast);
+  box-shadow: 0 14px 30px rgba(15, 23, 42, 0.10);
+  backdrop-filter: blur(18px);
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast), background-color var(--transition-fast), border-color var(--transition-fast);
 }
 
 .card:hover {
-  border-color: var(--color-gray-400);
+  transform: translateY(-2px);
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.16);
+  border-color: rgba(148, 163, 184, 0.95);
+  background-color: rgba(255, 255, 255, 0.9);
 }
 
 .card-header {
   background: transparent;
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-gray-200);
   font-size: max(var(--text-sm), 0.8125rem);
-  font-weight: 600;
-  color: var(--color-gray-700);
+  font-weight: 700;
+  color: var(--color-gray-900);
   padding: var(--space-4) var(--space-5);
+  text-transform: none;
+  letter-spacing: 0.03em;
 }
 
 .card-body {
@@ -388,16 +505,17 @@ input[type="number"] {
 
 /* File input */
 .shiny-input-container .input-group {
-  border: 1.5px dashed var(--color-border);
-  border-radius: var(--radius-lg);
+  border: 2px dashed var(--color-ink);
+  border-radius: 0;
   padding: var(--space-4);
-  background: var(--color-gray-50);
-  transition: border-color var(--transition-fast), background var(--transition-fast);
+  background: rgba(244, 241, 234, 0.9);
+  transition: border-color var(--transition-fast), background var(--transition-fast), box-shadow var(--transition-fast);
 }
 
 .shiny-input-container .input-group:hover {
-  border-color: var(--color-primary);
-  background: var(--color-primary-light);
+  border-color: var(--color-accent);
+  background: #fffdf3;
+  box-shadow: 4px 4px 0 0 var(--color-ink);
 }
 
 .shiny-input-container .input-group .form-control {
@@ -431,33 +549,44 @@ input[type="number"] {
 .btn {
   font-size: var(--text-sm);
   font-weight: 500;
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-md);
-  transition: all var(--transition-fast);
+  padding: calc(var(--space-2) + 1px) calc(var(--space-4) + 2px);
+  border-radius: 999px;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.14);
+  border-width: 1px;
+  border-style: solid;
+  backdrop-filter: blur(14px);
+  transition: transform var(--transition-base), box-shadow var(--transition-base), background-color var(--transition-base), color var(--transition-base), border-color var(--transition-base);
 }
 
 .btn-primary {
-  background: var(--color-primary);
-  border-color: var(--color-primary);
+  background: rgba(28, 25, 23, 0.94);
+  border-color: rgba(15, 23, 42, 0.9);
+  color: #ffffff;
 }
 
 .btn-primary:hover {
-  background: var(--color-primary-hover);
-  border-color: var(--color-primary-hover);
+  background: rgba(15, 23, 42, 0.98);
+  border-color: rgba(15, 23, 42, 1);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.3);
+  transform: translateY(-1px);
 }
 
 .btn-secondary,
 .btn-default {
-  background: var(--color-surface);
-  border: 1.5px solid var(--color-border);
-  color: var(--color-gray-700);
+  background: var(--color-stone-100);
+  border-color: var(--color-stone-200);
+  color: var(--color-gray-800);
 }
 
 .btn-secondary:hover,
 .btn-default:hover {
-  background: var(--color-gray-100);
-  border-color: var(--color-gray-400);
+  background: var(--color-stone-200);
+  border-color: var(--color-stone-300);
   color: var(--color-gray-900);
+  transform: translateY(-1px);
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.16);
 }
 
 /* Action buttons (Shiny) */
@@ -471,14 +600,14 @@ input[type="number"] {
 
 .table {
   font-size: var(--text-sm);
-  border-color: var(--color-border);
+  border-color: var(--color-gray-200);
 }
 
 .table th {
   font-weight: 600;
   color: var(--color-gray-600);
   background: var(--color-gray-50);
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-gray-200);
   padding: var(--space-3) var(--space-4);
   text-transform: uppercase;
   font-size: var(--text-xs);
@@ -487,12 +616,17 @@ input[type="number"] {
 
 .table td {
   padding: var(--space-3) var(--space-4);
-  border-bottom: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-gray-100);
   color: var(--color-gray-700);
 }
 
 .table tbody tr:hover {
-  background: var(--color-gray-50);
+  background: var(--color-sage-50);
+  transform: translateX(4px);
+}
+
+.table tbody tr {
+  transition: background-color 0.15s ease, transform 0.15s ease;
 }
 
 /* Table card bodies: show full table, no scrollbars, stable font size */
@@ -582,9 +716,11 @@ input[type="number"] {
    ============================================ */
 
 h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-sans);
   font-weight: 600;
   color: var(--color-gray-900);
   margin-top: 0;
+  letter-spacing: -0.02em;
 }
 
 h1 { font-size: var(--text-3xl); }
@@ -594,7 +730,7 @@ h4 { font-size: var(--text-lg); }
 h5 { font-size: var(--text-base); }
 
 .text-muted {
-  color: var(--color-gray-500) !important;
+  color: var(--color-muted) !important;
 }
 
 /* Monospace for statistics */
@@ -705,14 +841,18 @@ h5 { font-size: var(--text-base); }
 
 .navbar,
 .bslib-page-title {
-  background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border);
+  background: rgba(250, 250, 249, 0.86);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.6);
+  box-shadow: 0 16px 35px rgba(15, 23, 42, 0.12);
+  backdrop-filter: blur(20px);
 }
 
 .navbar-brand,
 .bslib-page-title {
-  font-weight: 600;
+  font-weight: 800;
   color: var(--color-gray-900);
+  text-transform: none;
+  letter-spacing: 0.08em;
 }
 
 /* ============================================
