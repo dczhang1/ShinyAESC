@@ -1,8 +1,8 @@
-# ShinyAESC: Shiny Alternative Effect Size Calculator
+# ESCAPE: Effect Size Calculator for Practical Effects
 
 ## Overview
 
-ShinyAESC is a web-based SaaS tool that helps researchers and practitioners calculate and visualize alternative effect size statistics. It makes statistical results more interpretable by providing indices such as the **Common Language Effect Size (CLES)** and the **Binomial Effect Size Display (BESD)**, alongside traditional statistics like Pearson's correlation and Cohen's d (implied via CLES conversions).
+ESCAPE is a web-based SaaS tool that helps researchers and practitioners calculate and visualize alternative effect size statistics. It makes statistical results more interpretable by providing indices such as the **Common Language Effect Size (CLES)** and the **Binomial Effect Size Display (BESD)**, alongside traditional statistics like Pearson's correlation and Cohen's d (implied via CLES conversions).
 
 This tool was developed to accompany the paper:
 

@@ -1,5 +1,5 @@
 # utils_theme.R
-# Linear-inspired theme configuration for ShinyAESC
+# Linear-inspired theme configuration for ESCAPE
 # Using bslib for Bootstrap 5 theming
 
 library(bslib)

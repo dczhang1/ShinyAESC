@@ -1,4 +1,4 @@
-# ShinyAESC Enhancement Plan
+# ESCAPE Enhancement Plan
 
 ## Guiding Principle
 The app's purpose is to produce **practically useful, lay consumer-friendly, and interpretable effect sizes**. Improvements should prioritize accessibility and communication over statistical rigor for its own sake.

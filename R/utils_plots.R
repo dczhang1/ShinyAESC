@@ -1,5 +1,5 @@
 # utils_plots.R
-# Plot theming and helper functions for ShinyAESC
+# Plot theming and helper functions for ESCAPE
 # Linear-inspired, minimal aesthetic (static ggplot2 only)
 
 library(ggplot2)

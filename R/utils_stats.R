@@ -1,5 +1,5 @@
 # utils_stats.R
-# Statistical calculation utilities for ShinyAESC
+# Statistical calculation utilities for ESCAPE
 # Extracted for testability and reuse
 
 #' Calculate Pearson correlation and R-squared
