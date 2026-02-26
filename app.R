@@ -51,13 +51,13 @@ landing_page_ui <- function() {
         div(
           class = "hero-badge",
           tags$i(`data-lucide` = "sparkles", style = "width: 14px; height: 14px;"),
-          "Free & Open Source"
+          "Translate statistics, not people"
         ),
-        h1(class = "hero-title", "Understand Your Effect Sizes"),
+        h1(class = "hero-title", "Translate Statistics into Everyday Impact"),
         p(
           class = "hero-subtitle",
-          "Transform correlation coefficients into intuitive, actionable insights. ",
-          "Calculate Cohen's d, CLES, expectancy charts, and more."
+          "Turn traditional indices like r and d into user-friendly probabilities, success rates, ",
+          "and plain-language effect sizes that drive real-world decisions."
         ),
         div(
           class = "hero-actions",
@@ -120,22 +120,22 @@ landing_page_ui <- function() {
         feature_card(
           "bar-chart-3",
           "Expectancy Charts",
-          "Visualize the probability of success across different score ranges with intuitive bar charts."
+          "Show \"out of 100 people\" style probabilities instead of abstract coefficients, using intuitive bar charts."
         ),
         feature_card(
           "layers",
           "Multiple Effect Sizes",
-          "Calculate Cohen's d, Hedges' g, CLES, and BESD from a single dataset automatically."
+          "Calculate Cohen's d, Hedges' g, CLES, and BESD, then present them as interpretable, side-by-side stories."
         ),
         feature_card(
           "trending-up",
-          "Traditional Statistics",
-          "View descriptive statistics, correlations, histograms, and scatterplots with regression."
+          "Bridge Traditional Statistics",
+          "Keep familiar descriptives and correlations, but pair them with consumer-friendly translations."
         ),
         feature_card(
           "download",
           "Export Reports",
-          "Generate professional HTML reports with all your analyses ready to share."
+          "Generate professional HTML reports with effect sizes explained in clear, shareable language."
         ),
         feature_card(
           "file-spreadsheet",
@@ -233,81 +233,105 @@ analysis_ui <- function() {
     fillable = FALSE,
 
     sidebar = sidebar(
-      width = 280,
+      width = 400,
 
-      # Back to Landing
-      actionButton(
-        "back_to_landing",
-        label = tagList(
-          tags$i(`data-lucide` = "arrow-left", style = "width: 14px; height: 14px;"),
-          "New Analysis"
+      div(
+        class = "sidebar-panel",
+
+        # Panel header
+        div(
+          class = "sidebar-panel-header",
+          div(
+            class = "sidebar-panel-title",
+            span(class = "sidebar-panel-accent"),
+            span("Analysis Controls")
+          ),
+          span(class = "sidebar-panel-tag", "Setup")
         ),
-        class = "btn-ghost btn-sm w-100 mb-4"
-      ),
 
-      # Data Info
-      uiOutput("data_info"),
+        # Back to Landing
+        actionButton(
+          "back_to_landing",
+          label = tagList(
+            tags$i(`data-lucide` = "arrow-left", style = "width: 14px; height: 14px;"),
+            "New Analysis"
+          ),
+          class = "btn-ghost btn-sm w-100 mb-3"
+        ),
 
-      hr(),
+        # Data Info
+        uiOutput("data_info"),
 
-      # File Upload Section
-      h4(
-        tags$i(`data-lucide` = "upload", style = "width: 14px; height: 14px; margin-right: 6px;"),
-        "Data"
-      ),
-      fileInput(
-        "file1",
-        label = NULL,
-        accept = c(".csv", ".xlsx", ".sav", ".sas7bdat"),
-        placeholder = "Drop file or click",
-        buttonLabel = tags$span(
-          tags$i(`data-lucide` = "folder-open", style = "width: 14px; height: 14px;")
+        div(class = "sidebar-panel-divider"),
+
+        # File Upload Section
+        div(
+          class = "sidebar-section sidebar-section--data",
+          h4(
+            class = "sidebar-section-title",
+            tags$i(`data-lucide` = "upload", style = "width: 14px; height: 14px;"),
+            "Data"
+          ),
+          fileInput(
+            "file1",
+            label = NULL,
+            accept = c(".csv", ".xlsx", ".sav", ".sas7bdat"),
+            placeholder = "Drop file or click",
+            buttonLabel = tags$span(
+              tags$i(`data-lucide` = "folder-open", style = "width: 14px; height: 14px;")
+            )
+          )
+        ),
+
+        # Variables Section
+        div(
+          class = "sidebar-section sidebar-section--vars",
+          h4(
+            class = "sidebar-section-title",
+            tags$i(`data-lucide` = "sliders", style = "width: 14px; height: 14px;"),
+            "Variables"
+          ),
+          selectInput("predictorVar", "Predictor (X)", choices = NULL),
+          selectInput("criterionVar", "Criterion (Y)", choices = NULL)
+        ),
+
+        # Parameters Section
+        div(
+          class = "sidebar-section sidebar-section--params",
+          h4(
+            class = "sidebar-section-title",
+            tags$i(`data-lucide` = "settings", style = "width: 14px; height: 14px;"),
+            "Parameters"
+          ),
+          numericInput("bins", "Number of bins", value = 5, min = 3, max = 12, step = 1),
+          numericInput("cutoffInput", "Criterion cutoff (Y)", value = 3.5, step = 0.1),
+          actionButton(
+            "setmean",
+            label = tags$span(
+              tags$i(`data-lucide` = "target", style = "width: 12px; height: 12px; margin-right: 4px;"),
+              "Set to mean"
+            ),
+            class = "btn-secondary btn-sm w-100 mb-3"
+          ),
+          sliderInput(
+            "cutoff.X",
+            "Predictor percentile (X)",
+            min = 0.01, max = 0.99, value = 0.5, step = 0.01
+          )
+        ),
+
+        # Export Section
+        div(
+          class = "sidebar-section sidebar-section--export",
+          downloadButton(
+            "report",
+            label = tags$span(
+              tags$i(`data-lucide` = "download", style = "width: 14px; height: 14px;"),
+              "Export Report"
+            ),
+            class = "btn-primary w-100"
+          )
         )
-      ),
-
-      hr(),
-
-      # Variables Section
-      h4(
-        tags$i(`data-lucide` = "sliders", style = "width: 14px; height: 14px; margin-right: 6px;"),
-        "Variables"
-      ),
-      selectInput("predictorVar", "Predictor (X)", choices = NULL),
-      selectInput("criterionVar", "Criterion (Y)", choices = NULL),
-
-      hr(),
-
-      # Parameters Section
-      h4(
-        tags$i(`data-lucide` = "settings", style = "width: 14px; height: 14px; margin-right: 6px;"),
-        "Parameters"
-      ),
-      numericInput("bins", "Number of bins", value = 5, min = 3, max = 12, step = 1),
-      numericInput("cutoffInput", "Criterion cutoff (Y)", value = 3.5, step = 0.1),
-      actionButton(
-        "setmean",
-        label = tags$span(
-          tags$i(`data-lucide` = "target", style = "width: 12px; height: 12px; margin-right: 4px;"),
-          "Set to mean"
-        ),
-        class = "btn-secondary btn-sm w-100 mb-3"
-      ),
-      sliderInput(
-        "cutoff.X",
-        "Predictor percentile (X)",
-        min = 0.01, max = 0.99, value = 0.5, step = 0.01
-      ),
-
-      hr(),
-
-      # Export Section
-      downloadButton(
-        "report",
-        label = tags$span(
-          tags$i(`data-lucide` = "download", style = "width: 14px; height: 14px; margin-right: 6px;"),
-          "Export Report"
-        ),
-        class = "btn-primary w-100"
       )
     ),
 
@@ -568,7 +592,7 @@ ui <- page_fillable(
     tags$link(rel = "stylesheet", href = "css/landing.css"),
     tags$link(
       rel = "stylesheet",
-      href = "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=JetBrains+Mono:wght@400;500&display=swap"
+      href = "https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,700&family=JetBrains+Mono:wght@400;500&display=swap"
     ),
     tags$script(src = "https://unpkg.com/lucide@latest/dist/umd/lucide.js"),
     tags$script(src = "js/main.js")
