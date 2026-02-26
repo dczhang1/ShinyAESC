@@ -932,7 +932,12 @@ server <- function(input, output, session) {
 
   output$instructions <- renderUI({
     if (file.exists("shinyInstructions.html")) {
-      includeHTML("shinyInstructions.html")
+      raw_html <- paste(readLines("shinyInstructions.html", warn = FALSE), collapse = "\n")
+      body_html <- sub("(?is).*<body[^>]*>", "", raw_html, perl = TRUE)
+      body_html <- sub("(?is)</body>.*$", "", body_html, perl = TRUE)
+      body_html <- gsub("(?is)<style[^>]*>.*?</style>", "", body_html, perl = TRUE)
+      body_html <- gsub("(?is)<script[^>]*>.*?</script>", "", body_html, perl = TRUE)
+      HTML(sprintf('<div class="help-content">%s</div>', body_html))
     } else {
       div(
         class = "help-content",

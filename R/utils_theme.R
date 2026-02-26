@@ -53,14 +53,14 @@ app_theme <- bs_theme(
 
   # Cards
   "card-bg" = "#FFFFFF",
-  "card-border-color" = colors$gray_200,
+  "card-border-color" = colors$gray_300,
   "card-border-radius" = "0.5rem",
   "card-cap-bg" = "#FFFFFF",
   "card-cap-padding-y" = "0.75rem",
 
   # Inputs
   "input-bg" = "#FFFFFF",
-  "input-border-color" = colors$gray_200,
+  "input-border-color" = colors$gray_300,
   "input-border-radius" = "0.375rem",
   "input-focus-border-color" = colors$primary,
   "input-focus-box-shadow" = paste0("0 0 0 2px ", colors$primary, "20"),
@@ -73,14 +73,14 @@ app_theme <- bs_theme(
 
   # Sidebar
   "sidebar-bg" = "#FFFFFF",
-  "sidebar-border-color" = colors$gray_200,
+  "sidebar-border-color" = colors$gray_300,
 
   # Nav tabs
   "nav-link-color" = colors$gray_500,
   "nav-tabs-link-active-color" = colors$gray_900,
-  "nav-tabs-border-color" = colors$gray_200,
+  "nav-tabs-border-color" = colors$gray_300,
 
   # Tables
-  "table-border-color" = colors$gray_200,
+  "table-border-color" = colors$gray_300,
   "table-striped-bg" = colors$gray_50
 )
