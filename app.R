@@ -320,6 +320,36 @@ analysis_ui <- function() {
           )
         ),
 
+        # Icon Array Section
+        div(
+          class = "sidebar-section sidebar-section--iconarray",
+          h4(
+            class = "sidebar-section-title",
+            tags$i(`data-lucide` = "users", style = "width: 14px; height: 14px;"),
+            "Icon Array"
+          ),
+          selectInput(
+            "iconarray_type",
+            "Icon type",
+            choices = c("Person" = "person", "Circle" = "circle", "Square" = "square"),
+            selected = "person"
+          ),
+          numericInput(
+            "iconarray_total",
+            "Total icons",
+            value = 100,
+            min = 10,
+            max = 500,
+            step = 10
+          ),
+          selectInput(
+            "iconarray_layout",
+            "Layout",
+            choices = c("Auto" = "auto", "10x10" = "10x10", "20x20" = "20x20", "25x25" = "25x25"),
+            selected = "auto"
+          )
+        ),
+
         # Export Section
         div(
           class = "sidebar-section sidebar-section--export",
@@ -561,7 +591,62 @@ analysis_ui <- function() {
           )
         ),
 
-        # ---- Tab 5: Help ----
+        # ---- Tab 5: Icon Array ----
+        nav_panel(
+          title = tags$span(
+            tags$i(`data-lucide` = "users", style = "width: 14px; height: 14px; margin-right: 6px;"),
+            "Icon Array"
+          ),
+          value = "iconarray",
+          div(
+            class = "analysis-page",
+            card(
+              card_header(
+                div(
+                  class = "d-flex justify-content-between align-items-center w-100",
+                  span("Icon Array Visualization"),
+                  downloadButton(
+                    "download_icon_array",
+                    label = "Download",
+                    class = "btn-ghost btn-sm"
+                  )
+                )
+              ),
+              card_body(
+                tags$p(class = "mb-3", textOutput("iconarray_description")),
+                div(
+                  class = "analysis-plot-wrap",
+                  style = "height: 420px;",
+                  plotOutput("iconarray_plot", width = "100%", height = "420px")
+                )
+              )
+            ),
+            card(
+              card_header("Icon Array Settings"),
+              card_body(
+                div(
+                  class = "iconarray-legend",
+                  tags$div(
+                    class = "legend-item",
+                    tags$span(class = "legend-color", style = paste0("background-color: ", plot_colors$primary)),
+                    tags$span("Success (CLES)")
+                  ),
+                  tags$div(
+                    class = "legend-item",
+                    tags$span(class = "legend-color", style = paste0("background-color: ", plot_colors$secondary)),
+                    tags$span("Failure (1 - CLES)")
+                  )
+                ),
+                div(
+                  class = "iconarray-stats mt-3",
+                  tags$p(class = "mb-1", textOutput("iconarray_stats"))
+                )
+              )
+            )
+          )
+        ),
+
+        # ---- Tab 6: Help ----
         nav_panel(
           title = tags$span(
             tags$i(`data-lucide` = "help-circle", style = "width: 14px; height: 14px; margin-right: 6px;"),
@@ -1155,6 +1240,99 @@ server <- function(input, output, session) {
         dpi = 300,
         bg = "white"
       )
+    }
+  )
+
+  # --- Icon Array Tab Outputs ---
+
+  output$iconarray_description <- renderText({
+    ev <- effective_vars()
+    cles_val <- effect_sizes()$cles
+    
+    if (is.na(cles_val)) {
+      return("Adjust the cutoff percentile to see CLES icon array.")
+    }
+    
+    paste0(
+      "Out of ", input$iconarray_total, " random pairs, approximately ",
+      round(cles_val * input$iconarray_total), " times the high-scoring person will ",
+      "outperform the low-scoring person."
+    )
+  })
+
+  output$iconarray_plot <- renderPlot({
+    ev <- effective_vars()
+    cles_val <- effect_sizes()$cles
+    
+    if (is.na(cles_val)) {
+      # Return empty plot if no data
+      ggplot() +
+        labs(title = "No data available") +
+        theme_minimal_linear()
+    } else {
+      plot_icon_array(
+        cles_prob = cles_val,
+        total_icons = input$iconarray_total,
+        icon_type = input$iconarray_type,
+        layout = input$iconarray_layout,
+        predictor_name = ev$predictor,
+        criterion_name = ev$criterion
+      )
+    }
+  }, width = 720, height = 420, res = 96)
+
+  output$iconarray_stats <- renderText({
+    ev <- effective_vars()
+    cles_val <- effect_sizes()$cles
+    
+    if (is.na(cles_val)) {
+      return("CLES: Not available")
+    }
+    
+    num_success <- round(cles_val * input$iconarray_total)
+    num_failure <- input$iconarray_total - num_success
+    
+    paste0(
+      "Success: ", num_success, " (", round(cles_val * 100, 1), "%) | ",
+      "Failure: ", num_failure, " (", round((1 - cles_val) * 100, 1), "%)"
+    )
+  })
+
+  output$download_icon_array <- downloadHandler(
+    filename = function() {
+      ev <- effective_vars()
+      paste0(
+        "ShinyAESC_IconArray_",
+        sanitize_filename(ev$predictor),
+        "_",
+        sanitize_filename(ev$criterion),
+        "_",
+        Sys.Date(),
+        ".png"
+      )
+    },
+    content = function(file) {
+      ev <- effective_vars()
+      cles_val <- effect_sizes()$cles
+      
+      if (!is.na(cles_val)) {
+        p <- plot_icon_array(
+          cles_prob = cles_val,
+          total_icons = input$iconarray_total,
+          icon_type = input$iconarray_type,
+          layout = input$iconarray_layout,
+          predictor_name = ev$predictor,
+          criterion_name = ev$criterion
+        )
+        ggplot2::ggsave(
+          filename = file,
+          plot = p,
+          width = 7,
+          height = 5,
+          dpi = 300,
+          bg = "white"
+        )
+      }
     }
   )
 
