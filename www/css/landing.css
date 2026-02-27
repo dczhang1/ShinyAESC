@@ -105,22 +105,34 @@
 }
 
 /* File input upload button styling */
+.hero-actions .shiny-input-container {
+  position: relative;
+  display: inline-flex;
+  margin: 0;
+}
+
 .hero-actions .shiny-input-container input[type="file"] {
   position: absolute;
   width: 100%;
   height: 100%;
   opacity: 0;
   cursor: pointer;
+  z-index: 2;
 }
 
-.hero-actions .shiny-input-container {
-  position: relative;
+/* Remove input-group wrapper styling */
+.hero-actions .input-group {
+  border: none;
+  background: transparent;
+  padding: 0;
   display: inline-flex;
 }
 
+/* Style the upload button to match primary button */
 .hero-actions .shiny-input-container .btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: var(--space-2);
   padding: var(--space-3) var(--space-5);
   font-size: var(--text-sm);
@@ -130,35 +142,14 @@
   transition: all var(--transition-base);
   background: var(--color-primary);
   color: white;
-  border: none;
+  border: 2px solid var(--color-primary);
+  min-height: 44px;
+  box-sizing: border-box;
 }
 
 .hero-actions .shiny-input-container:hover .btn {
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(139, 110, 240, 0.3);
-}
-
-/* Unified button styling - Upload Component */
-.hero-actions .shiny-input-container {
-  margin: 0;
-}
-
-.hero-actions .input-group {
-  border: 1px solid rgba(186, 178, 238, 0.6);
-  background: rgba(248, 245, 255, 0.5);
-  padding: var(--space-3) var(--space-5);
-  border-radius: var(--radius-lg);
-  transition: all var(--transition-base);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 44px;
-}
-
-.hero-actions .input-group:hover {
-  border-color: rgba(139, 110, 240, 0.8);
-  background: rgba(248, 245, 255, 0.7);
-  box-shadow: 0 2px 8px rgba(139, 110, 240, 0.1);
 }
 
 .hero-actions .btn-default {
@@ -178,12 +169,14 @@
   border-radius: var(--radius-lg);
   transition: all var(--transition-base);
   min-height: 44px;
+  box-sizing: border-box;
 }
 
 .hero-actions .btn-default:hover {
   background: rgba(139, 110, 240, 0.1);
   border-color: var(--color-primary);
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(139, 110, 240, 0.15);
 }
 
 /* ============================================
