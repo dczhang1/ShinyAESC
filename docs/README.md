@@ -62,9 +62,12 @@ For deployment (e.g. Shiny Server, ShinyApps.io, RStudio Connect), deploy the pr
 | `R/utils_plots.R` | Plotting and visualization utilities. |
 | `www/css/` | Stylesheets (e.g. `landing.css`, `main.css`). |
 | `www/js/` | Client-side JavaScript (e.g. `main.js`). |
+| `www/assets/` | Static assets (e.g. `logo.png`). |
 | `data/sampleData.csv` | Sample dataset for demonstration. |
-| `shinyInstructions.html` | In-app help documentation. |
-| `archive/` | Deprecated single-file app versions (`appv2.r`, `app_v2.R`, `app_v3.R`) kept for reference. |
+| `docs/README.md` | This file - project documentation. |
+| `docs/plan.md` | Enhancement plan and feature roadmap. |
+| `docs/shinyInstructions.html` | In-app help documentation. |
+| `archive/` | Deprecated app versions and obsolete files. |
 
 ## Citation
 

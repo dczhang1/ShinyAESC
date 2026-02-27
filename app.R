@@ -1449,8 +1449,8 @@ server <- function(input, output, session) {
   # --- Help Content ---
 
   output$instructions <- renderUI({
-    if (file.exists("shinyInstructions.html")) {
-      raw_html <- paste(readLines("shinyInstructions.html", warn = FALSE), collapse = "\n")
+    if (file.exists("docs/shinyInstructions.html")) {
+      raw_html <- paste(readLines("docs/shinyInstructions.html", warn = FALSE), collapse = "\n")
       body_html <- sub("(?is).*<body[^>]*>", "", raw_html, perl = TRUE)
       body_html <- sub("(?is)</body>.*$", "", body_html, perl = TRUE)
       body_html <- gsub("(?is)<style[^>]*>.*?</style>", "", body_html, perl = TRUE)
