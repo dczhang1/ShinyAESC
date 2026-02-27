@@ -61,24 +61,8 @@ landing_page_ui <- function() {
           ),
         div(
           class = "hero-actions",
-          actionButton(
-            "try_sample",
-            label = tagList(
-              tags$i(`data-lucide` = "play", style = "width: 16px; height: 16px;"),
-              "Try with Sample Data"
-            ),
-            class = "btn-primary btn-lg"
-          ),
-          fileInput(
-            "landing_file",
-            label = NULL,
-            accept = c(".csv", ".xlsx", ".sav", ".sas7bdat"),
-            buttonLabel = tagList(
-              tags$i(`data-lucide` = "upload", style = "width: 16px; height: 16px;"),
-              "Upload Your Data"
-            ),
-            placeholder = NULL
-          )
+          actionButton("try_sample", "Try with Sample Data"),
+          fileInput("landing_file", NULL, accept = c(".csv", ".xlsx", ".sav", ".sas7bdat"), buttonLabel = "Upload Your Data", placeholder = NULL)
         )
       ),
 
@@ -439,36 +423,6 @@ analysis_ui <- function() {
           )
         ),
 
-        # Icon Array Section
-        div(
-          class = "sidebar-section sidebar-section--iconarray",
-          h4(
-            class = "sidebar-section-title",
-            tags$i(`data-lucide` = "users", style = "width: 14px; height: 14px;"),
-            "Icon Array"
-          ),
-          selectInput(
-            "iconarray_type",
-            "Icon type",
-            choices = c("Person" = "person", "Circle" = "circle", "Square" = "square"),
-            selected = "person"
-          ),
-          numericInput(
-            "iconarray_total",
-            "Total icons",
-            value = 100,
-            min = 10,
-            max = 500,
-            step = 10
-          ),
-          selectInput(
-            "iconarray_layout",
-            "Layout",
-            choices = c("Auto" = "auto", "10x10" = "10x10", "20x20" = "20x20", "25x25" = "25x25"),
-            selected = "auto"
-          )
-        ),
-
         # Export Section
         div(
           class = "sidebar-section sidebar-section--export",
@@ -732,6 +686,43 @@ analysis_ui <- function() {
                 )
               ),
               card_body(
+                # Icon Array Controls - Horizontal Layout
+                div(
+                  class = "d-flex gap-3 mb-3",
+                  style = "flex-wrap: wrap;",
+                  div(
+                    class = "flex-grow-1",
+                    style = "min-width: 150px;",
+                    selectInput(
+                      "iconarray_type",
+                      "Icon type",
+                      choices = c("Person" = "person", "Circle" = "circle", "Square" = "square"),
+                      selected = "person"
+                    )
+                  ),
+                  div(
+                    class = "flex-grow-1",
+                    style = "min-width: 120px;",
+                    numericInput(
+                      "iconarray_total",
+                      "Total icons",
+                      value = 100,
+                      min = 10,
+                      max = 500,
+                      step = 10
+                    )
+                  ),
+                  div(
+                    class = "flex-grow-1",
+                    style = "min-width: 120px;",
+                    selectInput(
+                      "iconarray_layout",
+                      "Layout",
+                      choices = c("Auto" = "auto", "10x10" = "10x10", "20x20" = "20x20", "25x25" = "25x25"),
+                      selected = "auto"
+                    )
+                  )
+                ),
                 tags$p(class = "mb-3", textOutput("iconarray_description")),
                 div(
                   class = "analysis-plot-wrap",

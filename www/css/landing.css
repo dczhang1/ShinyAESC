@@ -86,40 +86,104 @@
   align-items: center;
 }
 
+/* Unified button styling - Primary Action */
 .hero-actions .btn-primary {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  padding: var(--space-4) var(--space-6);
-  font-size: var(--text-base);
+  padding: var(--space-3) var(--space-5);
+  font-size: var(--text-sm);
   font-weight: 600;
+  border-radius: var(--radius-lg);
+  letter-spacing: 0.01em;
+  transition: all var(--transition-base);
 }
 
+.hero-actions .btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(139, 110, 240, 0.3);
+}
+
+/* File input upload button styling */
+.hero-actions .shiny-input-container input[type="file"] {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.hero-actions .shiny-input-container {
+  position: relative;
+  display: inline-flex;
+}
+
+.hero-actions .shiny-input-container .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  border-radius: var(--radius-lg);
+  letter-spacing: 0.01em;
+  transition: all var(--transition-base);
+  background: var(--color-primary);
+  color: white;
+  border: none;
+}
+
+.hero-actions .shiny-input-container:hover .btn {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(139, 110, 240, 0.3);
+}
+
+/* Unified button styling - Upload Component */
 .hero-actions .shiny-input-container {
   margin: 0;
 }
 
 .hero-actions .input-group {
-  border: 2px dashed var(--color-border);
-  background: transparent;
-  padding: var(--space-3) var(--space-4);
+  border: 1px solid rgba(186, 178, 238, 0.6);
+  background: rgba(248, 245, 255, 0.5);
+  padding: var(--space-3) var(--space-5);
   border-radius: var(--radius-lg);
   transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
 }
 
 .hero-actions .input-group:hover {
-  border-color: var(--color-primary);
-  background: var(--color-primary-light);
+  border-color: rgba(139, 110, 240, 0.8);
+  background: rgba(248, 245, 255, 0.7);
+  box-shadow: 0 2px 8px rgba(139, 110, 240, 0.1);
 }
 
 .hero-actions .btn-default {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: var(--space-2);
   background: transparent;
-  border: none;
-  color: var(--color-gray-700);
-  font-weight: 500;
+  border: 2px solid rgba(139, 110, 240, 0.4);
+  color: var(--color-primary);
+  font-weight: 600;
+  font-size: var(--text-sm);
+  padding: var(--space-3) var(--space-5);
+  margin: 0;
+  cursor: pointer;
+  letter-spacing: 0.01em;
+  border-radius: var(--radius-lg);
+  transition: all var(--transition-base);
+  min-height: 44px;
+}
+
+.hero-actions .btn-default:hover {
+  background: rgba(139, 110, 240, 0.1);
+  border-color: var(--color-primary);
+  transform: translateY(-1px);
 }
 
 /* ============================================
