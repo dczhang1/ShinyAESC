@@ -307,7 +307,9 @@ body::before {
 
 .bslib-sidebar-layout > .main {
   border-radius: 0 var(--radius-xl) var(--radius-xl) 0;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .bslib-grid-container [class^="bslib-grid"] {
@@ -646,7 +648,10 @@ body::before {
 
 .card-body-scroll {
   max-height: 70vh;
+  overflow-x: auto;
   overflow-y: auto;
+  min-height: 0;
+  -webkit-overflow-scrolling: touch;
 }
 
 /* Prevent card content from shrinking to unreadable sizes */

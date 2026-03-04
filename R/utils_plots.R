@@ -245,9 +245,10 @@ plot_icon_array <- function(cles_prob, total_icons = 100, icon_type = "person", 
   
   # Create plot based on icon type
   if (icon_type == "person") {
-    # Use geom_point with person-like shape
-    p <- ggplot(icon_data, aes(x = col, y = row, color = status)) +
-      geom_point(size = 3, shape = 16) +
+    # Use Unicode person silhouette (U+1F464) so "person" is an actual person icon
+    person_char <- "\U0001F464"
+    p <- ggplot(icon_data, aes(x = col, y = row, color = status, label = person_char)) +
+      geom_text(size = 3.5) +
       scale_color_manual(
         values = c("Success" = plot_colors$primary, "Failure" = plot_colors$secondary),
         name = "Status"
