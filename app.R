@@ -66,17 +66,11 @@ landing_page_ui <- function() {
         )
       ),
 
-      # Hero Visual - Simplified Icon Array Component
+      # Hero Visual - Icon array only (no text/labels)
       div(
         class = "hero-visual",
         div(
           class = "icon-array-card",
-          # Header - simplified context
-          div(
-            class = "icon-array-header",
-            p(class = "icon-array-subtitle", "Employee Selection Example")
-          ),
-          # Icon array visualization
           div(
             class = "icon-array-container",
             # 69 high performer icons
@@ -93,26 +87,6 @@ landing_page_ui <- function() {
                 tags$i(`data-lucide` = "user")
               )
             }))
-          ),
-          # Legend
-          div(
-            class = "icon-array-legend",
-            div(
-              class = "legend-item",
-              div(class = "legend-dot success-dot"),
-              span("High performer")
-            ),
-            div(
-              class = "legend-item",
-              div(class = "legend-dot neutral-dot"),
-              span("Low performer")
-            )
-          ),
-          # Footer metric
-          div(
-            class = "icon-array-footer",
-            span(class = "footer-label", "Test correlation:"),
-            span(class = "footer-value", "r = 0.548")
           )
         )
       )
@@ -161,7 +135,7 @@ landing_page_ui <- function() {
     div(
       class = "use-cases-section",
       h2(class = "section-title", "Real-World Use Cases"),
-      p(class = "section-subtitle", "See how researchers and practitioners use ESCAPE to make data-driven decisions"),
+      p(class = "section-subtitle", "See how ESCAPE can be used to make data-driven decisions in the real world"),
       div(
         class = "use-cases-carousel",
         # Carousel navigation
@@ -178,37 +152,37 @@ landing_page_ui <- function() {
             "user-check",
             "Selection Tool Validity",
             "HR departments assess whether pre-employment tests predict job performance. Instead of reporting r = 0.35, ESCAPE shows that 67% of high-scoring applicants outperform low-scoring applicants—helping hiring managers make informed decisions.",
-            "https://images.unsplash.com/photo-1521737604893-d14cc237f11d?w=600&h=400&fit=crop"
+            "images/usecase1.png"
           ),
           use_case_card(
             "heart-pulse",
             "Health Intervention Effectiveness",
             "Clinical trials evaluate treatment outcomes. A correlation of r = 0.42 becomes: \"Patients receiving the new treatment have a 71% chance of better outcomes compared to standard care.\" This makes results accessible to patients and policymakers.",
-            "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=600&h=400&fit=crop"
+            "images/usecase2.png"
           ),
           use_case_card(
             "graduation-cap",
             "Educational Assessment",
             "Schools analyze whether entrance exams predict academic success. Rather than abstract correlations, educators can say: \"Students scoring above the 75th percentile are 2.3 times more likely to graduate on time.\"",
-            "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=600&h=400&fit=crop"
+            "images/usecase3.png"
           ),
           use_case_card(
             "scale",
             "Psychological Scale Validation",
             "Researchers validate new measurement instruments. Instead of technical metrics, they can demonstrate: \"The new anxiety scale correctly identifies 78% of individuals who need clinical intervention.\"",
-            "https://images.unsplash.com/photo-1576091160550-217358c7e618?w=600&h=400&fit=crop"
+            "images/usecase4.png"
           ),
           use_case_card(
             "target",
             "Program Evaluation",
             "Nonprofits and government agencies evaluate program impact. A correlation of r = 0.28 translates to: \"Participants are 64% more likely to achieve positive outcomes than non-participants.\"",
-            "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=600&h=400&fit=crop"
+            "images/usecase5.png"
           ),
           use_case_card(
             "trending-up",
             "Predictive Analytics",
             "Business analysts forecast customer behavior. Rather than r = 0.45, stakeholders understand: \"Customers with high engagement scores are 73% more likely to make repeat purchases.\"",
-            "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop"
+            "images/usecase6.png"
           )
         ),
         # Carousel navigation
@@ -263,7 +237,8 @@ landing_page_ui <- function() {
           tags$i(`data-lucide` = "lightbulb", class = "insight-icon"),
           div(
             tags$strong("Key Insight"),
-            p("Students scoring in the top 25% on ACT have a 69% chance of achieving above-average GPA, compared to 42% for those in the bottom 75%.")
+            p("Students scoring in the top 25% on ACT have a 69% chance of achieving above-average GPA, compared to 42% for those in the bottom 75%."),
+            plotOutput("landing_expectancy_plot", width = "100%", height = "300px")
           )
         )
       ),
@@ -910,6 +885,29 @@ server <- function(input, output, session) {
     "yes"
   })
   outputOptions(output, "data_ready", suspendWhenHidden = FALSE)
+
+  # Sample data for landing page "See it in action" expectancy preview
+  landing_preview_data <- reactive({
+    if (app_state$view != "landing") return(NULL)
+    path <- get_sample_data_path()
+    if (is.null(path)) return(NULL)
+    raw <- tryCatch(read.csv(path, header = TRUE), error = function(e) NULL)
+    if (is.null(raw) || ncol(raw) < 2) return(NULL)
+    pred_name <- names(raw)[1]
+    crit_name <- names(raw)[2]
+    df <- raw %>%
+      dplyr::select(Predictor = 1, Criterion = 2) %>%
+      na.omit()
+    list(df = df, predictor_name = pred_name, criterion_name = crit_name)
+  })
+
+  # Expectancy chart in landing Key Insight (sample data, fixed bins=5, cutoff=3.5)
+  output$landing_expectancy_plot <- renderPlot({
+    preview <- landing_preview_data()
+    if (is.null(preview) || nrow(preview$df) < 2) return(invisible(NULL))
+    exp_df <- calc_expectancy(preview$df, bins = 5, cutoff_y = 3.5)
+    plot_expectancy(exp_df, preview$predictor_name, 3.5)
+  })
 
   # Data info display
   output$data_info <- renderUI({
