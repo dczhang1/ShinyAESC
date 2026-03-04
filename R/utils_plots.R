@@ -76,6 +76,57 @@ plot_expectancy <- function(df, predictor_name, cutoff_y) {
     )
 }
 
+#' Create expectancy bar chart for landing page (striking, card-style aesthetic)
+#' @param df Expectancy data frame from calc_expectancy()
+#' @param predictor_name Name of predictor variable
+#' @param cutoff_y Criterion cutoff value
+#' @return ggplot object
+plot_expectancy_landing <- function(df, predictor_name, cutoff_y) {
+  primary_light <- paste0(plot_colors$primary, "99")
+  df$pct_label <- scales::percent(df$proportion, accuracy = 1)
+  df$tier <- ifelse(df$proportion >= 0.5, "above", "below")
+  ggplot(df, aes(x = xlabels, y = proportion, fill = tier)) +
+    geom_hline(
+      yintercept = 0.5,
+      color = plot_colors$grid,
+      linewidth = 0.35,
+      linetype = "dashed"
+    ) +
+    geom_col(width = 0.72, color = NA) +
+    geom_text(
+      aes(y = proportion / 2, label = pct_label),
+      color = "white",
+      fontface = "bold",
+      size = 3.2,
+      vjust = 0.5
+    ) +
+    scale_fill_manual(
+      values = c("above" = plot_colors$primary, "below" = primary_light),
+      guide = "none"
+    ) +
+    scale_y_continuous(
+      limits = c(0, 1),
+      labels = scales::percent_format(),
+      expand = expansion(mult = c(0, 0.06))
+    ) +
+    labs(x = predictor_name, y = NULL) +
+    theme_minimal_linear() +
+    theme(
+      axis.title.y = element_blank(),
+      axis.text.x = element_text(angle = 38, hjust = 1, size = 10, color = plot_colors$text_muted),
+      axis.text.y = element_text(size = 9, color = plot_colors$text_muted),
+      axis.line = element_line(color = paste0(plot_colors$grid, "CC"), linewidth = 0.5),
+      panel.grid.major.y = element_line(color = paste0(plot_colors$grid, "99"), linewidth = 0.25),
+      panel.grid.major.x = element_blank(),
+      panel.grid.minor = element_blank(),
+      plot.title = element_blank(),
+      plot.subtitle = element_blank(),
+      plot.margin = margin(10, 12, 10, 12),
+      panel.background = element_rect(fill = "transparent", color = NA),
+      plot.background = element_rect(fill = "transparent", color = NA)
+    )
+}
+
 #' Create histogram
 #' @param data Numeric vector
 #' @param title Plot title

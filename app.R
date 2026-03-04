@@ -209,7 +209,7 @@ landing_page_ui <- function() {
     div(
       class = "sample-section",
       h2(class = "section-title", "See it in action"),
-      p(class = "section-subtitle", "Our sample dataset shows the relationship between ACT scores and college GPA"),
+      p(class = "section-subtitle", "Our sample dataset shows the relationship between SAT scores and college GPA"),
       div(
         class = "sample-preview",
         div(
@@ -218,17 +218,17 @@ landing_page_ui <- function() {
             class = "sample-table",
             tags$thead(
               tags$tr(
-                tags$th("ACT Score"),
+                tags$th("SAT Score"),
                 tags$th("College GPA")
               )
             ),
             tags$tbody(
-              tags$tr(tags$td("28"), tags$td("3.42")),
-              tags$tr(tags$td("24"), tags$td("3.15")),
-              tags$tr(tags$td("31"), tags$td("3.78")),
-              tags$tr(tags$td("22"), tags$td("2.89")),
-              tags$tr(tags$td("26"), tags$td("3.31")),
-              tags$tr(class = "sample-more", tags$td(colspan = "2", "...and 177 more rows"))
+              tags$tr(tags$td("127"), tags$td("3.18")),
+              tags$tr(tags$td("122"), tags$td("3.33")),
+              tags$tr(tags$td("116"), tags$td("3.25")),
+              tags$tr(tags$td("95"), tags$td("2.42")),
+              tags$tr(tags$td("107"), tags$td("2.63")),
+              tags$tr(class = "sample-more", tags$td(colspan = "2", "...and 995 more rows"))
             )
           )
         ),
@@ -237,8 +237,8 @@ landing_page_ui <- function() {
           tags$i(`data-lucide` = "lightbulb", class = "insight-icon"),
           div(
             tags$strong("Key Insight"),
-            p("Students scoring in the top 25% on ACT have a 69% chance of achieving above-average GPA, compared to 42% for those in the bottom 75%."),
-            plotOutput("landing_expectancy_plot", width = "100%", height = "300px")
+            p("Students scoring in the top 25% on SAT have a 22% chance of achieving above-average GPA (3.5+), compared to 4% for those in the bottom 75%."),
+            div(class = "sample-insight-chart", plotOutput("landing_expectancy_plot", width = "100%", height = "300px"))
           )
         )
       ),
@@ -507,6 +507,7 @@ analysis_ui <- function() {
             card(
               card_header("Descriptive Statistics & Correlation"),
               card_body(
+                class = "card-body-scroll",
                 tableOutput("descriptable"),
                 div(
                 class = "correlation-line mt-3 pt-3",
@@ -586,7 +587,7 @@ analysis_ui <- function() {
             ),
             card(
               card_header("Expectancy Table"),
-              card_body(tableOutput("expectancyTable"))
+              card_body(class = "card-body-scroll", tableOutput("expectancyTable"))
             )
           )
         ),
@@ -624,6 +625,7 @@ analysis_ui <- function() {
                 )
               ),
               card_body(
+                class = "card-body-scroll",
                 tags$p(class = "mb-3", textOutput("cles.verbal")),
                 div(
                   class = "analysis-plot-wrap",
@@ -661,6 +663,7 @@ analysis_ui <- function() {
                 )
               ),
               card_body(
+                class = "card-body-scroll",
                 # Icon Array Controls - Horizontal Layout
                 div(
                   class = "d-flex gap-3 mb-3",
@@ -906,7 +909,7 @@ server <- function(input, output, session) {
     preview <- landing_preview_data()
     if (is.null(preview) || nrow(preview$df) < 2) return(invisible(NULL))
     exp_df <- calc_expectancy(preview$df, bins = 5, cutoff_y = 3.5)
-    plot_expectancy(exp_df, preview$predictor_name, 3.5)
+    plot_expectancy_landing(exp_df, preview$predictor_name, 3.5)
   })
 
   # Data info display

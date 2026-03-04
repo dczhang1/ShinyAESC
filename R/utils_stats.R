@@ -135,8 +135,10 @@ calc_expectancy <- function(df, bins, cutoff_y) {
       n = dplyr::n(),
       .groups = "drop"
     ) |>
+    dplyr::arrange(ntile_X) |>
     dplyr::mutate(
-      xlabels = paste(round(lowerBound, 1), "to", round(upperBound, 1))
+      xlabels = paste(round(lowerBound, 1), "to", round(upperBound, 1)),
+      xlabels = factor(xlabels, levels = unique(xlabels))
     )
 }
 

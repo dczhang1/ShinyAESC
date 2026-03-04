@@ -644,6 +644,11 @@ body::before {
   min-width: 0; /* allow flex/grid children to shrink without overflow */
 }
 
+.card-body-scroll {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
 /* Prevent card content from shrinking to unreadable sizes */
 .insight-card-body,
 .stat-card-body {
