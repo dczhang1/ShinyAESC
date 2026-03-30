@@ -109,7 +109,11 @@ plot_expectancy_landing <- function(df, predictor_name, cutoff_y) {
       labels = scales::percent_format(),
       expand = expansion(mult = c(0, 0.06))
     ) +
-    labs(x = predictor_name, y = NULL) +
+    labs(
+      x = predictor_name,
+      y = NULL,
+      subtitle = paste0("Proportion scoring above ", cutoff_y, " by predictor quintile")
+    ) +
     theme_minimal_linear() +
     theme(
       axis.title.y = element_blank(),

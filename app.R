@@ -43,204 +43,170 @@ landing_page_ui <- function() {
   div(
     class = "landing-page",
 
-    # Hero Section
+    # ---- Hero Section ----
     div(
       class = "hero-section",
+      div(
+        class = "hero-content",
+        p(class = "hero-tagline", "Effect Size Calculator for Practical Effects"),
         div(
-          class = "hero-content",
-          div(
-            class = "app-name-badge",
-            tags$strong("ESCAPE"),
-            " — Effect Size Calculator for Practical Effects"
-          ),
-          h1(class = "hero-title", "Translate Statistics into Everyday Impact"),
-          p(
-            class = "hero-subtitle",
-            "Traditional effect sizes like correlations are hard to understand. ESCAPE transforms abstract coefficients ",
-            "into intuitive probabilities, success rates, and plain-language metrics that anyone can use to make informed decisions."
-          ),
+          class = "app-name-badge",
+          tags$strong("ESCAPE")
+        ),
+        h1(class = "hero-title", "Stop reporting correlations. Start communicating results."),
+        p(
+          class = "hero-subtitle",
+          "Effect sizes satisfy reviewers. They rarely move anyone else. ",
+          "ESCAPE converts r, d, and g into probabilities, success rates, and visual summaries ",
+          "that hiring managers, clinicians, and policy teams can actually understand \u2014 and act on."
+        ),
         div(
           class = "hero-actions",
-          actionButton("try_sample", "Try with Sample Data"),
-          actionButton("open_guided_upload", "Upload Your Data")
+          actionButton("try_sample", "Try with Sample Data", class = "btn-primary"),
+          actionButton("open_guided_upload", "Upload Your Data", class = "btn-outline-primary")
+        ),
+        p(class = "hero-trust-signal",
+          "No account needed \u00B7 Your data never leaves your browser \u00B7 Works with CSV, Excel, SPSS, SAS"
         )
       ),
 
-      # Hero Visual - Icon array only (no text/labels)
+      # Hero Visual - Before / After transformation card
       div(
         class = "hero-visual",
         div(
-          class = "icon-array-card",
-          div(
-            class = "icon-array-container",
-            # 69 high performer icons
-            tagList(lapply(1:69, function(i) {
-              div(
-                class = paste0("array-icon success-icon delay-", ((i - 1) %% 10) + 1),
-                tags$i(`data-lucide` = "user-check")
+          class = "transformation-card",
+          div(class = "transformation-panel transformation-before",
+            span(class = "transformation-label", "BEFORE"),
+            div(class = "apa-excerpt",
+              p(class = "apa-text",
+                "A Pearson correlation analysis revealed a statistically significant relationship between treatment assignment and patient outcome, ",
+                em("r"),
+                "(98) = .42, ",
+                em("p"),
+                " < .001. The effect size, using Cohen\u2019s ",
+                em("d"),
+                ", was 0.90."
+              ),
+              p(class = "apa-text apa-text--faded",
+                "These results suggest..."
               )
-            })),
-            # 31 low performer icons
-            tagList(lapply(1:31, function(i) {
-              div(
-                class = paste0("array-icon neutral-icon delay-", ((i - 1) %% 10) + 1),
-                tags$i(`data-lucide` = "user")
-              )
-            }))
+            )
+          ),
+          div(class = "transformation-arrow",
+            tags$i(`data-lucide` = "chevron-right")
+          ),
+          div(class = "transformation-panel transformation-after",
+            span(class = "transformation-label", "AFTER"),
+            div(class = "transformation-stat", "71 out of 100"),
+            div(class = "transformation-icon-array",
+              tagList(lapply(1:71, function(i) {
+                div(class = paste0("mini-icon mini-success"), tags$i(`data-lucide` = "user-check"))
+              })),
+              tagList(lapply(1:29, function(i) {
+                div(class = paste0("mini-icon mini-neutral"), tags$i(`data-lucide` = "user"))
+              }))
+            ),
+            span(class = "transformation-caption", "respond better")
           )
         )
       )
     ),
 
-    # Features Section
+    # ---- The Problem Section ----
     div(
-      class = "features-section",
-      h2(class = "section-title", "Everything you need for effect size analysis"),
+      class = "problem-section",
+      h2(class = "section-title", "The problem with reporting statistics"),
       div(
-        class = "features-grid",
-        feature_card(
-          "bar-chart-3",
-          "Expectancy Charts",
-          "Show \"out of 100 people\" style probabilities instead of abstract coefficients, using intuitive bar charts."
+        class = "problem-callout",
+        div(class = "problem-row",
+          code("r = 0.35, p < .001"),
+          span(class = "problem-arrow", "\u2192"),
+          span("means nothing to a hiring manager")
         ),
-        feature_card(
-          "layers",
-          "Multiple Effect Sizes",
-          "Calculate Cohen's d, Hedges' g, CLES, and BESD, then present them as interpretable, side-by-side stories."
+        div(class = "problem-row",
+          code("Cohen's d = 0.74"),
+          span(class = "problem-arrow", "\u2192"),
+          span("means nothing to a hospital board")
         ),
-        feature_card(
-          "trending-up",
-          "Bridge Traditional Statistics",
-          "Keep familiar descriptives and correlations, but pair them with consumer-friendly translations."
+        div(class = "problem-row",
+          code("R\u00B2 = 0.12"),
+          span(class = "problem-arrow", "\u2192"),
+          span("means nothing to a school parent")
         ),
-        feature_card(
-          "download",
-          "Export Reports",
-          "Generate professional HTML reports with effect sizes explained in clear, shareable language."
-        ),
-        feature_card(
-          "file-spreadsheet",
-          "Multiple Formats",
-          "Import data from CSV, Excel (.xlsx), SPSS (.sav), and SAS (.sas7bdat) files."
-        ),
-        feature_card(
-          "shield-check",
-          "Privacy First",
-          "All analysis happens in your browser. Your data never leaves your computer."
+        p(class = "problem-summary",
+          "ESCAPE translates these numbers into language that drives decisions."
         )
       )
     ),
 
-    # Use Cases Section
+    # ---- How It Works Section ----
     div(
-      class = "use-cases-section",
-      h2(class = "section-title", "Real-World Use Cases"),
-      p(class = "section-subtitle", "See how ESCAPE can be used to make data-driven decisions in the real world"),
+      class = "how-it-works-section",
+      h2(class = "section-title", "How it works"),
       div(
-        class = "use-cases-carousel",
-        # Carousel navigation
-        tags$button(
-          type = "button",
-          class = "carousel-nav carousel-prev",
-          `aria-label` = "Previous",
-          tags$i(`data-lucide` = "chevron-left")
+        class = "steps-grid",
+        div(class = "step-card",
+          span(class = "step-number", "1"),
+          h3(class = "step-title", "Upload"),
+          p(class = "step-description", "Drop in your CSV, Excel, SPSS, or SAS file.")
         ),
-        # Carousel slides container
-        div(
-          class = "carousel-slides",
-          use_case_card(
-            "user-check",
-            "Selection Tool Validity",
-            "HR departments assess whether pre-employment tests predict job performance. Instead of reporting r = 0.35, ESCAPE shows that 67% of high-scoring applicants outperform low-scoring applicants—helping hiring managers make informed decisions.",
-            "assets/selection.jpg"
-          ),
-          use_case_card(
-            "heart-pulse",
-            "Health Intervention Effectiveness",
-            "Clinical trials evaluate treatment outcomes. A correlation of r = 0.42 becomes: \"Patients receiving the new treatment have a 71% chance of better outcomes compared to standard care.\" This makes results accessible to patients and policymakers.",
-            "assets/health.jpg"
-          ),
-          use_case_card(
-            "graduation-cap",
-            "Educational Assessment",
-            "Schools analyze whether entrance exams predict academic success. Rather than abstract correlations, educators can say: \"Students scoring above the 75th percentile are 2.3 times more likely to graduate on time.\"",
-            "assets/education.jpg"
-          ),
-          use_case_card(
-            "scale",
-            "Psychological Scale Validation",
-            "Researchers validate new measurement instruments. Instead of technical metrics, they can demonstrate: \"The new anxiety scale correctly identifies 78% of individuals who need clinical intervention.\"",
-            "assets/validation.jpg"
-          ),
-          use_case_card(
-            "target",
-            "Program Evaluation",
-            "Nonprofits and government agencies evaluate program impact. A correlation of r = 0.28 translates to: \"Participants are 64% more likely to achieve positive outcomes than non-participants.\"",
-            "assets/program.jpg"
-          ),
-          use_case_card(
-            "trending-up",
-            "Predictive Analytics",
-            "Business analysts forecast customer behavior. Rather than r = 0.45, stakeholders understand: \"Customers with high engagement scores are 73% more likely to make repeat purchases.\"",
-            "assets/predictive.jpg"
-          )
+        div(class = "step-connector", tags$i(`data-lucide` = "chevron-right")),
+        div(class = "step-card",
+          span(class = "step-number", "2"),
+          h3(class = "step-title", "Analyze"),
+          p(class = "step-description", "Select variables and effect size metrics.")
         ),
-        # Carousel navigation
-        tags$button(
-          type = "button",
-          class = "carousel-nav carousel-next",
-          `aria-label` = "Next",
-          tags$i(`data-lucide` = "chevron-right")
-        ),
-        # Carousel indicators
-        div(
-          class = "carousel-indicators",
-          tags$button(class = "carousel-indicator active", `data-slide` = "0", `aria-label` = "Slide 1"),
-          tags$button(class = "carousel-indicator", `data-slide` = "1", `aria-label` = "Slide 2"),
-          tags$button(class = "carousel-indicator", `data-slide` = "2", `aria-label` = "Slide 3"),
-          tags$button(class = "carousel-indicator", `data-slide` = "3", `aria-label` = "Slide 4"),
-          tags$button(class = "carousel-indicator", `data-slide` = "4", `aria-label` = "Slide 5"),
-          tags$button(class = "carousel-indicator", `data-slide` = "5", `aria-label` = "Slide 6")
+        div(class = "step-connector", tags$i(`data-lucide` = "chevron-right")),
+        div(class = "step-card step-card--highlight",
+          span(class = "step-number", "3"),
+          h3(class = "step-title", "Communicate"),
+          p(class = "step-description", "Get plain-language reports with icon arrays and charts.")
         )
       )
     ),
 
-    # Sample Data Preview
+    # ---- Sample Data Preview (moved up) ----
     div(
       class = "sample-section",
       h2(class = "section-title", "See it in action"),
       p(class = "section-subtitle", "Our sample dataset shows the relationship between SAT scores and college GPA"),
       div(
         class = "sample-preview",
-        div(
-          class = "sample-table-container",
-          tags$table(
-            class = "sample-table",
-            tags$thead(
-              tags$tr(
-                tags$th("SAT Score"),
-                tags$th("College GPA")
-              )
+          div(
+            class = "sample-table-container",
+            tags$caption(class = "sample-caption",
+              "Sample dataset: SAT scores (scaled, n = 1,000) vs. College GPA"
             ),
-            tags$tbody(
-              tags$tr(tags$td("127"), tags$td("3.18")),
-              tags$tr(tags$td("122"), tags$td("3.33")),
-              tags$tr(tags$td("116"), tags$td("3.25")),
-              tags$tr(tags$td("95"), tags$td("2.42")),
-              tags$tr(tags$td("107"), tags$td("2.63")),
-              tags$tr(class = "sample-more", tags$td(colspan = "2", "...and 995 more rows"))
+            tags$table(
+              class = "sample-table",
+              tags$thead(
+                tags$tr(
+                  tags$th("SAT Score"),
+                  tags$th("College GPA")
+                )
+              ),
+              tags$tbody(
+                tags$tr(tags$td("127"), tags$td("3.18")),
+                tags$tr(tags$td("122"), tags$td("3.33")),
+                tags$tr(tags$td("116"), tags$td("3.25")),
+                tags$tr(tags$td("95"), tags$td("2.42")),
+                tags$tr(tags$td("107"), tags$td("2.63")),
+                tags$tr(class = "sample-more", tags$td(colspan = "2", "...and 995 more rows"))
+              )
+            )
+          ),
+          div(
+            class = "sample-insight",
+            tags$i(`data-lucide` = "lightbulb", class = "insight-icon"),
+            div(
+              tags$strong("Key Insight"),
+              p("Students in the top 20% of SAT scores are ",
+                tags$strong("6.9\u00D7 more likely"),
+                " to achieve a 3.0+ GPA \u2014 that\u2019s the kind of statement that gets a committee\u2019s attention."
+              ),
+              div(class = "sample-insight-chart", plotOutput("landing_expectancy_plot", width = "100%", height = "300px"))
             )
           )
-        ),
-        div(
-          class = "sample-insight",
-          tags$i(`data-lucide` = "lightbulb", class = "insight-icon"),
-          div(
-            tags$strong("Key Insight"),
-            p("Students scoring in the top 25% on SAT have a 22% chance of achieving above-average GPA (3.5+), compared to 4% for those in the bottom 75%."),
-            div(class = "sample-insight-chart", plotOutput("landing_expectancy_plot", width = "100%", height = "300px"))
-          )
-        )
       ),
       actionButton(
         "try_sample_bottom",
@@ -252,39 +218,158 @@ landing_page_ui <- function() {
       )
     ),
 
-    # Footer
+    # ---- Use Cases Section (auto-advancing carousel) ----
+    div(
+      class = "use-cases-section",
+      h2(class = "section-title", "From the lab to the boardroom"),
+      p(class = "section-subtitle", "See how ESCAPE helps researchers in HR, healthcare, and education make their findings unignorable"),
+      div(
+        class = "use-cases-carousel",
+        tags$button(
+          type = "button", class = "carousel-nav carousel-prev",
+          `aria-label` = "Previous",
+          tags$i(`data-lucide` = "chevron-left")
+        ),
+        div(
+          class = "carousel-viewport",
+          div(
+            class = "carousel-track",
+            use_case_card("user-check", "Selection Tool Validity",
+              "67% of high-scoring applicants outperform",
+              "HR departments assess whether pre-employment tests predict job performance. Instead of reporting r = 0.35, ESCAPE shows that 67% of high-scoring applicants outperform low-scoring applicants\u2014helping hiring managers make informed decisions.",
+              "assets/selection.jpg"
+            ),
+            use_case_card("heart-pulse", "Health Intervention Effectiveness",
+              "71% chance of better outcomes",
+              "Clinical trials evaluate treatment outcomes. A correlation of r = 0.42 becomes: \"Patients receiving the new treatment have a 71% chance of better outcomes compared to standard care.\" This makes results accessible to patients and policymakers.",
+              "assets/health.jpg"
+            ),
+            use_case_card("graduation-cap", "Educational Assessment",
+              "2.3\u00D7 more likely to graduate on time",
+              "Schools analyze whether entrance exams predict academic success. Rather than abstract correlations, educators can say: \"Students scoring above the 75th percentile are 2.3 times more likely to graduate on time.\"",
+              "assets/education.jpg"
+            ),
+            use_case_card("scale", "Psychological Scale Validation",
+              "78% of individuals correctly identified",
+              "Researchers validate new measurement instruments. Instead of technical metrics, they can demonstrate: \"The new anxiety scale correctly identifies 78% of individuals who need clinical intervention.\"",
+              "assets/validation.jpg"
+            ),
+            use_case_card("target", "Program Evaluation",
+              "64% more likely to achieve positive outcomes",
+              "Nonprofits and government agencies evaluate program impact. A correlation of r = 0.28 translates to: \"Participants are 64% more likely to achieve positive outcomes than non-participants.\"",
+              "assets/program.jpg"
+            ),
+            use_case_card("trending-up", "Predictive Analytics",
+              "73% more likely to make repeat purchases",
+              "Business analysts forecast customer behavior. Rather than r = 0.45, stakeholders understand: \"Customers with high engagement scores are 73% more likely to make repeat purchases.\"",
+              "assets/predictive.jpg"
+            )
+          )
+        ),
+        tags$button(
+          type = "button", class = "carousel-nav carousel-next",
+          `aria-label` = "Next",
+          tags$i(`data-lucide` = "chevron-right")
+        ),
+        div(
+          class = "carousel-indicators",
+          tags$button(class = "carousel-dot active", `data-slide` = "0", `aria-label` = "Slide 1"),
+          tags$button(class = "carousel-dot", `data-slide` = "1", `aria-label` = "Slide 2"),
+          tags$button(class = "carousel-dot", `data-slide` = "2", `aria-label` = "Slide 3"),
+          tags$button(class = "carousel-dot", `data-slide` = "3", `aria-label` = "Slide 4"),
+          tags$button(class = "carousel-dot", `data-slide` = "4", `aria-label` = "Slide 5"),
+          tags$button(class = "carousel-dot", `data-slide` = "5", `aria-label` = "Slide 6")
+        )
+      )
+    ),
+
+    # ---- Features Section ----
+    div(
+      class = "features-section",
+      h2(class = "section-title", "From raw numbers to boardroom-ready insight"),
+      div(
+        class = "features-grid",
+        feature_card_micro(
+          "shield-check",
+          "Privacy First",
+          "All analysis happens in your browser. Your data never leaves your computer.",
+          "Runs entirely in your browser \u2014 no server, no uploads",
+          "feature-icon--green"
+        ),
+        feature_card_micro(
+          "bar-chart-3",
+          "Expectancy Charts",
+          "Show \"out of 100 people\" style probabilities instead of abstract coefficients.",
+          "r = 0.35 \u2192 \"67 out of 100 top scorers succeed\"",
+          "feature-icon--blue"
+        ),
+        feature_card_micro(
+          "layers",
+          "Multiple Effect Sizes",
+          "Calculate Cohen's d, Hedges' g, CLES, and BESD, all in one view.",
+          "Cohen's d, Hedges' g, CLES, BESD \u2014 all in one view",
+          "feature-icon--purple"
+        ),
+        feature_card_micro(
+          "trending-up",
+          "Bridge Traditional Statistics",
+          "Keep familiar descriptives and correlations, paired with consumer-friendly translations.",
+          "Pair every r value with a plain-language equivalent",
+          "feature-icon--teal"
+        ),
+        feature_card_micro(
+          "download",
+          "Export Reports",
+          "Generate professional HTML reports with effect sizes explained in clear, shareable language.",
+          "One-click HTML report, ready to email to stakeholders",
+          "feature-icon--emerald"
+        ),
+        feature_card_micro(
+          "file-spreadsheet",
+          "Multiple Formats",
+          "Import data from CSV, Excel (.xlsx), SPSS (.sav), and SAS (.sas7bdat) files.",
+          "CSV, Excel, SPSS, SAS \u2014 drag and drop any format",
+          "feature-icon--orange"
+        )
+      )
+    ),
+
+    # ---- Footer ----
     div(
       class = "landing-footer",
-      p(
-        tags$strong("ESCAPE"), " — Effect Size Calculator for Practical Effects",
-        tags$br(),
-        "Built with ",
-        tags$i(`data-lucide` = "heart", style = "width: 14px; height: 14px; color: #F87171;"),
-        " using R Shiny"
+      div(class = "footer-content",
+        p(class = "footer-brand",
+          tags$strong("ESCAPE"), " \u2014 Effect Size Calculator for Practical Effects"
+        ),
+        p(class = "footer-built",
+          "Built with ",
+          tags$i(`data-lucide` = "heart", style = "width: 14px; height: 14px; color: #F87171;"),
+          " using R Shiny"
+        )
       )
     )
   )
 }
 
-# Feature Card Helper
-feature_card <- function(icon, title, description) {
+# Feature Card Helper (with micro-example)
+feature_card_micro <- function(icon, title, description, micro, color_class = "feature-icon--purple") {
   div(
     class = "feature-card",
     div(
-      class = "feature-icon",
+      class = paste("feature-icon", color_class),
       tags$i(`data-lucide` = icon)
     ),
     h3(class = "feature-title", title),
-    p(class = "feature-description", description)
+    p(class = "feature-description", description),
+    code(class = "feature-micro", micro)
   )
 }
 
-# Use Case Card Helper
-use_case_card <- function(icon, title, description, image) {
+# Use Case Card Helper (carousel slide with stock image)
+use_case_card <- function(icon, title, stat, description, image) {
   div(
     class = "use-case-card",
-    div(
-      class = "use-case-image",
+    div(class = "use-case-image",
       tags$img(src = image, alt = title, class = "use-case-img")
     ),
     div(
@@ -293,6 +378,7 @@ use_case_card <- function(icon, title, description, image) {
         class = "use-case-icon-badge",
         tags$i(`data-lucide` = icon)
       ),
+      span(class = "use-case-stat", stat),
       h3(class = "use-case-title", title),
       p(class = "use-case-description", description)
     )
@@ -1303,20 +1389,18 @@ server <- function(input, output, session) {
     if (is.null(path)) return(NULL)
     raw <- tryCatch(read.csv(path, header = TRUE), error = function(e) NULL)
     if (is.null(raw) || ncol(raw) < 2) return(NULL)
-    pred_name <- names(raw)[1]
-    crit_name <- names(raw)[2]
     df <- raw %>%
       dplyr::select(Predictor = 1, Criterion = 2) %>%
       na.omit()
-    list(df = df, predictor_name = pred_name, criterion_name = crit_name)
+    list(df = df, predictor_name = "SAT Score (scaled)", criterion_name = "College GPA")
   })
 
-  # Expectancy chart in landing Key Insight (sample data, fixed bins=5, cutoff=3.5)
+  # Expectancy chart in landing Key Insight (sample data, fixed bins=5, cutoff=3.0)
   output$landing_expectancy_plot <- renderPlot({
     preview <- landing_preview_data()
     if (is.null(preview) || nrow(preview$df) < 2) return(invisible(NULL))
-    exp_df <- calc_expectancy(preview$df, bins = 5, cutoff_y = 3.5)
-    plot_expectancy_landing(exp_df, preview$predictor_name, 3.5)
+    exp_df <- calc_expectancy(preview$df, bins = 5, cutoff_y = 3.0)
+    plot_expectancy_landing(exp_df, preview$predictor_name, 3.0)
   })
 
   # Data info display
