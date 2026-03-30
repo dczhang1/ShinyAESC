@@ -1,0 +1,159 @@
+<div class="help-doc">
+  <h2>ESCAPE Help Guide</h2>
+  <p>
+    ESCAPE (Effect Size Calculator for Practical Effects) helps you translate
+    correlations into practical, interpretable results for decisions and communication.
+  </p>
+
+  <h3>Quick Start</h3>
+  <ol>
+    <li>
+      Start analysis from the landing page by selecting
+      <strong>Try with Sample Data</strong> or uploading your own file.
+      Supported formats: <code>.csv</code>, <code>.xlsx</code>, <code>.sav</code>, and
+      <code>.sas7bdat</code>.
+    </li>
+    <li>
+      In the sidebar, choose your <strong>Predictor (X)</strong> and
+      <strong>Criterion (Y)</strong> variables.
+    </li>
+    <li>
+      Set <strong>Number of bins</strong>, adjust <strong>Criterion cutoff (Y)</strong>,
+      and use <strong>Predictor percentile (X)</strong> to define comparison groups.
+    </li>
+    <li>Review the outputs across each analysis tab.</li>
+    <li>
+      Export your results using <strong>Export Report</strong> and per-chart
+      <strong>Download</strong> buttons.
+    </li>
+  </ol>
+
+  <h3>Controls Explained</h3>
+  <ul>
+    <li>
+      <strong>Data:</strong> Upload a new dataset at any time from the sidebar.
+      The data card shows row and column counts and whether you are using sample or uploaded data.
+    </li>
+    <li>
+      <strong>Predictor (X) and Criterion (Y):</strong> ESCAPE analyzes the relationship between
+      these two numeric variables.
+    </li>
+    <li>
+      <strong>Number of bins:</strong> Controls how Predictor (X) is grouped in the
+      <strong>Expectancy</strong> chart and table.
+    </li>
+    <li>
+      <strong>Criterion cutoff (Y):</strong> Defines the success threshold for expectancy and BESD outputs.
+      Use <strong>Set to mean</strong> to auto-fill the criterion mean.
+    </li>
+    <li>
+      <strong>Predictor percentile (X):</strong> Splits cases into Above vs Below predictor groups.
+      This directly affects Cohen's d, Hedges' g, CLES, BESD, and Icon Array results.
+    </li>
+  </ul>
+
+  <h3>Tab-by-Tab Guide</h3>
+  <h4>Summary</h4>
+  <ul>
+    <li>Shows top-line metrics: correlation (r), Cohen's d, and CLES.</li>
+    <li>Includes a scatterplot with trend line and a plain-language Key Insight panel.</li>
+  </ul>
+
+  <h4>Data &amp; Descriptives</h4>
+  <ul>
+    <li>Displays your raw data table.</li>
+    <li>Shows descriptive statistics and variance explained from r<sup>2</sup>.</li>
+    <li>Provides distribution histograms for Predictor and Criterion.</li>
+  </ul>
+
+  <h4>Expectancy</h4>
+  <ul>
+    <li>
+      Plots the proportion above the criterion cutoff within each Predictor bin.
+    </li>
+    <li>
+      Includes an expectancy table with bin ranges, proportions, frequencies, and sample size.
+    </li>
+  </ul>
+
+  <h4>Effect Sizes</h4>
+  <ul>
+    <li>Reports Pearson's r, Hedges' g, Cohen's d, d confidence interval, and CLES probability.</li>
+    <li>Shows group means/SDs for Above vs Below predictor groups.</li>
+    <li>Includes overlap density and two BESD views: empirical (cutoff-based) and theoretical (derived from r).</li>
+  </ul>
+
+  <h4>Icon Array</h4>
+  <ul>
+    <li>
+      Converts CLES into an intuitive visual count of successes vs failures.
+    </li>
+    <li>
+      Customize icon type, total icons, and layout to match your communication context.
+    </li>
+  </ul>
+
+  <h4>Converter</h4>
+  <ul>
+    <li>
+      Converts published summary effects when raw data are unavailable.
+    </li>
+    <li>
+      Supports input of Pearson's r or Cohen's d, then computes the corresponding translated metrics.
+    </li>
+  </ul>
+
+  <h3>How to Interpret Key Metrics</h3>
+  <ul>
+    <li><strong>Pearson's r:</strong> Direction and strength of the linear relationship between X and Y.</li>
+    <li><strong>r<sup>2</sup>:</strong> Percent of Criterion variance explained by Predictor.</li>
+    <li><strong>Cohen's d:</strong> Standardized mean difference between Above and Below predictor groups.</li>
+    <li><strong>Hedges' g:</strong> A bias-corrected standardized mean difference.</li>
+    <li><strong>CLES:</strong> Probability that a random person from the Above group outperforms one from the Below group.</li>
+    <li><strong>BESD (empirical):</strong> 2x2 probabilities computed from your selected predictor/criterion cutoffs.</li>
+    <li><strong>BESD (theoretical):</strong> 2x2 probabilities transformed from correlation via 0.5 +/- r/2.</li>
+  </ul>
+  <p>
+    Example interpretation: if CLES is 0.69, then in 69 out of 100 random Above-vs-Below pairs,
+    the Above-group person is expected to score higher on the criterion.
+  </p>
+
+  <h3>Troubleshooting</h3>
+  <ul>
+    <li>
+      <strong>No results or blank plots:</strong> Confirm both selected variables are numeric and contain non-missing values.
+    </li>
+    <li>
+      <strong>CLES or BESD unavailable:</strong> Your current percentile split may leave too few observations in one group.
+      Try a less extreme predictor percentile.
+    </li>
+    <li>
+      <strong>Upload error:</strong> Ensure file extension is supported and data are readable.
+    </li>
+    <li>
+      <strong>Unexpected values:</strong> Verify the current Criterion cutoff (Y) and predictor percentile (X) settings.
+    </li>
+  </ul>
+
+  <h3>Exports</h3>
+  <ul>
+    <li><strong>Export Report:</strong> Generates an HTML report with key metrics, tables, and core plots.</li>
+    <li><strong>Download buttons:</strong> Export individual figures (PNG) from major visual panels.</li>
+  </ul>
+
+  <h3>Further Reading</h3>
+  <ul>
+    <li>McGraw, K. O., &amp; Wong, S. P. (1992). A common language effect size statistic. <em>Psychological Bulletin, 111</em>(2), 361-365.</li>
+    <li>Rosenthal, R., &amp; Rubin, D. B. (1982). A simple, general purpose display of magnitude of experimental effect. <em>Journal of Educational Psychology, 74</em>(2), 166-169.</li>
+    <li>Schrader, W. B. (1965). A taxonomy of expectancy tables. <em>Journal of Educational Measurement, 2</em>(1), 29-35.</li>
+    <li>Zhang, D. C., Highhouse, S., Brooks, M. E., &amp; Zhang, Y. (2018). Communicating the validity of structured job interviews with graphical visual aids. <em>International Journal of Selection and Assessment, 26</em>(2-4), 93-108.</li>
+    <li>Zhang, D. C. (2018). Utility of alternative effect size statistics and the development of a web-based calculator: Shiny-AESC. <em>Frontiers in Psychology, 9</em>, 1221. <a href="https://doi.org/10.3389/fpsyg.2018.01221" target="_blank" rel="noopener noreferrer">https://doi.org/10.3389/fpsyg.2018.01221</a></li>
+    <li>Brooks, M. E., Dalal, D. K., &amp; Nolan, K. P. (2014). Are common language effect sizes easier to understand than traditional effect sizes? <em>Journal of Applied Psychology, 99</em>(2), 332-340. <a href="https://doi.org/10.1037/a0034745" target="_blank" rel="noopener noreferrer">https://doi.org/10.1037/a0034745</a></li>
+    <li>Funder, D. C., &amp; Ozer, D. J. (2019). Evaluating effect size in psychological research: Sense and nonsense. <em>Advances in Methods and Practices in Psychological Science, 2</em>(2), 156-168. <a href="https://doi.org/10.1177/2515245919847202" target="_blank" rel="noopener noreferrer">https://doi.org/10.1177/2515245919847202</a></li>
+    <li>Hanel, P. H., &amp; Mehler, D. M. (2019). Beyond reporting statistical significance: Identifying informative effect sizes to improve scientific communication. <em>Public Understanding of Science, 28</em>(4), 468-485. <a href="https://doi.org/10.1177/0963662519834193" target="_blank" rel="noopener noreferrer">https://doi.org/10.1177/0963662519834193</a></li>
+    <li>Kraft, M. A. (2020). Interpreting effect sizes of education interventions. <em>Educational Researcher, 49</em>(4), 241-253. <a href="https://doi.org/10.3102/0013189X20912798" target="_blank" rel="noopener noreferrer">https://doi.org/10.3102/0013189X20912798</a></li>
+    <li>Mastrich, Z., &amp; Hernandez, I. (2021). Results everyone can understand: A review of common language effect size indicators to bridge the research-practice gap. <em>Health Psychology, 40</em>(10), 727-736. <a href="https://doi.org/10.1037/hea0001112" target="_blank" rel="noopener noreferrer">https://doi.org/10.1037/hea0001112</a></li>
+    <li>May, H. (2004). Making statistics more meaningful for policy research and program evaluation. <em>American Journal of Evaluation, 25</em>(4), 525-540. <a href="https://doi.org/10.1177/109821400402500408" target="_blank" rel="noopener noreferrer">https://doi.org/10.1177/109821400402500408</a></li>
+    <li>Michal, A. L., &amp; Shah, P. (2024). A practical significance bias in laypeople's evaluation of scientific findings. <em>Psychological Science, 35</em>(4), 315-327. <a href="https://doi.org/10.1177/09567976241231506" target="_blank" rel="noopener noreferrer">https://doi.org/10.1177/09567976241231506</a></li>
+  </ul>
+</div>
