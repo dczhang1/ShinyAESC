@@ -332,6 +332,40 @@ body::before {
   gap: var(--space-6);
 }
 
+.start-guide ol {
+  margin-bottom: 0;
+  padding-left: 1.1rem;
+}
+
+.start-guide li {
+  margin-bottom: 0.4rem;
+}
+
+.start-guide-card {
+  background: linear-gradient(140deg, rgba(255, 255, 255, 0.96), rgba(245, 240, 255, 0.92));
+  border-radius: var(--radius-lg);
+}
+
+.start-brief-card {
+  border-left: 3px solid var(--color-primary);
+  background: rgba(255, 255, 255, 0.72);
+  border-radius: var(--radius-lg);
+}
+
+.converter-controls-card {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.98), rgba(243, 236, 255, 0.92));
+  border-radius: var(--radius-lg);
+}
+
+.converter-output-card {
+  background: rgba(255, 255, 255, 0.78);
+  border-radius: var(--radius-lg);
+}
+
+.converter-output-card .table {
+  margin-bottom: 0;
+}
+
 /* Fixed-height plot wrappers: no flex shrink, plot fills container */
 .analysis-plot-wrap {
   padding: var(--space-4);
@@ -1165,6 +1199,14 @@ h5 { font-size: var(--text-base); }
 /* Tab content fade */
 .tab-pane.active {
   animation: fadeIn var(--transition-base) ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation: none !important;
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
 }
 
 /* ============================================

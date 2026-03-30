@@ -433,6 +433,38 @@ analysis_ui <- function() {
       navset_card_underline(
         id = "main_tabs",
 
+        # ---- Tab 0: Start Here ----
+        nav_panel(
+          title = tags$span(
+            tags$i(`data-lucide` = "compass", style = "width: 14px; height: 14px; margin-right: 6px;"),
+            "Start Here"
+          ),
+          value = "start",
+          div(
+            class = "analysis-page",
+            card(
+              card_header("Guided Workflow"),
+              card_body(
+                class = "start-guide-card",
+                div(
+                  class = "start-guide",
+                  tags$ol(
+                    tags$li("Choose Predictor (X) and Criterion (Y) in the sidebar."),
+                    tags$li("Set Criterion cutoff and Predictor percentile."),
+                    tags$li("Read practical interpretation in Summary."),
+                    tags$li("Review technical details in Effect Sizes and BESD."),
+                    tags$li("Export report when ready.")
+                  )
+                )
+              )
+            ),
+            card(
+              card_header("Your current analysis question"),
+              card_body(class = "start-brief-card", uiOutput("start_here_blurb"))
+            )
+          )
+        ),
+
         # ---- Tab 1: Summary ----
         nav_panel(
           title = tags$span(
@@ -636,7 +668,13 @@ analysis_ui <- function() {
             ),
             card(
               card_header("Binomial Effect Size Display (BESD)"),
-              card_body(tableOutput("besd"))
+              card_body(
+                tags$h6("Empirical (cutoff-based)"),
+                tableOutput("besd"),
+                tags$hr(),
+                tags$h6("Theoretical (from r)"),
+                tableOutput("besd_theoretical")
+              )
             )
           )
         ),
@@ -734,7 +772,39 @@ analysis_ui <- function() {
           )
         ),
 
-        # ---- Tab 6: Help ----
+        nav_panel(
+          title = tags$span(
+            tags$i(`data-lucide` = "shuffle", style = "width: 14px; height: 14px; margin-right: 6px;"),
+            "Converter"
+          ),
+          value = "converter",
+          div(
+            class = "analysis-page",
+            card(
+              card_header("Effect Size Converter (Theoretical)"),
+              card_body(
+                class = "converter-controls-card",
+                layout_columns(
+                  col_widths = c(4, 4, 4),
+                  selectInput("converter_input_type", "Input type", choices = c("Correlation (r)" = "r", "Cohen's d" = "d")),
+                  numericInput("converter_value", "Input value", value = 0.3, step = 0.01),
+                  uiOutput("converter_validity")
+                ),
+                tags$p(class = "text-muted", "Use this mode when you only have published summary effect sizes.")
+              )
+            ),
+            card(
+              card_header("Converted Metrics"),
+              card_body(
+                class = "converter-output-card",
+                tableOutput("converter_table"),
+                tags$hr(),
+                uiOutput("converter_interpretation")
+              )
+            )
+          )
+        ),
+        # ---- Tab 7: Help ----
         nav_panel(
           title = tags$span(
             tags$i(`data-lucide` = "help-circle", style = "width: 14px; height: 14px; margin-right: 6px;"),
@@ -992,7 +1062,7 @@ server <- function(input, output, session) {
       mutate(
         Group = case_when(
           Predictor < co_X ~ "Below",
-          Predictor > co_X ~ "Above",
+          Predictor >= co_X ~ "Above",
           TRUE ~ NA_character_
         )
       ) %>%
@@ -1044,7 +1114,8 @@ server <- function(input, output, session) {
   output$overview_d <- renderText({
     d <- effect_sizes()$d
     if (is.na(d)) return("--")
-    paste0("d = ", round(d, 2))
+    direction <- if (d >= 0) "positive" else "negative"
+    paste0("|d| = ", round(abs(d), 2), " (", direction, ")")
   })
 
   output$overview_cles <- renderText({
@@ -1064,9 +1135,14 @@ server <- function(input, output, session) {
     r <- validity_stats()$r
     cles <- effect_sizes()$cles
     d <- effect_sizes()$d
+    n_above <- sum(df_cles()$Group == "Above")
+    n_below <- sum(df_cles()$Group == "Below")
+    d_ci <- calc_d_ci(d, n_above, n_below)
+    r_ci <- calc_r_ci(r, nrow(selected_data()))
 
     r_strength <- interpret_correlation(r)
     d_magnitude <- if (!is.na(d)) interpret_cohens_d(d) else "unknown"
+    d_direction <- if (!is.na(d) && d >= 0) "higher" else "lower"
 
     cles_text <- if (!is.na(cles)) {
       paste0(
@@ -1076,7 +1152,8 @@ server <- function(input, output, session) {
         tags$strong(paste0(round(cles * 100, 1), "%")),
         " probability of scoring higher on ",
         ev$criterion, " than someone from the bottom ",
-        round((1 - input$cutoff.X) * 100), "%."
+        round((1 - input$cutoff.X) * 100), "%. ",
+        "Practical takeaway: treat this as one decision input alongside context, constraints, and professional judgment."
       )
     } else {
       "Adjust the cutoff percentile to see CLES insights."
@@ -1088,6 +1165,17 @@ server <- function(input, output, session) {
         class = "insight-row",
         tags$i(`data-lucide` = "info", class = "insight-icon-small"),
         p(paste0(r_strength, " (r = ", round(r, 3), ") with ", d_magnitude, " effect size."))
+      ),
+      div(
+        class = "insight-row",
+        tags$i(`data-lucide` = "activity", class = "insight-icon-small"),
+        p(
+          paste0(
+            "Direction: higher predictor group tends to score ", d_direction, " on ", ev$criterion,
+            ". Uncertainty ranges: r 95% CI [", round(r_ci$lower, 2), ", ", round(r_ci$upper, 2),
+            "], d 95% CI [", round(d_ci$lower, 2), ", ", round(d_ci$upper, 2), "]."
+          )
+        )
       ),
       div(
         class = "insight-row highlight",
@@ -1217,6 +1305,74 @@ server <- function(input, output, session) {
     df <- selected_data()
     calc_besd(df, cutoff_X_val(), input$cutoffInput, ev$predictor, ev$criterion)
   }, rownames = TRUE, digits = 3)
+
+  output$besd_theoretical <- renderTable({
+    ev <- effective_vars()
+    calc_besd_theoretical(validity_stats()$r, ev$predictor, ev$criterion)
+  }, rownames = TRUE, digits = 3)
+
+  output$start_here_blurb <- renderUI({
+    ev <- effective_vars()
+    if (is.null(ev$predictor) || is.null(ev$criterion)) return(tags$p("Select variables to begin."))
+    tags$div(
+      tags$p(tags$strong("Primary question: "), paste0("How much does ", ev$predictor, " improve practical outcomes on ", ev$criterion, "?")),
+      tags$p(tags$strong("Recommended path: "), "Summary -> Expectancy -> Effect Sizes -> Converter (if raw data are unavailable).")
+    )
+  })
+
+  converter_metrics <- reactive({
+    in_type <- input$converter_input_type
+    in_val <- input$converter_value
+    if (is.null(in_type) || is.null(in_val) || !is.finite(in_val)) return(NULL)
+
+    if (in_type == "r") {
+      if (in_val <= -1 || in_val >= 1) return(NULL)
+      r <- in_val
+      d <- r_to_d(r)
+    } else {
+      d <- in_val
+      r <- d_to_r(d)
+    }
+
+    if (!is.finite(r) || !is.finite(d)) return(NULL)
+    cles <- d_to_cles(d)
+    data.frame(
+      Metric = c("Correlation (r)", "Cohen's d", "CLES (Probability)", "BESD High Group Success", "BESD Low Group Success"),
+      Value = c(round(r, 3), round(d, 3), round(cles, 3), round(0.5 + r / 2, 3), round(0.5 - r / 2, 3))
+    )
+  })
+
+  output$converter_table <- renderTable({
+    cm <- converter_metrics()
+    validate(need(!is.null(cm), "Enter a valid effect size value. For r, use (-1, 1)."))
+    cm
+  }, digits = 3)
+
+  output$converter_validity <- renderUI({
+    in_type <- input$converter_input_type
+    in_val <- input$converter_value
+    if (is.null(in_val)) return(tags$span(class = "text-muted", ""))
+    if (in_type == "r" && (in_val <= -1 || in_val >= 1)) {
+      return(tags$span(style = "color: var(--color-danger);", "For r input, value must be between -1 and 1 (exclusive)."))
+    }
+    tags$span(style = "color: var(--color-success);", "Input is valid.")
+  })
+
+  output$converter_interpretation <- renderUI({
+    cm <- converter_metrics()
+    req(!is.null(cm))
+    r_val <- as.numeric(cm$Value[cm$Metric == "Correlation (r)"])
+    cles_val <- as.numeric(cm$Value[cm$Metric == "CLES (Probability)"])
+    if (!is.finite(r_val) || !is.finite(cles_val)) return(NULL)
+    tags$p(
+      class = "mb-0 text-muted",
+      paste0(
+        "Interpretation: with r = ", round(r_val, 3), ", translated CLES is about ",
+        round(cles_val * 100, 1), "%, meaning roughly ",
+        round(cles_val * 100), " out of 100 random pairings favor the higher-scoring group."
+      )
+    )
+  })
 
   # --- Figure Downloads ---
 

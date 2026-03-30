@@ -16,20 +16,81 @@ calc_correlation <- function(x, y) {
   )
 }
 
+#' Validate groups for two-group effect size calculations
+#' @param group1 Values from first group
+#' @param group2 Values from second group
+#' @return Named list with cleaned vectors and diagnostics
+validate_two_groups <- function(group1, group2) {
+  g1 <- group1[!is.na(group1)]
+  g2 <- group2[!is.na(group2)]
+  n1 <- length(g1)
+  n2 <- length(g2)
+  list(
+    group1 = g1,
+    group2 = g2,
+    n1 = n1,
+    n2 = n2,
+    ok = (n1 >= 2 && n2 >= 2),
+    message = if (n1 < 2 || n2 < 2) "Insufficient non-missing values in one or both groups" else NULL
+  )
+}
+
+#' Convert correlation to Cohen's d (theoretical)
+#' @param r Correlation coefficient
+#' @return Cohen's d
+r_to_d <- function(r) {
+  if (is.na(r) || abs(r) >= 1) return(NA_real_)
+  2 * r / sqrt(1 - r^2)
+}
+
+#' Convert Cohen's d to correlation (theoretical)
+#' @param d Cohen's d
+#' @return Correlation coefficient
+d_to_r <- function(d) {
+  if (is.na(d)) return(NA_real_)
+  d / sqrt(d^2 + 4)
+}
+
+#' Convert Cohen's d to CLES (parametric)
+#' @param d Cohen's d
+#' @return CLES probability
+d_to_cles <- function(d) {
+  if (is.na(d)) return(NA_real_)
+  pnorm(d / sqrt(2))
+}
+
+#' Calculate confidence interval for r using Fisher z
+#' @param r Correlation coefficient
+#' @param n Sample size
+#' @param ci Confidence level
+#' @return List with lower and upper bounds
+calc_r_ci <- function(r, n, ci = 0.95) {
+  if (is.na(r) || n < 4 || abs(r) >= 1) return(list(lower = NA_real_, upper = NA_real_))
+  z <- atanh(r)
+  se <- 1 / sqrt(n - 3)
+  z_crit <- qnorm(1 - (1 - ci) / 2)
+  z_low <- z - z_crit * se
+  z_high <- z + z_crit * se
+  list(lower = tanh(z_low), upper = tanh(z_high))
+}
+
 #' Calculate Cohen's d effect size
 #' @param group1 Values from first group
 #' @param group2 Values from second group
 #' @return Cohen's d value
 calc_cohens_d <- function(group1, group2) {
-  m1 <- mean(group1, na.rm = TRUE)
-  m2 <- mean(group2, na.rm = TRUE)
-  s1 <- sd(group1, na.rm = TRUE)
-  s2 <- sd(group2, na.rm = TRUE)
-
-  # Pooled SD (simple average of variances, then sqrt)
-  sd_pooled <- sqrt((s1^2 + s2^2) / 2)
-
-  abs(m1 - m2) / sd_pooled
+  v <- validate_two_groups(group1, group2)
+  if (!v$ok) return(NA_real_)
+  m1 <- mean(v$group1)
+  m2 <- mean(v$group2)
+  s1 <- sd(v$group1)
+  s2 <- sd(v$group2)
+  denom_df <- v$n1 + v$n2 - 2
+  if (is.na(s1) || is.na(s2) || denom_df <= 0) return(NA_real_)
+  # Weighted pooled SD (recommended default for two independent groups)
+  sd_pooled <- sqrt(((v$n1 - 1) * s1^2 + (v$n2 - 1) * s2^2) / denom_df)
+  if (!is.finite(sd_pooled) || sd_pooled <= 0) return(NA_real_)
+  (m1 - m2) / sd_pooled
 }
 
 #' Calculate Hedges' g effect size (bias-corrected Cohen's d)
@@ -37,17 +98,14 @@ calc_cohens_d <- function(group1, group2) {
 #' @param group2 Values from second group
 #' @return Hedges' g value
 calc_hedges_g <- function(group1, group2) {
-  m1 <- mean(group1, na.rm = TRUE)
-  m2 <- mean(group2, na.rm = TRUE)
-  s1 <- sd(group1, na.rm = TRUE)
-  s2 <- sd(group2, na.rm = TRUE)
-  n1 <- sum(!is.na(group1))
-  n2 <- sum(!is.na(group2))
-
-  # Pooled SD (weighted by sample size)
-  sd_pooled <- sqrt(((n1 - 1) * s1^2 + (n2 - 1) * s2^2) / (n1 + n2 - 2))
-
-  abs(m1 - m2) / sd_pooled
+  d <- calc_cohens_d(group1, group2)
+  v <- validate_two_groups(group1, group2)
+  if (is.na(d) || !v$ok) return(NA_real_)
+  df <- v$n1 + v$n2 - 2
+  if (df <= 1) return(NA_real_)
+  # Small sample correction
+  J <- 1 - (3 / (4 * df - 1))
+  J * d
 }
 
 #' Calculate Common Language Effect Size (CLES)
@@ -57,13 +115,8 @@ calc_hedges_g <- function(group1, group2) {
 #' @param group2 Values from second group
 #' @return CLES probability (0-1)
 calc_cles <- function(group1, group2) {
-  m1 <- mean(group1, na.rm = TRUE)
-  m2 <- mean(group2, na.rm = TRUE)
-  s1 <- sd(group1, na.rm = TRUE)
-  s2 <- sd(group2, na.rm = TRUE)
-
-  z_diff <- abs(m1 - m2) / sqrt(s1^2 + s2^2)
-  pnorm(z_diff)
+  d <- calc_cohens_d(group1, group2)
+  d_to_cles(d)
 }
 
 #' Calculate confidence interval for Cohen's d
@@ -73,6 +126,7 @@ calc_cles <- function(group1, group2) {
 #' @param ci Confidence level (default 0.95)
 #' @return List with lower and upper bounds
 calc_d_ci <- function(d, n1, n2, ci = 0.95) {
+  if (is.na(d) || n1 < 2 || n2 < 2) return(list(lower = NA_real_, upper = NA_real_))
   z <- qnorm(1 - (1 - ci) / 2)
   se_d <- sqrt((n1 + n2) / (n1 * n2) + d^2 / (2 * (n1 + n2)))
 
@@ -88,25 +142,34 @@ calc_d_ci <- function(d, n1, n2, ci = 0.95) {
 #' @param r_value Correlation coefficient
 #' @return Data frame with all metrics
 calc_all_effect_sizes <- function(above_group, below_group, r_value) {
-  n1 <- sum(!is.na(above_group))
-  n2 <- sum(!is.na(below_group))
-
-  if (n1 < 2 || n2 < 2) {
+  v <- validate_two_groups(above_group, below_group)
+  if (!v$ok) {
     return(data.frame(
       Metric = "Error",
       Value = "Insufficient data in one or both groups"
     ))
   }
+  n1 <- v$n1
+  n2 <- v$n2
 
   hedges_g <- calc_hedges_g(above_group, below_group)
   cohens_d <- calc_cohens_d(above_group, below_group)
   cles <- calc_cles(above_group, below_group)
   d_ci <- calc_d_ci(cohens_d, n1, n2)
+  r_ci <- calc_r_ci(r_value, n1 + n2)
 
   data.frame(
-    Metric = c("Pearson's r", "Hedges' g", "Cohen's d", "Cohen's d [95% CI]", "CLES (Probability)"),
+    Metric = c(
+      "Pearson's r",
+      "Pearson's r [95% CI]",
+      "Hedges' g",
+      "Cohen's d",
+      "Cohen's d [95% CI]",
+      "CLES (Probability)"
+    ),
     Value = c(
       round(r_value, 3),
+      paste0("[", round(r_ci$lower, 3), ", ", round(r_ci$upper, 3), "]"),
       round(hedges_g, 3),
       round(cohens_d, 3),
       paste0("[", round(d_ci$lower, 3), ", ", round(d_ci$upper, 3), "]"),
@@ -151,22 +214,69 @@ calc_expectancy <- function(df, bins, cutoff_y) {
 #' @return Matrix with BESD values
 calc_besd <- function(df, cutoff_x, cutoff_y, predictor_name = "Predictor", criterion_name = "Criterion") {
   df <- df |> dplyr::mutate(dicho_Y = as.numeric(Criterion > cutoff_y))
-
-  prob_Y_above <- mean(df$dicho_Y[df$Predictor > cutoff_x], na.rm = TRUE)
-  prob_Y_below <- mean(df$dicho_Y[df$Predictor < cutoff_x], na.rm = TRUE)
+  above_idx <- df$Predictor >= cutoff_x
+  below_idx <- df$Predictor < cutoff_x
+  n_above <- sum(above_idx, na.rm = TRUE)
+  n_below <- sum(below_idx, na.rm = TRUE)
+  if (n_above < 1 || n_below < 1) {
+    return(matrix(
+      c(NA_real_, NA_real_, NA_real_, NA_real_),
+      nrow = 2, ncol = 2,
+      dimnames = list(
+        c(
+          paste(predictor_name, ">=", round(cutoff_x, 2)),
+          paste(predictor_name, "<", round(cutoff_x, 2))
+        ),
+        c(
+          paste("p(", criterion_name, ") >", round(cutoff_y, 2)),
+          paste("p(", criterion_name, ") <=", round(cutoff_y, 2))
+        )
+      )
+    ))
+  }
+  prob_Y_above <- mean(df$dicho_Y[above_idx], na.rm = TRUE)
+  prob_Y_below <- mean(df$dicho_Y[below_idx], na.rm = TRUE)
 
   matrix(
     c(prob_Y_above, prob_Y_below, 1 - prob_Y_above, 1 - prob_Y_below),
     nrow = 2, ncol = 2,
     dimnames = list(
       c(
-        paste(predictor_name, ">", round(cutoff_x, 2)),
+        paste(predictor_name, ">=", round(cutoff_x, 2)),
         paste(predictor_name, "<", round(cutoff_x, 2))
       ),
       c(
         paste("p(", criterion_name, ") >", round(cutoff_y, 2)),
-        paste("p(", criterion_name, ") <", round(cutoff_y, 2))
+        paste("p(", criterion_name, ") <=", round(cutoff_y, 2))
       )
+    )
+  )
+}
+
+#' Calculate canonical BESD from correlation
+#' @param r Correlation coefficient
+#' @param predictor_name Name of predictor variable
+#' @param criterion_name Name of criterion variable
+#' @return Matrix with BESD values
+calc_besd_theoretical <- function(r, predictor_name = "Predictor", criterion_name = "Criterion") {
+  if (is.na(r)) {
+    return(matrix(
+      c(NA_real_, NA_real_, NA_real_, NA_real_),
+      nrow = 2, ncol = 2,
+      dimnames = list(
+        c(paste(predictor_name, "High"), paste(predictor_name, "Low")),
+        c(paste(criterion_name, "Success"), paste(criterion_name, "Failure"))
+      )
+    ))
+  }
+  hit_high <- 0.5 + r / 2
+  hit_low <- 0.5 - r / 2
+  matrix(
+    c(hit_high, hit_low, 1 - hit_high, 1 - hit_low),
+    nrow = 2, ncol = 2,
+    dimnames = list(
+      c(paste(predictor_name, "High"), paste(predictor_name, "Low")),
+      c(paste(criterion_name, "Success"), paste(criterion_name, "Failure"))
     )
   )
 }

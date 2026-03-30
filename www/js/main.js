@@ -19,6 +19,7 @@
     $(document).on('shiny:value', function() {
       // Small delay to let DOM update
       setTimeout(initLucideIcons, 50);
+      setTimeout(initCarousel, 50);
     });
 
     // Custom message handler for icon re-init
@@ -47,6 +48,8 @@
       const container = document.createElement('div');
       container.id = 'toast-container';
       container.className = 'toast-container';
+      container.setAttribute('role', 'status');
+      container.setAttribute('aria-live', 'polite');
       container.style.cssText = `
         position: fixed;
         bottom: 1rem;
@@ -93,15 +96,29 @@
       max-width: 350px;
     `;
 
-    toast.innerHTML = `
-      <span style="color: ${config.bg};">
-        <i data-lucide="${config.icon}" style="width: 18px; height: 18px;"></i>
-      </span>
-      <span style="flex: 1;">${message}</span>
-      <button style="background: none; border: none; color: #71717A; cursor: pointer; padding: 0;">
-        <i data-lucide="x" style="width: 16px; height: 16px;"></i>
-      </button>
-    `;
+    const iconWrap = document.createElement('span');
+    iconWrap.style.color = config.bg;
+    const iconEl = document.createElement('i');
+    iconEl.setAttribute('data-lucide', config.icon);
+    iconEl.style.width = '18px';
+    iconEl.style.height = '18px';
+    iconWrap.appendChild(iconEl);
+
+    const messageEl = document.createElement('span');
+    messageEl.style.flex = '1';
+    messageEl.textContent = String(message);
+
+    const closeBtn = document.createElement('button');
+    closeBtn.style.cssText = 'background: none; border: none; color: #71717A; cursor: pointer; padding: 0;';
+    const closeIcon = document.createElement('i');
+    closeIcon.setAttribute('data-lucide', 'x');
+    closeIcon.style.width = '16px';
+    closeIcon.style.height = '16px';
+    closeBtn.appendChild(closeIcon);
+
+    toast.appendChild(iconWrap);
+    toast.appendChild(messageEl);
+    toast.appendChild(closeBtn);
 
     container.appendChild(toast);
     initLucideIcons();
@@ -113,7 +130,7 @@
     });
 
     // Close button
-    toast.querySelector('button').addEventListener('click', () => dismissToast(toast));
+    closeBtn.addEventListener('click', () => dismissToast(toast));
 
     // Auto dismiss
     if (duration > 0) {
@@ -211,13 +228,7 @@
      CAROUSEL FOR USE CASES
      ============================================ */
 
-  let carouselInitialized = false;
-  
   function initCarousel(retryCount = 0) {
-    if (carouselInitialized) {
-      console.log('Carousel already initialized, skipping');
-      return;
-    }
     const carousel = document.querySelector('.use-cases-carousel');
     if (!carousel) {
       if (retryCount < 10) {
@@ -242,7 +253,10 @@
     const nextBtn = carousel.querySelector('.carousel-next');
     const indicators = Array.from(carousel.querySelectorAll('.carousel-indicator'));
 
-    carouselInitialized = true;
+    if (carousel.dataset.initialized === 'true') {
+      return;
+    }
+    carousel.dataset.initialized = 'true';
     console.log('Carousel init:', {
       slides: slides.length,
       prevBtn: !!prevBtn,
@@ -342,15 +356,16 @@
     });
 
     // Auto-advance every 5 seconds
-    let autoAdvance = setInterval(nextSlide, 5000);
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let autoAdvance = reduceMotion ? null : setInterval(nextSlide, 5000);
 
     // Pause on hover
     carousel.addEventListener('mouseenter', function() {
-      clearInterval(autoAdvance);
+      if (autoAdvance) clearInterval(autoAdvance);
     });
 
     carousel.addEventListener('mouseleave', function() {
-      autoAdvance = setInterval(nextSlide, 5000);
+      if (!reduceMotion) autoAdvance = setInterval(nextSlide, 5000);
     });
 
     // Keyboard navigation
