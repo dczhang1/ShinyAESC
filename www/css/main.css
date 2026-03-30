@@ -332,6 +332,24 @@ body::before {
   gap: var(--space-6);
 }
 
+/* Top tab + nested subsection pills (Summary / Traditional / Practical) */
+.analysis-page--nested {
+  gap: var(--space-4);
+}
+
+.analysis-page--nested .nav.nav-pills {
+  margin-bottom: var(--space-3);
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.analysis-subsection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding-top: var(--space-1);
+}
+
 .start-guide ol {
   margin-bottom: 0;
   padding-left: 1.1rem;
