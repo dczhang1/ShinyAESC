@@ -62,7 +62,7 @@ landing_page_ui <- function() {
         div(
           class = "hero-actions",
           actionButton("try_sample", "Try with Sample Data"),
-          fileInput("landing_file", NULL, accept = c(".csv", ".xlsx", ".sav", ".sas7bdat"), buttonLabel = "Upload Your Data", placeholder = NULL)
+          actionButton("open_guided_upload", "Upload Your Data")
         )
       ),
 
@@ -854,8 +854,11 @@ server <- function(input, output, session) {
   app_state <- reactiveValues(
     view = "landing",  # "landing" or "analysis"
     data_source = NULL,  # "sample" or "uploaded"
-    landing_file = NULL   # preserved file from landing upload (lost when DOM switches)
+    landing_file = NULL,  # preserved file from landing upload (lost when DOM switches)
+    guided_done = FALSE,  # first-time own-data wizard is session-scoped
+    guided_step = 1
   )
+  guided_file_meta <- reactiveVal(NULL)
 
   # --- Navigation ---
 
@@ -870,12 +873,36 @@ server <- function(input, output, session) {
     app_state$data_source <- "sample"
   })
 
-  # File upload from landing page (store file so it survives UI switch)
-  observeEvent(input$landing_file, {
-    req(input$landing_file)
-    app_state$landing_file <- input$landing_file
+  # Open guided upload from landing page
+  observeEvent(input$open_guided_upload, {
+    app_state$landing_file <- NULL
+    guided_file_meta(NULL)
     app_state$view <- "analysis"
     app_state$data_source <- "uploaded"
+    app_state$guided_step <- 1
+    app_state$guided_done <- FALSE
+  })
+
+  # Upload file from guided modal step 1
+  observeEvent(input$guided_file, {
+    req(input$guided_file)
+    guided_file_meta(input$guided_file)
+    app_state$landing_file <- input$guided_file
+    app_state$data_source <- "uploaded"
+    if (isTRUE(app_state$guided_step == 1)) {
+      show_guided_wizard()
+    }
+  })
+
+  # Sidebar upload should override preserved landing upload
+  observeEvent(input$file1, {
+    req(input$file1)
+    app_state$landing_file <- NULL
+    guided_file_meta(NULL)
+    app_state$data_source <- "uploaded"
+    if (!isTRUE(app_state$guided_done)) {
+      app_state$guided_step <- 1
+    }
   })
 
   # Back to landing
@@ -883,6 +910,7 @@ server <- function(input, output, session) {
     app_state$view <- "landing"
     app_state$data_source <- NULL
     app_state$landing_file <- NULL
+    guided_file_meta(NULL)
   })
 
   # Render main UI based on state
@@ -913,8 +941,8 @@ server <- function(input, output, session) {
     }
 
     if (is.null(inFile)) {
-      # Use sample data if in analysis view
-      if (app_state$view == "analysis") {
+      # Use sample data only when sample mode is active
+      if (app_state$view == "analysis" && identical(app_state$data_source, "sample")) {
         sample_path <- get_sample_data_path()
         if (!is.null(sample_path)) {
           return(read.csv(sample_path, header = TRUE))
@@ -949,6 +977,256 @@ server <- function(input, output, session) {
       ))
       return(NULL)
     })
+  })
+
+  guided_step2_state <- reactive({
+    is_numeric_like <- function(x) {
+      if (is.numeric(x) || is.integer(x)) return(TRUE)
+      # Accept columns that are safely coercible to numeric (e.g., labelled types)
+      suppressWarnings({
+        x_num <- as.numeric(x)
+      })
+      !all(is.na(x_num)) && all(is.na(x) == is.na(x_num))
+    }
+    column_type_label <- function(x) {
+      paste(class(x), collapse = "/")
+    }
+
+    df <- data_set()
+    if (is.null(df) || ncol(df) < 2) {
+      return(list(
+        ready = FALSE,
+        message = "Your dataset needs at least 2 columns.",
+        predictor = NULL,
+        criterion = NULL
+      ))
+    }
+    dsnames <- names(df)
+    pred <- input$guided_predictorVar
+    crit <- input$guided_criterionVar
+    if (is.null(pred) || !pred %in% dsnames) pred <- dsnames[1]
+    if (is.null(crit) || !crit %in% dsnames) crit <- dsnames[min(2, length(dsnames))]
+    if (identical(pred, crit) && length(dsnames) >= 2) {
+      crit <- dsnames[ifelse(match(pred, dsnames) == 1, 2, 1)]
+    }
+
+    if (identical(pred, crit)) {
+      return(list(
+        ready = FALSE,
+        message = "Please choose different variables for X and Y.",
+        predictor = pred,
+        criterion = crit
+      ))
+    }
+
+    pred_is_numeric <- is_numeric_like(df[[pred]])
+    crit_is_numeric <- is_numeric_like(df[[crit]])
+    if (!pred_is_numeric || !crit_is_numeric) {
+      bad_vars <- character(0)
+      if (!pred_is_numeric) {
+        bad_vars <- c(
+          bad_vars,
+          paste0("Predictor (X) `", pred, "` is type ", column_type_label(df[[pred]]), ".")
+        )
+      }
+      if (!crit_is_numeric) {
+        bad_vars <- c(
+          bad_vars,
+          paste0("Criterion (Y) `", crit, "` is type ", column_type_label(df[[crit]]), ".")
+        )
+      }
+      return(list(
+        ready = FALSE,
+        message = paste(
+          c(
+            "X and Y must both be numeric columns.",
+            bad_vars,
+            "Please choose numeric variables."
+          ),
+          collapse = " "
+        ),
+        predictor = pred,
+        criterion = crit
+      ))
+    }
+
+    list(
+      ready = TRUE,
+      message = NULL,
+      predictor = pred,
+      criterion = crit
+    )
+  })
+
+  output$guided_step2_message <- renderUI({
+    step2_state <- guided_step2_state()
+    if (is.null(step2_state$message)) return(NULL)
+    tags$p(class = "text-danger mb-0", step2_state$message)
+  })
+
+  show_guided_wizard <- function() {
+    df <- data_set()
+    file_meta <- guided_file_meta()
+    has_file <- !is.null(file_meta)
+    has_data <- !is.null(df)
+    has_two_cols <- has_data && ncol(df) >= 2
+    dsnames <- if (has_data) names(df) else character(0)
+    current_file <- if (!is.null(file_meta)) {
+      file_meta$name
+    } else if (!is.null(app_state$landing_file)) {
+      app_state$landing_file$name
+    } else if (!is.null(input$file1)) {
+      input$file1$name
+    } else {
+      "No file selected"
+    }
+    data_stats_detail <- if (has_data) {
+      tagList(
+        tags$span(class = "data-info-dot", "\u2022"),
+        tags$span(paste(nrow(df), "rows")),
+        tags$span(class = "data-info-dot", "\u2022"),
+        tags$span(paste(ncol(df), "columns"))
+      )
+    } else if (has_file) {
+      tagList(
+        tags$span(class = "data-info-dot", "\u2022"),
+        tags$span("File selected")
+      )
+    } else {
+      NULL
+    }
+
+    step <- app_state$guided_step
+
+    step_body <- if (step == 1) {
+      div(
+        class = "guided-wizard-body",
+        div(
+          class = "guided-wizard-progress",
+          tags$span(class = "guided-wizard-progress__step guided-wizard-progress__step--active", "1"),
+          tags$span(class = "guided-wizard-progress__divider"),
+          tags$span(class = "guided-wizard-progress__step", "2")
+        ),
+        tags$p(class = "mb-3 guided-wizard-title", "Step 1 of 2: Confirm your uploaded dataset."),
+        fileInput(
+          "guided_file",
+          label = "Upload dataset",
+          accept = c(".csv", ".xlsx", ".sav", ".sas7bdat"),
+          placeholder = "Drop file here or click to browse",
+          buttonLabel = tags$span(
+            tags$i(`data-lucide` = "folder-open", style = "width: 14px; height: 14px; margin-right: 6px;"),
+            "Choose file"
+          )
+        ),
+        tags$div(
+          class = "data-info-card mb-3",
+          div(class = "data-info-badge", "Your Data"),
+          div(
+            class = "data-info-stats",
+            tags$span(current_file),
+            data_stats_detail
+          )
+        ),
+        if (!has_file) {
+          tags$p(class = "text-danger mb-0", "Waiting for file to load. Please upload a valid file to continue.")
+        } else if (!has_data) {
+          tags$p(class = "text-muted mb-0", "File selected. Continue to choose variables in Step 2.")
+        } else {
+          tags$p(class = "text-muted mb-0", "Dataset loaded. Continue to choose Predictor (X) and Criterion (Y).")
+        }
+      )
+    } else {
+      step2_state <- guided_step2_state()
+      pred_selected <- step2_state$predictor
+      crit_selected <- step2_state$criterion
+
+      div(
+        class = "guided-wizard-body",
+        div(
+          class = "guided-wizard-progress",
+          tags$span(class = "guided-wizard-progress__step", "1"),
+          tags$span(class = "guided-wizard-progress__divider"),
+          tags$span(class = "guided-wizard-progress__step guided-wizard-progress__step--active", "2")
+        ),
+        tags$p(class = "mb-3 guided-wizard-title", "Step 2 of 2: Choose your analysis variables."),
+        if (!has_two_cols) {
+          tags$p(class = "text-danger mb-0", "Your dataset needs at least 2 columns to select X and Y variables.")
+        } else {
+          tagList(
+            selectInput("guided_predictorVar", "Predictor (X)", choices = dsnames, selected = pred_selected),
+            selectInput("guided_criterionVar", "Criterion (Y)", choices = dsnames, selected = crit_selected),
+            uiOutput("guided_step2_message"),
+            tags$p(class = "text-muted mb-0", "These choices will be applied to the full dashboard.")
+          )
+        }
+      )
+    }
+
+    step1_ready <- has_file
+
+    footer <- if (step == 1) {
+      tagList(
+        actionButton("guided_skip", "Skip guide", class = "btn-ghost"),
+        if (step1_ready) {
+          actionButton("guided_next", "Continue", class = "btn-primary")
+        } else {
+          tags$button(type = "button", class = "btn btn-primary", disabled = "disabled", "Continue")
+        }
+      )
+    } else {
+      tagList(
+        actionButton("guided_back", "Back", class = "btn-ghost"),
+        actionButton("guided_finish", "Open Dashboard", class = "btn-primary")
+      )
+    }
+
+    showModal(
+      modalDialog(
+        class = "guided-startup-modal",
+        title = "Guided startup",
+        step_body,
+        footer = footer,
+        easyClose = FALSE
+      )
+    )
+    session$sendCustomMessage("focusGuidedWizard", list(step = step))
+  }
+
+  observeEvent(list(app_state$view, app_state$data_source), {
+    if (identical(app_state$view, "analysis") &&
+        identical(app_state$data_source, "uploaded") &&
+        !isTRUE(app_state$guided_done)) {
+      show_guided_wizard()
+    }
+  }, ignoreInit = TRUE)
+
+  observeEvent(input$guided_skip, {
+    app_state$guided_done <- TRUE
+    removeModal()
+  })
+
+  observeEvent(input$guided_next, {
+    app_state$guided_step <- 2
+    show_guided_wizard()
+  })
+
+  observeEvent(input$guided_back, {
+    app_state$guided_step <- 1
+    show_guided_wizard()
+  })
+
+  observeEvent(input$guided_finish, {
+    step2_state <- guided_step2_state()
+    if (!isTRUE(step2_state$ready)) {
+      msg <- if (!is.null(step2_state$message)) step2_state$message else "Please choose valid X and Y variables."
+      showNotification(msg, type = "warning")
+      show_guided_wizard()
+      return(NULL)
+    }
+    updateSelectInput(session, "predictorVar", selected = step2_state$predictor)
+    updateSelectInput(session, "criterionVar", selected = step2_state$criterion)
+    app_state$guided_done <- TRUE
+    removeModal()
   })
 
   # Hidden output for empty-state conditionalPanel (only in analysis view)
@@ -1152,8 +1430,7 @@ server <- function(input, output, session) {
         tags$strong(paste0(round(cles * 100, 1), "%")),
         " probability of scoring higher on ",
         ev$criterion, " than someone from the bottom ",
-        round((1 - input$cutoff.X) * 100), "%. ",
-        "Practical takeaway: treat this as one decision input alongside context, constraints, and professional judgment."
+        round((1 - input$cutoff.X) * 100), "%."
       )
     } else {
       "Adjust the cutoff percentile to see CLES insights."

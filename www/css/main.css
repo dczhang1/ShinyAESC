@@ -1263,3 +1263,65 @@ h5 { font-size: var(--text-base); }
 .iconarray-stats p {
   margin: 0;
 }
+
+/* ============================================
+  GUIDED STARTUP MODAL
+  ============================================ */
+
+.guided-startup-modal .modal-content {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-md);
+}
+
+.guided-startup-modal .modal-header {
+  border-bottom: 1px solid var(--color-border);
+}
+
+.guided-startup-modal .modal-footer {
+  border-top: 1px solid var(--color-border);
+}
+
+.guided-wizard-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.guided-wizard-progress {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.guided-wizard-progress__step {
+  width: 1.6rem;
+  height: 1.6rem;
+  border-radius: 999px;
+  border: 1px solid var(--color-border);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-gray-600);
+  background: var(--color-surface);
+}
+
+.guided-wizard-progress__step--active {
+  border-color: var(--color-primary);
+  color: #fff;
+  background: var(--color-primary);
+}
+
+.guided-wizard-progress__divider {
+  width: 1.2rem;
+  height: 1px;
+  background: var(--color-border);
+}
+
+.guided-wizard-title {
+  margin: 0;
+  color: var(--color-gray-800);
+  font-weight: 500;
+}

@@ -154,6 +154,23 @@
     Shiny.addCustomMessageHandler('showToast', function(data) {
       showToast(data.message, data.type, data.duration);
     });
+
+    Shiny.addCustomMessageHandler('focusGuidedWizard', function(data) {
+      const step = Number(data && data.step ? data.step : 1);
+      setTimeout(function() {
+        const modal = document.querySelector('.guided-startup-modal');
+        if (!modal) return;
+
+        const targetSelector = step === 2
+          ? '#guided_predictorVar'
+          : '#guided_file, #guided_next, #guided_finish, #guided_skip';
+
+        const target = modal.querySelector(targetSelector);
+        if (target && typeof target.focus === 'function') {
+          target.focus();
+        }
+      }, 80);
+    });
   }
 
   /* ============================================
