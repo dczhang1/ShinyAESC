@@ -10,6 +10,10 @@
   overflow-x: hidden;
 }
 
+[data-theme="dark"] .landing-page {
+  background: radial-gradient(circle at top left, #241b44 0%, #16122c 48%, #0f0d20 100%);
+}
+
 /* ============================================
    HERO SECTION
    ============================================ */
@@ -104,52 +108,78 @@
   box-shadow: 0 4px 12px rgba(139, 110, 240, 0.3);
 }
 
-/* File input upload button styling */
+/* File input upload box styling */
 .hero-actions .shiny-input-container {
-  position: relative;
-  display: inline-flex;
   margin: 0;
+  display: inline-flex;
 }
 
-.hero-actions .shiny-input-container input[type="file"] {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  opacity: 0;
-  cursor: pointer;
-  z-index: 2;
-}
-
-/* Remove input-group wrapper styling */
-.hero-actions .input-group {
+.hero-actions .shiny-input-container .input-group {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
   border: none;
   background: transparent;
   padding: 0;
-  display: inline-flex;
+  box-shadow: none;
+  transition: all var(--transition-base);
 }
 
-/* Style the upload button to match primary button */
-.hero-actions .shiny-input-container .btn {
+.hero-actions .shiny-input-container .input-group:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.hero-actions .shiny-input-container .input-group:focus-within {
+  box-shadow: none;
+}
+
+.hero-actions .shiny-input-container .input-group-btn {
+  display: flex;
+}
+
+.hero-actions .shiny-input-container .btn,
+.hero-actions .shiny-input-container .btn-default {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: var(--space-2);
+  min-height: 44px;
+  margin: 0;
+  border: 2px solid rgba(139, 110, 240, 0.4);
+  border-radius: var(--radius-lg);
   padding: var(--space-3) var(--space-5);
+  background: rgba(139, 110, 240, 0.06);
+  color: var(--color-primary);
   font-size: var(--text-sm);
   font-weight: 600;
-  border-radius: var(--radius-lg);
   letter-spacing: 0.01em;
-  transition: all var(--transition-base);
-  background: var(--color-primary);
-  color: white;
-  border: 2px solid var(--color-primary);
-  min-height: 44px;
   box-sizing: border-box;
+  transition: all var(--transition-base);
 }
 
-.hero-actions .shiny-input-container:hover .btn {
+.hero-actions .shiny-input-container .btn:hover,
+.hero-actions .shiny-input-container .btn:focus,
+.hero-actions .shiny-input-container .btn-default:hover,
+.hero-actions .shiny-input-container .btn-default:focus {
+  background: rgba(139, 110, 240, 0.12);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(139, 110, 240, 0.3);
+  box-shadow: 0 4px 12px rgba(139, 110, 240, 0.15);
+}
+
+.hero-actions .shiny-input-container .btn:active,
+.hero-actions .shiny-input-container .btn-default:active {
+  background: rgba(139, 110, 240, 0.16);
+  color: var(--color-primary);
+}
+
+.hero-actions .shiny-input-container .form-control {
+  display: none;
+}
+
+.hero-actions .shiny-input-container .form-control::placeholder {
+  color: var(--color-gray-400);
 }
 
 .hero-actions .btn-default {
@@ -202,6 +232,15 @@
     0 2px 16px rgba(139, 110, 240, 0.08),
     0 0 0 1px rgba(255, 255, 255, 0.5) inset;
   animation: cardFloat 6s ease-in-out infinite;
+}
+
+[data-theme="dark"] .icon-array-card,
+[data-theme="dark"] .use-case-card,
+[data-theme="dark"] .sample-table-container,
+[data-theme="dark"] .sample-insight,
+[data-theme="dark"] .feature-card {
+  background: linear-gradient(135deg, rgba(40, 31, 66, 0.95) 0%, rgba(31, 24, 51, 0.95) 100%);
+  border-color: rgba(102, 88, 150, 0.7);
 }
 
 /* Header */
@@ -608,6 +647,12 @@
   pointer-events: auto;
 }
 
+[data-theme="dark"] .carousel-nav {
+  background: rgba(40, 31, 66, 0.95);
+  color: var(--color-gray-700);
+  border-color: rgba(102, 88, 150, 0.75);
+}
+
 .carousel-nav:hover {
   background: var(--color-primary);
   border-color: var(--color-primary);
@@ -741,6 +786,10 @@
   color: var(--color-gray-600);
   text-align: left;
   border-bottom: 1px solid var(--color-border);
+}
+
+[data-theme="dark"] .sample-table th {
+  background: rgba(54, 43, 86, 0.8);
 }
 
 .sample-table td {
@@ -1060,5 +1109,15 @@
   .hero-actions .btn-primary,
   .hero-actions .shiny-input-container {
     width: 100%;
+  }
+
+  .hero-actions .shiny-input-container {
+    min-width: 0;
+  }
+
+  .hero-actions .shiny-input-container .btn,
+  .hero-actions .shiny-input-container .btn-default {
+    min-width: 140px;
+    padding: var(--space-3) var(--space-4);
   }
 }

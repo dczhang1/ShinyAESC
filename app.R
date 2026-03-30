@@ -152,37 +152,37 @@ landing_page_ui <- function() {
             "user-check",
             "Selection Tool Validity",
             "HR departments assess whether pre-employment tests predict job performance. Instead of reporting r = 0.35, ESCAPE shows that 67% of high-scoring applicants outperform low-scoring applicants—helping hiring managers make informed decisions.",
-            "images/usecase1.png"
+            "assets/selection.jpg"
           ),
           use_case_card(
             "heart-pulse",
             "Health Intervention Effectiveness",
             "Clinical trials evaluate treatment outcomes. A correlation of r = 0.42 becomes: \"Patients receiving the new treatment have a 71% chance of better outcomes compared to standard care.\" This makes results accessible to patients and policymakers.",
-            "images/usecase2.png"
+            "assets/health.jpg"
           ),
           use_case_card(
             "graduation-cap",
             "Educational Assessment",
             "Schools analyze whether entrance exams predict academic success. Rather than abstract correlations, educators can say: \"Students scoring above the 75th percentile are 2.3 times more likely to graduate on time.\"",
-            "images/usecase3.png"
+            "assets/education.jpg"
           ),
           use_case_card(
             "scale",
             "Psychological Scale Validation",
             "Researchers validate new measurement instruments. Instead of technical metrics, they can demonstrate: \"The new anxiety scale correctly identifies 78% of individuals who need clinical intervention.\"",
-            "images/usecase4.png"
+            "assets/validation.jpg"
           ),
           use_case_card(
             "target",
             "Program Evaluation",
             "Nonprofits and government agencies evaluate program impact. A correlation of r = 0.28 translates to: \"Participants are 64% more likely to achieve positive outcomes than non-participants.\"",
-            "images/usecase5.png"
+            "assets/program.jpg"
           ),
           use_case_card(
             "trending-up",
             "Predictive Analytics",
             "Business analysts forecast customer behavior. Rather than r = 0.45, stakeholders understand: \"Customers with high engagement scores are 73% more likely to make repeat purchases.\"",
-            "images/usecase6.png"
+            "assets/predictive.jpg"
           )
         ),
         # Carousel navigation

@@ -243,30 +243,36 @@ plot_icon_array <- function(cles_prob, total_icons = 100, icon_type = "person", 
   # Reverse row numbering so it goes from top to bottom
   icon_data$row <- n_rows - 1 - icon_data$row
   
+  status_colors <- c("Success" = plot_colors$primary, "Failure" = plot_colors$secondary)
+  icon_data$icon_color <- unname(status_colors[icon_data$status])
+
   # Create plot based on icon type
   if (icon_type == "person") {
-    # Use Unicode person silhouette (U+1F464) so "person" is an actual person icon
-    person_char <- "\U0001F464"
-    p <- ggplot(icon_data, aes(x = col, y = row, color = status, label = person_char)) +
-      geom_text(size = 3.5) +
-      scale_color_manual(
-        values = c("Success" = plot_colors$primary, "Failure" = plot_colors$secondary),
-        name = "Status"
-      )
+    # Build a person-like icon from two filled shapes for reliable color separation.
+    p <- ggplot(icon_data, aes(x = col, y = row, fill = status)) +
+      geom_point(
+        aes(y = row + 0.20),
+        shape = 21,
+        size = 2.2,
+        stroke = 0.28,
+        color = "#FFFFFF"
+      ) +
+      geom_point(
+        aes(y = row - 0.06),
+        shape = 23,
+        size = 3.0,
+        stroke = 0.28,
+        color = "#FFFFFF"
+      ) +
+      scale_fill_manual(values = status_colors, name = "Status")
   } else if (icon_type == "circle") {
-    p <- ggplot(icon_data, aes(x = col, y = row, color = status)) +
-      geom_point(size = 4, shape = 21, stroke = 1) +
-      scale_color_manual(
-        values = c("Success" = plot_colors$primary, "Failure" = plot_colors$secondary),
-        name = "Status"
-      )
+    p <- ggplot(icon_data, aes(x = col, y = row, fill = status)) +
+      geom_point(size = 4, shape = 21, stroke = 0.4, color = "#FFFFFF") +
+      scale_fill_manual(values = status_colors, name = "Status")
   } else if (icon_type == "square") {
-    p <- ggplot(icon_data, aes(x = col, y = row, color = status)) +
-      geom_point(size = 4, shape = 22, stroke = 1) +
-      scale_color_manual(
-        values = c("Success" = plot_colors$primary, "Failure" = plot_colors$secondary),
-        name = "Status"
-      )
+    p <- ggplot(icon_data, aes(x = col, y = row, fill = status)) +
+      geom_point(size = 4, shape = 22, stroke = 0.4, color = "#FFFFFF") +
+      scale_fill_manual(values = status_colors, name = "Status")
   }
   
   # Add labels and theme
