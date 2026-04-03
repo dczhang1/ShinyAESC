@@ -79,7 +79,7 @@ landing_page_ui <- function() {
             span(class = "transformation-label", "BEFORE"),
             div(class = "apa-excerpt",
               p(class = "apa-text",
-                "A Pearson correlation analysis revealed a statistically significant relationship between treatment assignment and patient outcome, ",
+                "A Pearson correlation analysis revealed a statistically significant relationship between structured interview scores and first-year job performance, ",
                 em("r"),
                 "(98) = .42, ",
                 em("p"),
@@ -106,7 +106,7 @@ landing_page_ui <- function() {
                 div(class = paste0("mini-icon mini-neutral"), tags$i(`data-lucide` = "user"))
               }))
             ),
-            span(class = "transformation-caption", "respond better")
+            span(class = "transformation-caption", "successful hires")
           )
         )
       )
@@ -491,9 +491,17 @@ analysis_ui <- function() {
             "report",
             label = tags$span(
               tags$i(`data-lucide` = "download", style = "width: 14px; height: 14px;"),
-              "Export Report"
+              "Export HTML Report"
             ),
             class = "btn-primary w-100"
+          ),
+          downloadButton(
+            "report_pdf",
+            label = tags$span(
+              tags$i(`data-lucide` = "file-text", style = "width: 14px; height: 14px;"),
+              "Export PDF Report"
+            ),
+            class = "btn-outline-primary w-100 mt-2"
           )
         )
       )
@@ -2061,6 +2069,74 @@ server <- function(input, output, session) {
 
   # --- Report Generation ---
 
+  assemble_report_params <- function() {
+    req(selected_data())
+    ev <- effective_vars()
+    df <- selected_data()
+    df_grouped <- df_cles()
+    above_vals <- df_grouped %>% filter(Group == "Above") %>% pull(Criterion)
+    below_vals <- df_grouped %>% filter(Group == "Below") %>% pull(Criterion)
+    corr <- validity_stats()$r
+    corr_abs <- abs(corr)
+    effect_band <- if (corr_abs < 0.10) "very small" else if (corr_abs < 0.30) "small" else if (corr_abs < 0.50) "moderate" else "large"
+    direction <- if (corr >= 0) "higher" else "lower"
+    practical_message <- paste0(
+      "The predictor has a ", effect_band, " relationship with the criterion (r = ",
+      sprintf("%.3f", corr),
+      "). In practical terms, higher predictor values are associated with ",
+      direction,
+      " criterion outcomes."
+    )
+    cles_val <- calc_cles(above_vals, below_vals)
+    cles_narrative <- cles_verbal(ev$predictor, ev$criterion, cutoff_X_val(), round(cles_val * 100, 1))
+    desc_tbl <- psych::describe(df) %>%
+      as.data.frame() %>%
+      tibble::rownames_to_column("Variable") %>%
+      dplyr::select(Variable, n, mean, sd, median, min, max)
+    exp_tbl <- df_exp() %>%
+      dplyr::transmute(
+        ntile_X,
+        xlabels,
+        proportion,
+        frequency,
+        n
+      )
+    besd_emp <- calc_besd(df, cutoff_X_val(), input$cutoffInput, ev$predictor, ev$criterion) %>%
+      as.data.frame() %>%
+      tibble::rownames_to_column("Group")
+    besd_theory <- calc_besd_theoretical(corr, ev$predictor, ev$criterion) %>%
+      as.data.frame() %>%
+      tibble::rownames_to_column("Group")
+    icon_plot_obj <- plot_icon_array(
+      cles_prob = cles_val,
+      total_icons = 100,
+      icon_type = "person",
+      layout = "auto",
+      predictor_name = ev$predictor,
+      criterion_name = ev$criterion
+    )
+    list(
+      predictor = ev$predictor,
+      criterion = ev$criterion,
+      n_obs = nrow(df),
+      bins = input$bins,
+      cutoff_y = input$cutoffInput,
+      cutoff_x_pct = round(input$cutoff.X * 100),
+      r = corr,
+      r2 = corr^2,
+      practical_message = practical_message,
+      cles_narrative = cles_narrative,
+      desc_stats = desc_tbl,
+      effect_sizes = calc_all_effect_sizes(above_vals, below_vals, corr),
+      exp_table = exp_tbl,
+      besd_empirical = besd_emp,
+      besd_theoretical = besd_theory,
+      scatter_plot = plot_scatter(df, ev$predictor, ev$criterion),
+      exp_plot = plot_expectancy(df_exp(), ev$predictor, input$cutoffInput),
+      icon_plot = icon_plot_obj
+    )
+  }
+
   output$report <- downloadHandler(
     filename = function() {
       paste0("ESCAPE_Report_", Sys.Date(), ".html")
@@ -2071,71 +2147,448 @@ server <- function(input, output, session) {
 
       rmd_content <- '
 ---
-title: "ESCAPE Analysis Report"
+title: "ESCAPE Professional Analysis Report"
 date: "`r Sys.Date()`"
+params:
+  predictor: ""
+  criterion: ""
+  n_obs: 0
+  bins: 10
+  cutoff_y: 0
+  cutoff_x_pct: 0
+  r: 0
+  r2: 0
+  practical_message: ""
+  cles_narrative: ""
+  desc_stats: NULL
+  effect_sizes: NULL
+  exp_table: NULL
+  besd_empirical: NULL
+  besd_theoretical: NULL
+  scatter_plot: NULL
+  exp_plot: NULL
+  icon_plot: NULL
 output:
   html_document:
-    theme: flatly
+    theme: cosmo
+    self_contained: true
     toc: true
+    toc_depth: 2
+    number_sections: false
+    df_print: paged
+    code_folding: hide
+    fig_caption: true
 ---
 
-## Analysis Summary
-
-**Predictor:** `r params$predictor`
-**Criterion:** `r params$criterion`
-
-### Correlation
-
-`r paste0("r = ", round(params$r, 3), " (", round(params$r^2 * 100, 1), "% variance explained)")`
-
-### Descriptive Statistics
-
-```{r, echo=FALSE}
-knitr::kable(params$desc_stats, digits = 3)
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
 ```
 
-### Effect Size Indices
+<style>
+@import url("https://fonts.googleapis.com/css2?family=Fira+Code:wght@500;600&family=Fira+Sans:wght@400;500;600;700&display=swap");
 
-```{r, echo=FALSE}
-knitr::kable(params$effect_sizes, digits = 3)
+:root {
+  --report-bg: #f8fafc;
+  --report-surface: #ffffff;
+  --report-primary: #1e40af;
+  --report-secondary: #3b82f6;
+  --report-accent: #f59e0b;
+  --report-border: #dbe5f3;
+  --report-text: #102a43;
+  --report-muted: #486581;
+}
+
+body {
+  font-family: "Fira Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--report-text);
+  background: var(--report-bg);
+}
+
+h1, h2, h3 {
+  color: var(--report-primary);
+  letter-spacing: -0.01em;
+}
+
+#header,
+.fluid-row#header {
+  margin-bottom: 1.25rem;
+}
+
+#header h1.title,
+h1.title,
+h1.title.toc-ignore,
+.title-block h1,
+.fluid-row#header h1 {
+  font-size: 2.75rem !important;
+  line-height: 1.12 !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.03em !important;
+  margin-bottom: 0.35rem !important;
+  color: var(--report-primary) !important;
+}
+
+#header .date,
+h4.date {
+  font-size: 0.95rem !important;
+  color: var(--report-muted) !important;
+  font-weight: 500 !important;
+}
+
+h2 {
+  font-size: 1.22rem;
+  border-bottom: 2px solid var(--report-border);
+  padding-bottom: 0.35rem;
+  margin-top: 1.6rem;
+}
+
+h3 {
+  font-size: 1.05rem;
+  margin-top: 1.1rem;
+}
+
+p, li {
+  color: var(--report-text);
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(160px, 1fr));
+  gap: 0.75rem;
+  margin: 0.75rem 0 1rem 0;
+}
+
+.summary-card {
+  background: var(--report-surface);
+  border: 1px solid var(--report-border);
+  border-radius: 12px;
+  padding: 0.75rem 0.85rem;
+  box-shadow: 0 8px 20px rgba(30, 64, 175, 0.07);
+}
+
+.summary-label {
+  color: var(--report-muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.2rem;
+}
+
+.summary-value {
+  color: var(--report-primary);
+  font-family: "Fira Code", ui-monospace, monospace;
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.report-callout {
+  background: linear-gradient(120deg, rgba(30, 64, 175, 0.08), rgba(59, 130, 246, 0.06));
+  border-left: 4px solid var(--report-secondary);
+  border-radius: 10px;
+  padding: 0.8rem 0.9rem;
+  margin: 0.9rem 0 1rem 0;
+}
+
+table {
+  background: var(--report-surface);
+  border: 1px solid var(--report-border);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+thead th {
+  background: #eef4ff;
+  color: var(--report-primary);
+  font-weight: 700;
+}
+
+tbody tr:nth-child(even) {
+  background: #f9fbff;
+}
+
+.tocify {
+  border-radius: 10px;
+  border: 1px solid var(--report-border);
+}
+</style>
+
+## Executive Summary
+
+```{r results="asis"}
+cards <- c(
+  sprintf("<div class=\\\"summary-card\\\"><div class=\\\"summary-label\\\">Predictor</div><div class=\\\"summary-value\\\">%s</div></div>", params$predictor),
+  sprintf("<div class=\\\"summary-card\\\"><div class=\\\"summary-label\\\">Criterion</div><div class=\\\"summary-value\\\">%s</div></div>", params$criterion),
+  sprintf("<div class=\\\"summary-card\\\"><div class=\\\"summary-label\\\">Sample Size</div><div class=\\\"summary-value\\\">%s</div></div>", params$n_obs),
+  sprintf("<div class=\\\"summary-card\\\"><div class=\\\"summary-label\\\">Top-group cutoff</div><div class=\\\"summary-value\\\">%s%%</div></div>", params$cutoff_x_pct),
+  sprintf("<div class=\\\"summary-card\\\"><div class=\\\"summary-label\\\">Criterion threshold</div><div class=\\\"summary-value\\\">%s</div></div>", params$cutoff_y),
+  sprintf("<div class=\\\"summary-card\\\"><div class=\\\"summary-label\\\">Variance explained</div><div class=\\\"summary-value\\\">%.1f%%</div></div>", params$r2 * 100)
+)
+cat(paste0("<div class=\\\"summary-grid\\\">", paste(cards, collapse = ""), "</div>"))
+```
+
+```{r results="asis"}
+cat(sprintf("<div class=\\\"report-callout\\\"><strong>Practical interpretation.</strong> %s</div>", params$practical_message))
+cat(sprintf("<div class=\\\"report-callout\\\"><strong>CLES interpretation.</strong> %s</div>", params$cles_narrative))
+```
+
+## Core Effect Size Findings
+
+```{r}
+core_tbl <- data.frame(
+  Metric = c("Pearsons r", "Variance explained (R^2)", "Criterion cutoff", "Expectancy bins"),
+  Value = c(
+    sprintf("%.3f", params$r),
+    sprintf("%.1f%%", params$r2 * 100),
+    as.character(params$cutoff_y),
+    as.character(params$bins)
+  ),
+  stringsAsFactors = FALSE
+)
+knitr::kable(core_tbl, align = c("l", "r"))
+```
+
+```{r}
+knitr::kable(params$effect_sizes, align = c("l", "r"))
+```
+
+## Descriptive Statistics
+
+```{r}
+knitr::kable(params$desc_stats, align = c("l", "r", "r", "r", "r", "r", "r"), digits = 3)
 ```
 
 ### Scatterplot
 
-```{r, echo=FALSE, fig.width=8, fig.height=5}
+```{r fig.width=9, fig.height=5}
 params$scatter_plot
 ```
 
 ### Expectancy Chart
 
-```{r, echo=FALSE, fig.width=8, fig.height=4}
+```{r fig.width=9, fig.height=4.5}
 params$exp_plot
 ```
 
+## Expectancy Table
+
+```{r}
+exp_tbl <- params$exp_table
+if (!is.null(exp_tbl) && nrow(exp_tbl) > 0) {
+  exp_tbl$proportion <- sprintf("%.1f%%", exp_tbl$proportion * 100)
+  knitr::kable(exp_tbl, align = c("r", "l", "r", "r", "r"), col.names = c("Bin", "Predictor range", "Success rate", "Successes", "N"))
+}
+```
+
+## Icon Array (Practical Probability)
+
+```{r fig.width=9, fig.height=4.8}
+params$icon_plot
+```
+
+## BESD (Observed Data)
+
+```{r}
+knitr::kable(params$besd_empirical, align = c("l", "r", "r"), digits = 3)
+```
+
+## BESD (Theoretical From r)
+
+```{r}
+knitr::kable(params$besd_theoretical, align = c("l", "r", "r"), digits = 3)
+```
+
 ---
-*Generated by ESCAPE*
+<small>Generated by ESCAPE (Effect Size Calculator for Practical Effects)</small>
 '
       writeLines(rmd_content, tempReport)
 
-      df <- selected_data()
-      df_grouped <- df_cles()
-      above_vals <- df_grouped %>% filter(Group == "Above") %>% pull(Criterion)
-      below_vals <- df_grouped %>% filter(Group == "Below") %>% pull(Criterion)
+      p <- assemble_report_params()
 
       rmarkdown::render(
         tempReport,
         output_file = file,
-        params = list(
-          predictor = effective_vars()$predictor,
-          criterion = effective_vars()$criterion,
-          r = validity_stats()$r,
-          desc_stats = psych::describe(df) %>% as.data.frame() %>% select(n, mean, sd, median, min, max),
-          effect_sizes = calc_all_effect_sizes(above_vals, below_vals, validity_stats()$r),
-          scatter_plot = plot_scatter(df, effective_vars()$predictor, effective_vars()$criterion),
-          exp_plot = plot_expectancy(df_exp(), effective_vars()$predictor, input$cutoffInput)
-        ),
+        params = p,
         envir = new.env(parent = globalenv())
       )
+    }
+  )
+
+  output$report_pdf <- downloadHandler(
+    filename = function() {
+      paste0("ESCAPE_Report_", Sys.Date(), ".pdf")
+    },
+    content = function(file) {
+      p <- assemble_report_params()
+      tempReport <- file.path(tempdir(), "report_pdf.Rmd")
+
+      rmd_pdf <- '
+---
+title: "ESCAPE Professional Analysis Report"
+date: "`r Sys.Date()`"
+params:
+  predictor: ""
+  criterion: ""
+  n_obs: 0
+  bins: 10
+  cutoff_y: 0
+  cutoff_x_pct: 0
+  r: 0
+  r2: 0
+  practical_message: ""
+  cles_narrative: ""
+  desc_stats: NULL
+  effect_sizes: NULL
+  exp_table: NULL
+  besd_empirical: NULL
+  besd_theoretical: NULL
+  scatter_plot: NULL
+  exp_plot: NULL
+  icon_plot: NULL
+output:
+  pdf_document:
+    toc: true
+    toc_depth: 2
+    number_sections: false
+geometry: margin=1in
+fontsize: 11pt
+documentclass: article
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(
+  echo = FALSE,
+  warning = FALSE,
+  message = FALSE,
+  fig.width = 7,
+  fig.height = 4.25,
+  dpi = 150,
+  dev = "png",
+  fig.ext = "png"
+)
+```
+
+## Executive Summary
+
+```{r}
+kpi <- data.frame(
+  Metric = c("Predictor", "Criterion", "Sample size", "Top-group cutoff (percent)", "Criterion threshold", "Variance explained (percent)"),
+  Value = c(
+    as.character(params$predictor),
+    as.character(params$criterion),
+    as.character(params$n_obs),
+    as.character(params$cutoff_x_pct),
+    as.character(params$cutoff_y),
+    sprintf("%.1f", params$r2 * 100)
+  ),
+  stringsAsFactors = FALSE
+)
+knitr::kable(kpi, booktabs = TRUE)
+```
+
+```{r results="asis"}
+cat("Practical interpretation. ", params$practical_message, "\n\n", "CLES interpretation. ", params$cles_narrative, sep = "")
+```
+
+## Core Effect Size Findings
+
+```{r}
+core_tbl <- data.frame(
+  Metric = c("Pearsons r", "Variance explained (R^2)", "Criterion cutoff", "Expectancy bins"),
+  Value = c(
+    sprintf("%.3f", params$r),
+    sprintf("%.1f%%", params$r2 * 100),
+    as.character(params$cutoff_y),
+    as.character(params$bins)
+  ),
+  stringsAsFactors = FALSE
+)
+knitr::kable(core_tbl, booktabs = TRUE, align = c("l", "r"))
+```
+
+```{r}
+knitr::kable(params$effect_sizes, booktabs = TRUE, align = c("l", "r"))
+```
+
+## Descriptive Statistics
+
+```{r}
+knitr::kable(params$desc_stats, booktabs = TRUE, align = c("l", "r", "r", "r", "r", "r", "r"), digits = 3)
+```
+
+### Scatterplot
+
+```{r fig.width=7, fig.height=4.5}
+params$scatter_plot
+```
+
+### Expectancy Chart
+
+```{r fig.width=7, fig.height=4}
+params$exp_plot
+```
+
+## Expectancy Table
+
+```{r}
+exp_tbl <- params$exp_table
+if (!is.null(exp_tbl) && nrow(exp_tbl) > 0) {
+  exp_tbl$proportion <- sprintf("%.1f%%", exp_tbl$proportion * 100)
+  knitr::kable(exp_tbl, booktabs = TRUE, align = c("r", "l", "r", "r", "r"), col.names = c("Bin", "Predictor range", "Success rate", "Successes", "N"))
+}
+```
+
+## Icon Array (Practical Probability)
+
+```{r fig.width=7, fig.height=4.5}
+params$icon_plot
+```
+
+## BESD (Observed Data)
+
+```{r}
+knitr::kable(params$besd_empirical, booktabs = TRUE, align = c("l", "r", "r"), digits = 3)
+```
+
+## BESD (Theoretical From r)
+
+```{r}
+knitr::kable(params$besd_theoretical, booktabs = TRUE, align = c("l", "r", "r"), digits = 3)
+```
+
+*Generated by ESCAPE (Effect Size Calculator for Practical Effects).*
+'
+      writeLines(rmd_pdf, tempReport)
+
+      err <- tryCatch(
+        {
+          rmarkdown::render(
+            tempReport,
+            output_file = file,
+            params = p,
+            output_format = rmarkdown::pdf_document(
+              toc = TRUE,
+              toc_depth = 2,
+              number_sections = FALSE
+            ),
+            envir = new.env(parent = globalenv())
+          )
+          NULL
+        },
+        error = function(e) e
+      )
+
+      if (!is.null(err)) {
+        session$sendCustomMessage("showToast", list(
+          message = paste0(
+            "PDF export needs a LaTeX engine (install TinyTeX: tinytex::install_tinytex()). ",
+            "Alternatively export HTML and use Print to PDF. ",
+            conditionMessage(err)
+          ),
+          type = "error"
+        ))
+        stop(conditionMessage(err))
+      }
     }
   )
 }

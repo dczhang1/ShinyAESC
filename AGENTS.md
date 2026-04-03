@@ -114,3 +114,4 @@ www/assets/                # Stock images for carousel (selection.jpg, health.jp
 - **Analysis dashboard**: `navset_card_underline` layout with tabs: Summary, Overview, Descriptives, Traditional, Practical, Help.
 - **Data flow**: `data_set()` reactive loads CSV/Excel/SPSS/SAS files → `selected_data()` creates generic Predictor/Criterion columns → analysis functions run in pipeline.
 - **Effect size calculations pipeline**: `calc_correlation()` → `calc_expectancy()` → `calc_cohens_d()` → `calc_cles()` → `calc_besd()` → `r_to_d()` / `d_to_r()`
+![1775223992956](image/AGENTS/1775223992956.png)![1775223999715](image/AGENTS/1775223999715.png)
