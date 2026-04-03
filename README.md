@@ -71,14 +71,10 @@ Rscript app.R
 | `app.R` | Main Shiny app (UI + server) |
 | `R/utils_*.R` | Theme, statistics, plots |
 | `www/` | CSS, JS, assets |
-| `data/sampleData.csv` | Bundled demo data |
+| `data/sampleData.csv` | Bundled demo data (NHIS 2024 adult: vigorous activity vs. self-rated health, n = 1,000) |
 | `docs/shinyInstructions.html` | In-app Help tab content |
 | `docs/README.md` | Additional project notes and structure |
 
+The demo extract uses variables from the NHIS 2024 Sample Adult public-use file (NCHS, CDC): vigorous leisure-time physical activity frequency (`VIGFREQW_A`, 0–7 days per week in the extract) and self-rated health (`PHSTAT_A`, recoded so higher = better health). It is for illustration only and does not reflect NCHS or CDC endorsement.
+
 ---
-
-## More documentation
-
-Extended overview, feature list, and roadmap-style notes: **[docs/README.md](docs/README.md)**.
-
-For coding agents and contributors, see **[AGENTS.md](AGENTS.md)** (build commands, conventions, file map).

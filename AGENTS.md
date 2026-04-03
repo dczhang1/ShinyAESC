@@ -11,7 +11,7 @@ Deployed at https://dczhang.shinyapps.io/shinyaesc/
 - **Language**: R (Shiny framework using `bslib` for Bootstrap 5 theming)
 - **Frontend**: HTML/CSS (custom `landing.css` + `main.css`), JS (`main.js`)
 - **Structure**: Single-file Shiny app (`app.R`) with sourced utility modules in `R/`
-- **Data**: Sample dataset at `data/sampleData.csv` (SAT_sum, GPA, sex, sat_v, sat_m, hs_gpa; n=1000)
+- **Data**: Sample dataset at `data/sampleData.csv` (`vigorous_days_per_week`, `self_rated_health`; NHIS 2024 public-use adult sample, n=1000)
 
 ## Build & Run Commands
 
@@ -111,7 +111,7 @@ www/assets/                # Stock images for carousel (selection.jpg, health.jp
 - **Landing page sections**: Hero → Problem → How It Works → Sample Data → Use Cases (carousel) → Features → Footer
 - **Sample data is pre-computed server-side** using `landing_preview_data` reactive with `calc_expectancy(...)` at `cutoff_y = 3.0`. Plot rendered via `plot_expectancy_landing()` to `plotOutput("landing_expectancy_plot")`.
 - **Guided wizard**: Multi-step file upload modal using `show_guided_wizard()`. Manages steps via `app_state$guided_step`. Auto-advances to step 2 when file is uploaded.
-- **Analysis dashboard**: `navset_card_underline` layout with tabs: Summary, Overview, Descriptives, Traditional, Practical, Help.
+- **Analysis dashboard**: `navset_card_underline` layout with main tabs: Summary, Traditional, Practical, Converter, Help (Summary uses nested pills: Getting started, Overview, Descriptives, Data).
 - **Data flow**: `data_set()` reactive loads CSV/Excel/SPSS/SAS files → `selected_data()` creates generic Predictor/Criterion columns → analysis functions run in pipeline.
 - **Effect size calculations pipeline**: `calc_correlation()` → `calc_expectancy()` → `calc_cohens_d()` → `calc_cles()` → `calc_besd()` → `r_to_d()` / `d_to_r()`
 ![1775223992956](image/AGENTS/1775223992956.png)![1775223999715](image/AGENTS/1775223999715.png)

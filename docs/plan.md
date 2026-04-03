@@ -92,7 +92,7 @@ hedges_g <- J * cohens_d
 **Possible simplified approach:**
 - Only allow 2 predictors
 - Show: "Predictor 1 alone: r = .30, Predictor 2 adds: Δr = .08"
-- CLES interpretation: "Adding SAT to high school GPA increases prediction accuracy from 60% to 64%"
+- CLES interpretation (example): "Adding a predictor improves classification accuracy from 60% to 64%"
 
 **Decision needed:** Is the simplified 2-predictor approach worth pursuing, or defer entirely?
 

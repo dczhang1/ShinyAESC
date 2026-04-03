@@ -169,28 +169,28 @@ landing_page_ui <- function() {
     div(
       class = "sample-section",
       h2(class = "section-title", "See it in action"),
-      p(class = "section-subtitle", "Our sample dataset shows the relationship between SAT scores and college GPA"),
+      p(class = "section-subtitle", "Our sample dataset shows vigorous leisure-time activity and self-rated health in U.S. adults (NHIS 2024 public-use data)"),
       div(
         class = "sample-preview",
           div(
             class = "sample-table-container",
             tags$caption(class = "sample-caption",
-              "Sample dataset: SAT scores (scaled, n = 1,000) vs. College GPA"
+              "Sample dataset: vigorous activity (days per week) vs. self-rated health (n = 1,000; higher health = better)"
             ),
             tags$table(
               class = "sample-table",
               tags$thead(
                 tags$tr(
-                  tags$th("SAT Score"),
-                  tags$th("College GPA")
+                  tags$th("Vigorous days/week"),
+                  tags$th("Self-rated health")
                 )
               ),
               tags$tbody(
-                tags$tr(tags$td("127"), tags$td("3.18")),
-                tags$tr(tags$td("122"), tags$td("3.33")),
-                tags$tr(tags$td("116"), tags$td("3.25")),
-                tags$tr(tags$td("95"), tags$td("2.42")),
-                tags$tr(tags$td("107"), tags$td("2.63")),
+                tags$tr(tags$td("1"), tags$td("2")),
+                tags$tr(tags$td("2"), tags$td("4")),
+                tags$tr(tags$td("2"), tags$td("4")),
+                tags$tr(tags$td("4"), tags$td("4")),
+                tags$tr(tags$td("4"), tags$td("5")),
                 tags$tr(class = "sample-more", tags$td(colspan = "2", "...and 995 more rows"))
               )
             )
@@ -200,9 +200,9 @@ landing_page_ui <- function() {
             tags$i(`data-lucide` = "lightbulb", class = "insight-icon"),
             div(
               tags$strong("Key Insight"),
-              p("Students in the top 20% of SAT scores are ",
-                tags$strong("6.9\u00D7 more likely"),
-                " to achieve a 3.0+ GPA \u2014 that\u2019s the kind of statement that gets a committee\u2019s attention."
+              p("Adults in the top fifth for vigorous activity days are ",
+                tags$strong("about 1.2\u00D7 as likely"),
+                " to score above a middling self-rated health threshold as those in the bottom fifth \u2014 see the expectancy chart."
               ),
               div(class = "sample-insight-chart", plotOutput("landing_expectancy_plot", width = "100%", height = "300px"))
             )
@@ -532,7 +532,7 @@ analysis_ui <- function() {
     conditionalPanel(
       condition = "output.data_ready === 'yes'",
       navset_card_underline(
-        # Bookmark values: summary, traditional, practical, help
+        # Bookmark values: summary, traditional, practical, converter, help
         id = "main_tabs",
 
         # ---- Summary (getting started, overview, descriptives, data) ----
@@ -562,7 +562,8 @@ analysis_ui <- function() {
                           tags$li("Set Criterion cutoff and Predictor percentile."),
                           tags$li("Use Summary (Overview and Descriptives) for a quick read of your data."),
                           tags$li("Use Practical effect sizes for alternative (CLES, BESD) and graphical (expectancy, icon array) presentations."),
-                          tags$li("Use Traditional effect sizes for classical indices, group summaries, and the theoretical converter."),
+                          tags$li("Use Traditional effect sizes for classical indices and group summaries."),
+                          tags$li("Use the Converter tab when you only have a published r or d and need the other form (theoretical)."),
                           tags$li("Export report from the sidebar when ready."),
                           tags$li("Open the Help tab for the app guide and (soon) interpretation resources.")
                         )
@@ -709,54 +710,18 @@ analysis_ui <- function() {
           ),
           value = "traditional",
           div(
-            class = "analysis-page analysis-page--nested",
-            navset_pill(
-              id = "traditional_sections",
-              nav_panel(
-                title = "Indices & groups",
-                value = "traditional_indices",
-                div(
-                  class = "analysis-subsection",
-                  layout_columns(
-                    col_widths = c(6, 6),
-                    card(
-                      card_header("Effect Size Indices"),
-                      card_body(tableOutput("cles"))
-                    ),
-                    card(
-                      card_header("Group Statistics"),
-                      card_body(tableOutput("clestable"))
-                    )
-                  )
-                )
-              ),
-              nav_panel(
-                title = "Converter",
-                value = "traditional_converter",
-                div(
-                  class = "analysis-subsection",
-                  card(
-                    card_header("Effect Size Converter (Theoretical)"),
-                    card_body(
-                      class = "converter-controls-card",
-                      layout_columns(
-                        col_widths = c(4, 4, 4),
-                        selectInput("converter_input_type", "Input type", choices = c("Correlation (r)" = "r", "Cohen's d" = "d")),
-                        numericInput("converter_value", "Input value", value = 0.3, step = 0.01),
-                        uiOutput("converter_validity")
-                      ),
-                      tags$p(class = "text-muted", "Use this mode when you only have published summary effect sizes.")
-                    )
-                  ),
-                  card(
-                    card_header("Converted Metrics"),
-                    card_body(
-                      class = "converter-output-card",
-                      tableOutput("converter_table"),
-                      tags$hr(),
-                      uiOutput("converter_interpretation")
-                    )
-                  )
+            class = "analysis-page",
+            div(
+              class = "analysis-subsection",
+              layout_columns(
+                col_widths = c(6, 6),
+                card(
+                  card_header("Effect Size Indices"),
+                  card_body(tableOutput("cles"))
+                ),
+                card(
+                  card_header("Group Statistics"),
+                  card_body(tableOutput("clestable"))
                 )
               )
             )
@@ -931,6 +896,43 @@ analysis_ui <- function() {
                       )
                     )
                   )
+                )
+              )
+            )
+          )
+        ),
+
+        # ---- Converter (theoretical r ↔ d) ----
+        nav_panel(
+          title = tags$span(
+            tags$i(`data-lucide` = "arrow-left-right", style = "width: 14px; height: 14px; margin-right: 6px;"),
+            "Converter"
+          ),
+          value = "converter",
+          div(
+            class = "analysis-page",
+            div(
+              class = "analysis-subsection",
+              card(
+                card_header("Effect Size Converter (Theoretical)"),
+                card_body(
+                  class = "converter-controls-card",
+                  layout_columns(
+                    col_widths = c(4, 4, 4),
+                    selectInput("converter_input_type", "Input type", choices = c("Correlation (r)" = "r", "Cohen's d" = "d")),
+                    numericInput("converter_value", "Input value", value = 0.3, step = 0.01),
+                    uiOutput("converter_validity")
+                  ),
+                  tags$p(class = "text-muted", "Use this tab when you only have published summary effect sizes and need the other form.")
+                )
+              ),
+              card(
+                card_header("Converted Metrics"),
+                card_body(
+                  class = "converter-output-card",
+                  tableOutput("converter_table"),
+                  tags$hr(),
+                  uiOutput("converter_interpretation")
                 )
               )
             )
@@ -1452,7 +1454,7 @@ server <- function(input, output, session) {
     df <- raw %>%
       dplyr::select(Predictor = 1, Criterion = 2) %>%
       na.omit()
-    list(df = df, predictor_name = "SAT Score (scaled)", criterion_name = "College GPA")
+    list(df = df, predictor_name = "Vigorous activity (days/week)", criterion_name = "Self-rated health")
   })
 
   # Expectancy chart in landing Key Insight (sample data, fixed bins=5, cutoff=3.0)
@@ -1798,7 +1800,7 @@ server <- function(input, output, session) {
       tags$p(tags$strong("Primary question: "), paste0("How much does ", ev$predictor, " improve practical outcomes on ", ev$criterion, "?")),
       tags$p(
         tags$strong("Recommended path: "),
-        "Summary (Overview and Descriptives) → Practical effect sizes (alternative CLES/BESD; graphical expectancy and icon array) → Traditional effect sizes (indices, group stats, Converter when you only have published effects). Use Help for the app guide and interpretation resources as they are added."
+        "Summary (Overview and Descriptives) → Traditional effect sizes (indices and group stats) → Practical effect sizes (alternative CLES/BESD; graphical expectancy and icon array) → Converter when you only have published r or d. Use Help for the app guide and interpretation resources as they are added."
       )
     )
   })
