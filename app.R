@@ -456,7 +456,19 @@ analysis_ui <- function() {
             "Variables"
           ),
           selectInput("predictorVar", "Predictor (X)", choices = NULL),
-          selectInput("criterionVar", "Criterion (Y)", choices = NULL)
+          selectInput("criterionVar", "Criterion (Y)", choices = NULL),
+          textInput(
+            "predictor_display_name",
+            "Predictor display name",
+            value = "",
+            placeholder = "Uses column name if empty"
+          ),
+          textInput(
+            "criterion_display_name",
+            "Criterion display name",
+            value = "",
+            placeholder = "Uses column name if empty"
+          )
         ),
 
         # Parameters Section
@@ -559,6 +571,7 @@ analysis_ui <- function() {
                         class = "start-guide",
                         tags$ol(
                           tags$li("Choose Predictor (X) and Criterion (Y) in the sidebar."),
+                          tags$li("Optionally set display names so plots and reports use clearer labels than raw column names."),
                           tags$li("Set Criterion cutoff and Predictor percentile."),
                           tags$li("Use Summary (Overview and Descriptives) for a quick read of your data."),
                           tags$li("Use Practical effect sizes for alternative (CLES, BESD) and graphical (expectancy, icon array) presentations."),
@@ -1510,6 +1523,28 @@ server <- function(input, output, session) {
     updateSelectInput(session, "criterionVar", choices = dsnames, selected = ev$criterion)
   })
 
+  observeEvent(input$predictorVar, {
+    updateTextInput(session, "predictor_display_name", value = "")
+  }, ignoreNULL = TRUE, ignoreInit = TRUE)
+
+  observeEvent(input$criterionVar, {
+    updateTextInput(session, "criterion_display_name", value = "")
+  }, ignoreNULL = TRUE, ignoreInit = TRUE)
+
+  predictor_display_name <- reactive({
+    ev <- effective_vars()
+    req(ev$predictor)
+    v <- input$predictor_display_name
+    if (is.null(v) || !nzchar(trimws(v))) ev$predictor else trimws(v)
+  })
+
+  criterion_display_name <- reactive({
+    ev <- effective_vars()
+    req(ev$criterion)
+    v <- input$criterion_display_name
+    if (is.null(v) || !nzchar(trimws(v))) ev$criterion else trimws(v)
+  })
+
   # Selected data (filtered); uses effective vars so chain never blocks on first paint
   selected_data <- reactive({
     req(data_set())
@@ -1608,13 +1643,13 @@ server <- function(input, output, session) {
   })
 
   output$overview_scatter <- renderPlot({
-    ev <- effective_vars()
-    p <- plot_scatter(selected_data(), ev$predictor, ev$criterion)
+    p <- plot_scatter(selected_data(), predictor_display_name(), criterion_display_name())
     print(p)
   }, width = 560, height = 340, res = 96)
 
   output$overview_insight <- renderUI({
-    ev <- effective_vars()
+    pd <- predictor_display_name()
+    cd <- criterion_display_name()
     r <- validity_stats()$r
     cles <- effect_sizes()$cles
     d <- effect_sizes()$d
@@ -1631,10 +1666,10 @@ server <- function(input, output, session) {
       paste0(
         "A randomly selected person from the top ",
         round(input$cutoff.X * 100), "% on ",
-        ev$predictor, " has a ",
+        pd, " has a ",
         tags$strong(paste0(round(cles * 100, 1), "%")),
         " probability of scoring higher on ",
-        ev$criterion, " than someone from the bottom ",
+        cd, " than someone from the bottom ",
         round((1 - input$cutoff.X) * 100), "%."
       )
     } else {
@@ -1653,7 +1688,7 @@ server <- function(input, output, session) {
         tags$i(`data-lucide` = "activity", class = "insight-icon-small"),
         p(
           paste0(
-            "Direction: higher predictor group tends to score ", d_direction, " on ", ev$criterion,
+            "Direction: higher predictor group tends to score ", d_direction, " on ", cd,
             ". Uncertainty ranges: r 95% CI [", round(r_ci$lower, 2), ", ", round(r_ci$upper, 2),
             "], d 95% CI [", round(d_ci$lower, 2), ", ", round(d_ci$upper, 2), "]."
           )
@@ -1686,8 +1721,7 @@ server <- function(input, output, session) {
   # --- Expectancy Tab Outputs ---
 
   output$expectancyPlot <- renderPlot({
-    ev <- effective_vars()
-    p <- plot_expectancy(df_exp(), ev$predictor, input$cutoffInput)
+    p <- plot_expectancy(df_exp(), predictor_display_name(), input$cutoffInput)
     print(p)
   }, width = 720, height = 420, res = 96)
 
@@ -1714,13 +1748,11 @@ server <- function(input, output, session) {
   })
 
   output$hist_x_title <- renderText({
-    ev <- effective_vars()
-    paste("Distribution of", ev$predictor)
+    paste("Distribution of", predictor_display_name())
   })
 
   output$hist_y_title <- renderText({
-    ev <- effective_vars()
-    paste("Distribution of", ev$criterion)
+    paste("Distribution of", criterion_display_name())
   })
 
   output$histogram.X <- renderPlot({
@@ -1734,8 +1766,7 @@ server <- function(input, output, session) {
   }, width = 560, height = 340, res = 96)
 
   output$corplot <- renderPlot({
-    ev <- effective_vars()
-    p <- plot_scatter(selected_data(), ev$predictor, ev$criterion)
+    p <- plot_scatter(selected_data(), predictor_display_name(), criterion_display_name())
     print(p)
   }, width = 720, height = 480, res = 96)
 
@@ -1763,7 +1794,6 @@ server <- function(input, output, session) {
   })
 
   output$cles.verbal <- renderText({
-    ev <- effective_vars()
     df <- df_cles()
     above_vals <- df %>% filter(Group == "Above") %>% pull(Criterion)
     below_vals <- df %>% filter(Group == "Below") %>% pull(Criterion)
@@ -1773,31 +1803,28 @@ server <- function(input, output, session) {
     }
 
     cles_val <- calc_cles(above_vals, below_vals)
-    cles_verbal(ev$predictor, ev$criterion, cutoff_X_val(), round(cles_val * 100, 1))
+    cles_verbal(predictor_display_name(), criterion_display_name(), cutoff_X_val(), round(cles_val * 100, 1))
   })
 
   output$histogram.overlap <- renderPlot({
-    ev <- effective_vars()
-    p <- plot_density_overlap(df_cles(), ev$criterion, ev$predictor, cutoff_X_val())
+    p <- plot_density_overlap(df_cles(), criterion_display_name(), predictor_display_name(), cutoff_X_val())
     print(p)
   }, width = 680, height = 380, res = 96)
 
   output$besd <- renderTable({
-    ev <- effective_vars()
     df <- selected_data()
-    calc_besd(df, cutoff_X_val(), input$cutoffInput, ev$predictor, ev$criterion)
+    calc_besd(df, cutoff_X_val(), input$cutoffInput, predictor_display_name(), criterion_display_name())
   }, rownames = TRUE, digits = 3)
 
   output$besd_theoretical <- renderTable({
-    ev <- effective_vars()
-    calc_besd_theoretical(validity_stats()$r, ev$predictor, ev$criterion)
+    calc_besd_theoretical(validity_stats()$r, predictor_display_name(), criterion_display_name())
   }, rownames = TRUE, digits = 3)
 
   output$start_here_blurb <- renderUI({
     ev <- effective_vars()
     if (is.null(ev$predictor) || is.null(ev$criterion)) return(tags$p("Select variables to begin."))
     tags$div(
-      tags$p(tags$strong("Primary question: "), paste0("How much does ", ev$predictor, " improve practical outcomes on ", ev$criterion, "?")),
+      tags$p(tags$strong("Primary question: "), paste0("How much does ", predictor_display_name(), " improve practical outcomes on ", criterion_display_name(), "?")),
       tags$p(
         tags$strong("Recommended path: "),
         "Summary (Overview and Descriptives) → Traditional effect sizes (indices and group stats) → Practical effect sizes (alternative CLES/BESD; graphical expectancy and icon array) → Converter when you only have published r or d. Use Help for the app guide and interpretation resources as they are added."
@@ -1870,20 +1897,18 @@ server <- function(input, output, session) {
 
   output$download_overview_scatter <- downloadHandler(
     filename = function() {
-      ev <- effective_vars()
       paste0(
         "ESCAPE_Scatter_",
-        sanitize_filename(ev$predictor),
+        sanitize_filename(predictor_display_name()),
         "_vs_",
-        sanitize_filename(ev$criterion),
+        sanitize_filename(criterion_display_name()),
         "_",
         Sys.Date(),
         ".png"
       )
     },
     content = function(file) {
-      ev <- effective_vars()
-      p <- plot_scatter(selected_data(), ev$predictor, ev$criterion)
+      p <- plot_scatter(selected_data(), predictor_display_name(), criterion_display_name())
       ggplot2::ggsave(
         filename = file,
         plot = p,
@@ -1897,17 +1922,20 @@ server <- function(input, output, session) {
 
   output$download_histogram_x <- downloadHandler(
     filename = function() {
-      ev <- effective_vars()
       paste0(
         "ESCAPE_Histogram_",
-        sanitize_filename(ev$predictor),
+        sanitize_filename(predictor_display_name()),
         "_",
         Sys.Date(),
         ".png"
       )
     },
     content = function(file) {
-      p <- plot_histogram(selected_data()$Predictor, fill_color = plot_colors$primary)
+      p <- plot_histogram(
+        selected_data()$Predictor,
+        title = paste("Distribution of", predictor_display_name()),
+        fill_color = plot_colors$primary
+      )
       ggplot2::ggsave(
         filename = file,
         plot = p,
@@ -1921,17 +1949,20 @@ server <- function(input, output, session) {
 
   output$download_histogram_y <- downloadHandler(
     filename = function() {
-      ev <- effective_vars()
       paste0(
         "ESCAPE_Histogram_",
-        sanitize_filename(ev$criterion),
+        sanitize_filename(criterion_display_name()),
         "_",
         Sys.Date(),
         ".png"
       )
     },
     content = function(file) {
-      p <- plot_histogram(selected_data()$Criterion, fill_color = plot_colors$success)
+      p <- plot_histogram(
+        selected_data()$Criterion,
+        title = paste("Distribution of", criterion_display_name()),
+        fill_color = plot_colors$success
+      )
       ggplot2::ggsave(
         filename = file,
         plot = p,
@@ -1945,18 +1976,16 @@ server <- function(input, output, session) {
 
   output$download_expectancy_plot <- downloadHandler(
     filename = function() {
-      ev <- effective_vars()
       paste0(
         "ESCAPE_Expectancy_",
-        sanitize_filename(ev$predictor),
+        sanitize_filename(predictor_display_name()),
         "_",
         Sys.Date(),
         ".png"
       )
     },
     content = function(file) {
-      ev <- effective_vars()
-      p <- plot_expectancy(df_exp(), ev$predictor, input$cutoffInput)
+      p <- plot_expectancy(df_exp(), predictor_display_name(), input$cutoffInput)
       ggplot2::ggsave(
         filename = file,
         plot = p,
@@ -1970,20 +1999,18 @@ server <- function(input, output, session) {
 
   output$download_cles_plot <- downloadHandler(
     filename = function() {
-      ev <- effective_vars()
       paste0(
         "ESCAPE_CLES_Overlap_",
-        sanitize_filename(ev$predictor),
+        sanitize_filename(predictor_display_name()),
         "_",
-        sanitize_filename(ev$criterion),
+        sanitize_filename(criterion_display_name()),
         "_",
         Sys.Date(),
         ".png"
       )
     },
     content = function(file) {
-      ev <- effective_vars()
-      p <- plot_density_overlap(df_cles(), ev$criterion, ev$predictor, cutoff_X_val())
+      p <- plot_density_overlap(df_cles(), criterion_display_name(), predictor_display_name(), cutoff_X_val())
       ggplot2::ggsave(
         filename = file,
         plot = p,
@@ -2013,7 +2040,6 @@ server <- function(input, output, session) {
   })
 
   output$iconarray_plot <- renderPlot({
-    ev <- effective_vars()
     cles_val <- effect_sizes()$cles
     
     if (is.na(cles_val)) {
@@ -2027,14 +2053,13 @@ server <- function(input, output, session) {
         total_icons = input$iconarray_total,
         icon_type = input$iconarray_type,
         layout = input$iconarray_layout,
-        predictor_name = ev$predictor,
-        criterion_name = ev$criterion
+        predictor_name = predictor_display_name(),
+        criterion_name = criterion_display_name()
       )
     }
   }, width = 720, height = 420, res = 96)
 
   output$iconarray_stats <- renderText({
-    ev <- effective_vars()
     cles_val <- effect_sizes()$cles
     
     if (is.na(cles_val)) {
@@ -2052,19 +2077,17 @@ server <- function(input, output, session) {
 
   output$download_icon_array <- downloadHandler(
     filename = function() {
-      ev <- effective_vars()
       paste0(
         "ESCAPE_IconArray_",
-        sanitize_filename(ev$predictor),
+        sanitize_filename(predictor_display_name()),
         "_",
-        sanitize_filename(ev$criterion),
+        sanitize_filename(criterion_display_name()),
         "_",
         Sys.Date(),
         ".png"
       )
     },
     content = function(file) {
-      ev <- effective_vars()
       cles_val <- effect_sizes()$cles
       
       if (!is.na(cles_val)) {
@@ -2073,8 +2096,8 @@ server <- function(input, output, session) {
           total_icons = input$iconarray_total,
           icon_type = input$iconarray_type,
           layout = input$iconarray_layout,
-          predictor_name = ev$predictor,
-          criterion_name = ev$criterion
+          predictor_name = predictor_display_name(),
+          criterion_name = criterion_display_name()
         )
         ggplot2::ggsave(
           filename = file,
@@ -2141,7 +2164,8 @@ server <- function(input, output, session) {
 
   assemble_report_params <- function() {
     req(selected_data())
-    ev <- effective_vars()
+    pd <- predictor_display_name()
+    cd <- criterion_display_name()
     df <- selected_data()
     df_grouped <- df_cles()
     above_vals <- df_grouped %>% filter(Group == "Above") %>% pull(Criterion)
@@ -2158,10 +2182,15 @@ server <- function(input, output, session) {
       " criterion outcomes."
     )
     cles_val <- calc_cles(above_vals, below_vals)
-    cles_narrative <- cles_verbal(ev$predictor, ev$criterion, cutoff_X_val(), round(cles_val * 100, 1))
+    cles_narrative <- cles_verbal(pd, cd, cutoff_X_val(), round(cles_val * 100, 1))
     desc_tbl <- psych::describe(df) %>%
       as.data.frame() %>%
       tibble::rownames_to_column("Variable") %>%
+      dplyr::mutate(Variable = dplyr::case_when(
+        Variable == "Predictor" ~ pd,
+        Variable == "Criterion" ~ cd,
+        TRUE ~ Variable
+      )) %>%
       dplyr::select(Variable, n, mean, sd, median, min, max)
     exp_tbl <- df_exp() %>%
       dplyr::transmute(
@@ -2171,10 +2200,10 @@ server <- function(input, output, session) {
         frequency,
         n
       )
-    besd_emp <- calc_besd(df, cutoff_X_val(), input$cutoffInput, ev$predictor, ev$criterion) %>%
+    besd_emp <- calc_besd(df, cutoff_X_val(), input$cutoffInput, pd, cd) %>%
       as.data.frame() %>%
       tibble::rownames_to_column("Group")
-    besd_theory <- calc_besd_theoretical(corr, ev$predictor, ev$criterion) %>%
+    besd_theory <- calc_besd_theoretical(corr, pd, cd) %>%
       as.data.frame() %>%
       tibble::rownames_to_column("Group")
     icon_plot_obj <- plot_icon_array(
@@ -2182,12 +2211,12 @@ server <- function(input, output, session) {
       total_icons = 100,
       icon_type = "person",
       layout = "auto",
-      predictor_name = ev$predictor,
-      criterion_name = ev$criterion
+      predictor_name = pd,
+      criterion_name = cd
     )
     list(
-      predictor = ev$predictor,
-      criterion = ev$criterion,
+      predictor = pd,
+      criterion = cd,
       n_obs = nrow(df),
       bins = input$bins,
       cutoff_y = input$cutoffInput,
@@ -2201,8 +2230,8 @@ server <- function(input, output, session) {
       exp_table = exp_tbl,
       besd_empirical = besd_emp,
       besd_theoretical = besd_theory,
-      scatter_plot = plot_scatter(df, ev$predictor, ev$criterion),
-      exp_plot = plot_expectancy(df_exp(), ev$predictor, input$cutoffInput),
+      scatter_plot = plot_scatter(df, pd, cd),
+      exp_plot = plot_expectancy(df_exp(), pd, input$cutoffInput),
       icon_plot = icon_plot_obj
     )
   }
