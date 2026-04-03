@@ -1,14 +1,8 @@
-# utils_theme.R
-# Linear-inspired theme configuration for ESCAPE
-# Using bslib for Bootstrap 5 theming
-
 library(bslib)
 
-# Color palette - Linear-inspired, near-monochrome
 colors <- list(
-
-  primary = "#5E6AD2",
-  primary_hover = "#4850A8",
+  primary = "#8B6EF0",
+  primary_hover = "#744EDB",
   success = "#3CCB7F",
   warning = "#FFBB38",
   danger = "#F87171",
@@ -26,11 +20,9 @@ colors <- list(
   gray_900 = "#18181B"
 )
 
-# Create the main theme
 app_theme <- bs_theme(
   version = 5,
 
-  # Core colors
   primary = colors$primary,
   secondary = colors$gray_500,
   success = colors$success,
@@ -39,48 +31,39 @@ app_theme <- bs_theme(
   light = colors$gray_100,
   dark = colors$gray_900,
 
-  # Typography - Inter for UI, monospace for stats
-  base_font = font_google("Inter", wght = "400;500;600;700"),
-  heading_font = font_google("Inter", wght = "600;700"),
+  base_font = font_google("Sora", wght = "400;500;600;700"),
+  heading_font = font_google("Fraunces", wght = "500;600;700"),
   code_font = font_google("JetBrains Mono", wght = "400;500"),
 
-  # Font sizes - Linear uses compact sizing
   font_size_base = "0.875rem",
 
-  # Customize Bootstrap variables
-  "body-bg" = colors$gray_50,
+  "body-bg" = "#F5F2FF",
   "body-color" = colors$gray_900,
 
-  # Cards
   "card-bg" = "#FFFFFF",
   "card-border-color" = colors$gray_300,
   "card-border-radius" = "0.5rem",
   "card-cap-bg" = "#FFFFFF",
   "card-cap-padding-y" = "0.75rem",
 
-  # Inputs
   "input-bg" = "#FFFFFF",
   "input-border-color" = colors$gray_300,
   "input-border-radius" = "0.375rem",
   "input-focus-border-color" = colors$primary,
   "input-focus-box-shadow" = paste0("0 0 0 2px ", colors$primary, "20"),
 
-  # Buttons
   "btn-border-radius" = "0.375rem",
   "btn-padding-x" = "1rem",
   "btn-padding-y" = "0.5rem",
   "btn-font-weight" = "500",
 
-  # Sidebar
   "sidebar-bg" = "#FFFFFF",
   "sidebar-border-color" = colors$gray_300,
 
-  # Nav tabs
   "nav-link-color" = colors$gray_500,
   "nav-tabs-link-active-color" = colors$gray_900,
   "nav-tabs-border-color" = colors$gray_300,
 
-  # Tables
   "table-border-color" = colors$gray_300,
   "table-striped-bg" = colors$gray_50
 )

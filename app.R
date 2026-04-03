@@ -994,7 +994,16 @@ ui <- page_fillable(
     tags$script(src = "js/main.js")
   ),
 
-  uiOutput("main_ui")
+  tags$a(
+    class = "skip-link",
+    href = "#main-content",
+    "Skip to main content"
+  ),
+  tags$main(
+    id = "main-content",
+    tabindex = "-1",
+    uiOutput("main_ui")
+  )
 )
 
 # ============================================

@@ -79,9 +79,10 @@
 
 .hero-subtitle {
   font-size: var(--text-xl);
-  color: var(--color-gray-500);
-  line-height: 1.6;
+  color: var(--color-gray-600);
+  line-height: 1.65;
   margin-bottom: var(--space-8);
+  max-width: 52ch;
 }
 
 .hero-actions {
@@ -107,8 +108,7 @@
 }
 
 .hero-actions .btn-primary:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 16px rgba(139, 110, 240, 0.35);
+  box-shadow: 0 6px 20px rgba(139, 110, 240, 0.4);
   background: var(--color-primary-hover);
   border-color: var(--color-primary-hover);
 }
@@ -129,10 +129,9 @@
 }
 
 .hero-actions .btn-outline-primary:hover {
-  background: rgba(139, 110, 240, 0.08);
+  background: rgba(139, 110, 240, 0.1);
   border-color: var(--color-primary);
-  transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(139, 110, 240, 0.15);
+  box-shadow: 0 4px 14px rgba(139, 110, 240, 0.18);
 }
 
 .hero-trust-signal {
@@ -466,8 +465,11 @@
 
 .section-subtitle {
   font-size: var(--text-lg);
-  color: var(--color-gray-500);
+  color: var(--color-gray-600);
   margin-bottom: var(--space-12);
+  max-width: 52rem;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 /* ============================================
@@ -1027,6 +1029,27 @@
   100% { opacity: 1; }
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .transformation-card {
+    animation: none !important;
+  }
+
+  .mini-icon {
+    animation: none !important;
+    opacity: 1;
+  }
+
+  .feature-card {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  .carousel-track {
+    transition: none !important;
+  }
+}
+
 /* ============================================
    DATA INFO CARD (Sidebar)
    ============================================ */
@@ -1181,6 +1204,11 @@
 
   .hero-content {
     max-width: 100%;
+  }
+
+  .hero-subtitle {
+    margin-left: auto;
+    margin-right: auto;
   }
 
   .hero-actions {
