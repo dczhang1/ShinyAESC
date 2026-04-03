@@ -1,5 +1,7 @@
 # ESCAPE: Effect Size Calculator for Practical Effects
 
+The primary GitHub-facing README (quick start, attribution, citation) lives at the repository root: **[../README.md](../README.md)**.
+
 ## Overview
 
 ESCAPE is a web-based SaaS tool that helps researchers and practitioners calculate and visualize alternative effect size statistics. It makes statistical results more interpretable by providing indices such as the **Common Language Effect Size (CLES)** and the **Binomial Effect Size Display (BESD)**, alongside traditional statistics like Pearson's correlation and Cohen's d (implied via CLES conversions).

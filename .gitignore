@@ -18,6 +18,12 @@
 ehthumbs.db
 Thumbs.db
 
+# AI / agent tooling (local editor & assistant artifacts)
+.cursor/
+.claude/
+AGENTS.md
+agents.md
+
 # IDE
 .vscode/
 .idea/

@@ -340,13 +340,7 @@ landing_page_ui <- function() {
       div(class = "footer-content",
         p(class = "footer-brand",
           tags$strong("ESCAPE"), " \u2014 Effect Size Calculator for Practical Effects"
-        ),
-        p(class = "footer-built",
-          "Built with ",
-          tags$i(`data-lucide` = "heart", style = "width: 14px; height: 14px; color: #F87171;"),
-          " using R Shiny"
-        ),
-        p(class = "footer-built", "Created by Don Zhang")
+        )
       )
     )
   )
@@ -388,18 +382,22 @@ use_case_card <- function(icon, title, stat, description, image) {
 
 # Analysis Interface Component - Redesigned layout: content-driven height, no fill collapse
 analysis_ui <- function() {
-  page_sidebar(
-    title = tags$span(
-      class = "d-flex align-items-center gap-2",
-      tags$i(`data-lucide` = "bar-chart-2", style = "width: 20px; height: 20px;"),
-      "ESCAPE",
-      tags$small(class = "text-muted", "by Don Zhang")
+  tagList(
+    div(
+      class = "navbar navbar-static-top",
+      div(
+        class = "container-fluid",
+        tags$span(
+          class = "d-flex align-items-center gap-2",
+          tags$i(`data-lucide` = "bar-chart-2", style = "width: 20px; height: 20px;"),
+          "ESCAPE"
+        )
+      )
     ),
-    theme = app_theme,
-    fillable = FALSE,
-
-    sidebar = sidebar(
-      width = 400,
+    layout_sidebar(
+      sidebar = sidebar(
+        width = 400,
+        open = list(desktop = "open", mobile = "always"),
 
       div(
         class = "sidebar-panel",
@@ -509,11 +507,18 @@ analysis_ui <- function() {
       )
     ),
 
-    # Main Content - Tabbed Navigation or Empty State
-    div(
-      style = "display: none;",
-      textOutput("data_ready", inline = TRUE)
-    ),
+    fillable = FALSE,
+    border = FALSE,
+    border_radius = FALSE,
+
+    tags$main(
+      class = "bslib-page-main bslib-gap-spacing html-fill-item html-fill-container",
+
+      # Main Content - Tabbed Navigation or Empty State
+      div(
+        style = "display: none;",
+        textOutput("data_ready", inline = TRUE)
+      ),
     conditionalPanel(
       condition = "output.data_ready !== 'yes'",
       card(
@@ -792,7 +797,10 @@ analysis_ui <- function() {
                     ),
                     card_body(
                       class = "card-body-scroll",
-                      tags$p(class = "mb-3", textOutput("cles.verbal")),
+                      div(
+                        class = "cles-verbal-callout",
+                        textOutput("cles.verbal")
+                      ),
                       div(
                         class = "analysis-plot-wrap",
                         style = "height: 380px;",
@@ -976,6 +984,8 @@ analysis_ui <- function() {
       )
     )
   )
+  )
+)
 }
 
 # ============================================
@@ -1019,8 +1029,10 @@ server <- function(input, output, session) {
     view = "landing",  # "landing" or "analysis"
     data_source = NULL,  # "sample" or "uploaded"
     landing_file = NULL,  # preserved file from landing upload (lost when DOM switches)
-    guided_done = FALSE,  # first-time own-data wizard is session-scoped
-    guided_step = 1
+    guided_done = FALSE,
+    guided_step = 1,
+    guided_entry_from_landing = FALSE,
+    guided_wizard_completed_once = FALSE
   )
   guided_file_meta <- reactiveVal(NULL)
 
@@ -1030,11 +1042,13 @@ server <- function(input, output, session) {
   observeEvent(input$try_sample, {
     app_state$view <- "analysis"
     app_state$data_source <- "sample"
+    app_state$guided_entry_from_landing <- FALSE
   })
 
   observeEvent(input$try_sample_bottom, {
     app_state$view <- "analysis"
     app_state$data_source <- "sample"
+    app_state$guided_entry_from_landing <- FALSE
   })
 
   # Open guided upload from landing page
@@ -1044,7 +1058,13 @@ server <- function(input, output, session) {
     app_state$view <- "analysis"
     app_state$data_source <- "uploaded"
     app_state$guided_step <- 1
-    app_state$guided_done <- FALSE
+    if (!isTRUE(app_state$guided_wizard_completed_once)) {
+      app_state$guided_done <- FALSE
+      app_state$guided_entry_from_landing <- TRUE
+    } else {
+      app_state$guided_done <- TRUE
+      app_state$guided_entry_from_landing <- FALSE
+    }
   })
 
   # Upload file from guided modal step 1
@@ -1053,9 +1073,7 @@ server <- function(input, output, session) {
     guided_file_meta(input$guided_file)
     app_state$landing_file <- input$guided_file
     app_state$data_source <- "uploaded"
-    if (isTRUE(app_state$guided_step == 1)) {
-      show_guided_wizard()
-    }
+    session$sendCustomMessage("initIcons", list())
   })
 
   # Sidebar upload should override preserved landing upload
@@ -1064,6 +1082,7 @@ server <- function(input, output, session) {
     app_state$landing_file <- NULL
     guided_file_meta(NULL)
     app_state$data_source <- "uploaded"
+    app_state$guided_entry_from_landing <- FALSE
     if (!isTRUE(app_state$guided_done)) {
       app_state$guided_step <- 1
     }
@@ -1228,13 +1247,12 @@ server <- function(input, output, session) {
     tags$p(class = "text-danger mb-0", step2_state$message)
   })
 
-  show_guided_wizard <- function() {
+  output$guided_step1_info <- renderUI({
+    req(isTRUE(app_state$guided_step == 1), !isTRUE(app_state$guided_done))
     df <- data_set()
     file_meta <- guided_file_meta()
     has_file <- !is.null(file_meta)
     has_data <- !is.null(df)
-    has_two_cols <- has_data && ncol(df) >= 2
-    dsnames <- if (has_data) names(df) else character(0)
     current_file <- if (!is.null(file_meta)) {
       file_meta$name
     } else if (!is.null(app_state$landing_file)) {
@@ -1259,6 +1277,45 @@ server <- function(input, output, session) {
     } else {
       NULL
     }
+    tagList(
+      tags$div(
+        class = "data-info-card mb-3",
+        div(class = "data-info-badge", "Your Data"),
+        div(
+          class = "data-info-stats",
+          tags$span(current_file),
+          data_stats_detail
+        )
+      ),
+      if (!has_file) {
+        tags$p(class = "text-danger mb-0", "Waiting for file to load. Please upload a valid file to continue.")
+      } else if (!has_data) {
+        tags$p(class = "text-muted mb-0", "File selected. Continue to choose variables in Step 2.")
+      } else {
+        tags$p(class = "text-muted mb-0", "Dataset loaded. Continue to choose Predictor (X) and Criterion (Y).")
+      }
+    )
+  })
+
+  output$guided_wizard_footer_step1 <- renderUI({
+    req(isTRUE(app_state$guided_step == 1), !isTRUE(app_state$guided_done))
+    file_meta <- guided_file_meta()
+    step1_ready <- !is.null(file_meta) || !is.null(app_state$landing_file)
+    tagList(
+      actionButton("guided_skip", "Skip guide", class = "btn-ghost"),
+      if (step1_ready) {
+        actionButton("guided_next", "Continue", class = "btn-primary")
+      } else {
+        tags$button(type = "button", class = "btn btn-primary", disabled = "disabled", "Continue")
+      }
+    )
+  })
+
+  show_guided_wizard <- function() {
+    df <- data_set()
+    has_data <- !is.null(df)
+    has_two_cols <- has_data && ncol(df) >= 2
+    dsnames <- if (has_data) names(df) else character(0)
 
     step <- app_state$guided_step
 
@@ -1282,22 +1339,7 @@ server <- function(input, output, session) {
             "Choose file"
           )
         ),
-        tags$div(
-          class = "data-info-card mb-3",
-          div(class = "data-info-badge", "Your Data"),
-          div(
-            class = "data-info-stats",
-            tags$span(current_file),
-            data_stats_detail
-          )
-        ),
-        if (!has_file) {
-          tags$p(class = "text-danger mb-0", "Waiting for file to load. Please upload a valid file to continue.")
-        } else if (!has_data) {
-          tags$p(class = "text-muted mb-0", "File selected. Continue to choose variables in Step 2.")
-        } else {
-          tags$p(class = "text-muted mb-0", "Dataset loaded. Continue to choose Predictor (X) and Criterion (Y).")
-        }
+        uiOutput("guided_step1_info")
       )
     } else {
       step2_state <- guided_step2_state()
@@ -1326,17 +1368,8 @@ server <- function(input, output, session) {
       )
     }
 
-    step1_ready <- has_file
-
     footer <- if (step == 1) {
-      tagList(
-        actionButton("guided_skip", "Skip guide", class = "btn-ghost"),
-        if (step1_ready) {
-          actionButton("guided_next", "Continue", class = "btn-primary")
-        } else {
-          tags$button(type = "button", class = "btn btn-primary", disabled = "disabled", "Continue")
-        }
-      )
+      uiOutput("guided_wizard_footer_step1")
     } else {
       tagList(
         actionButton("guided_back", "Back", class = "btn-ghost"),
@@ -1359,13 +1392,17 @@ server <- function(input, output, session) {
   observeEvent(list(app_state$view, app_state$data_source), {
     if (identical(app_state$view, "analysis") &&
         identical(app_state$data_source, "uploaded") &&
-        !isTRUE(app_state$guided_done)) {
+        !isTRUE(app_state$guided_done) &&
+        isTRUE(app_state$guided_entry_from_landing) &&
+        !isTRUE(app_state$guided_wizard_completed_once)) {
       show_guided_wizard()
     }
   }, ignoreInit = TRUE)
 
   observeEvent(input$guided_skip, {
+    app_state$guided_wizard_completed_once <- TRUE
     app_state$guided_done <- TRUE
+    app_state$guided_entry_from_landing <- FALSE
     removeModal()
   })
 
@@ -1389,7 +1426,9 @@ server <- function(input, output, session) {
     }
     updateSelectInput(session, "predictorVar", selected = step2_state$predictor)
     updateSelectInput(session, "criterionVar", selected = step2_state$criterion)
+    app_state$guided_wizard_completed_once <- TRUE
     app_state$guided_done <- TRUE
+    app_state$guided_entry_from_landing <- FALSE
     removeModal()
   })
 
@@ -1400,6 +1439,8 @@ server <- function(input, output, session) {
     "yes"
   })
   outputOptions(output, "data_ready", suspendWhenHidden = FALSE)
+  outputOptions(output, "guided_step1_info", suspendWhenHidden = FALSE)
+  outputOptions(output, "guided_wizard_footer_step1", suspendWhenHidden = FALSE)
 
   # Sample data for landing page "See it in action" expectancy preview
   landing_preview_data <- reactive({
@@ -2073,6 +2114,22 @@ server <- function(input, output, session) {
           tags$dd("The probability that a randomly selected person from one group will score higher than someone from the other group."),
           tags$dt("BESD"),
           tags$dd("Binomial Effect Size Display - shows success rates for each group in a 2x2 table.")
+        ),
+        h3("Attribution"),
+        tags$p(
+          tags$strong("ESCAPE"),
+          " (Effect Size Calculator for Practical Effects) is developed and maintained by ",
+          tags$strong("Don Zhang"),
+          ". The application is built with ",
+          tags$a(href = "https://shiny.posit.co/", target = "_blank", rel = "noopener noreferrer", "R Shiny"),
+          ". Public deployment: ",
+          tags$a(
+            href = "https://dczhang.shinyapps.io/shinyaesc/",
+            target = "_blank",
+            rel = "noopener noreferrer",
+            "https://dczhang.shinyapps.io/shinyaesc/"
+          ),
+          "."
         )
       )
     }
@@ -2410,7 +2467,13 @@ knitr::kable(params$besd_theoretical, align = c("l", "r", "r"), digits = 3)
 ```
 
 ---
-<small>Generated by ESCAPE (Effect Size Calculator for Practical Effects), created by Don Zhang.</small>
+
+<small>
+<strong>Generated by ESCAPE</strong> (Effect Size Calculator for Practical Effects).
+<strong>Author:</strong> Don Zhang.
+<strong>Implementation:</strong> R Shiny.
+<strong>App URL:</strong> <a href="https://dczhang.shinyapps.io/shinyaesc/">https://dczhang.shinyapps.io/shinyaesc/</a>
+</small>
 '
       writeLines(rmd_content, tempReport)
 
@@ -2567,7 +2630,7 @@ knitr::kable(params$besd_empirical, booktabs = TRUE, align = c("l", "r", "r"), d
 knitr::kable(params$besd_theoretical, booktabs = TRUE, align = c("l", "r", "r"), digits = 3)
 ```
 
-*Generated by ESCAPE (Effect Size Calculator for Practical Effects), created by Don Zhang.*
+*Generated by ESCAPE (Effect Size Calculator for Practical Effects). Author: Don Zhang. Implementation: R Shiny. App URL: https://dczhang.shinyapps.io/shinyaesc/*
 '
       writeLines(rmd_pdf, tempReport)
 

@@ -453,6 +453,43 @@ body::before {
   gap: var(--space-4);
 }
 
+.cles-verbal-callout {
+  background: linear-gradient(
+    135deg,
+    var(--color-primary-light) 0%,
+    rgba(139, 110, 240, 0.05) 100%
+  );
+  border: 1px solid rgba(139, 110, 240, 0.22);
+  border-left: 4px solid var(--color-primary);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5) var(--space-6);
+  margin-bottom: var(--space-4);
+  box-shadow: var(--shadow-sm);
+}
+
+.cles-verbal-callout .shiny-text-output {
+  display: block;
+  font-family: var(--font-serif);
+  font-size: max(var(--text-xl), 1.0625rem);
+  font-weight: 500;
+  line-height: 1.55;
+  color: var(--color-gray-900);
+  margin: 0;
+}
+
+[data-theme="dark"] .cles-verbal-callout {
+  background: linear-gradient(
+    135deg,
+    rgba(139, 110, 240, 0.18) 0%,
+    rgba(38, 19, 71, 0.45) 100%
+  );
+  border-color: rgba(165, 140, 245, 0.35);
+}
+
+[data-theme="dark"] .cles-verbal-callout .shiny-text-output {
+  color: var(--color-gray-100);
+}
+
 /* Single-line correlation under descriptives table */
 .correlation-line {
   border-top: 1px solid var(--color-border);
