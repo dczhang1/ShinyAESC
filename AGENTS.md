@@ -4,7 +4,7 @@ Guidance for agentic coding agents working on ESCAPE — Effect Size Calculator 
 
 This is an R Shiny application that converts traditional effect sizes (r, d, g) into probabilities, success rates, and visual summaries.
 
-Deployed at https://dczhang.shinyapps.io/shinyaesc/
+Deployed at https://dczhang.shinyapps.io/shinyescape/
 
 ## Project Overview
 
@@ -29,7 +29,7 @@ Rscript -e "tryCatch(parse('R/utils_theme.R'), error=function(e) cat('ERROR:', e
 node -c www/js/main.js
 
 # Deploy to shinyapps.io
-Rscript -e "rsconnect::deployApp('.', appName='shinyaesc', account='dczhang')"
+Rscript -e "rsconnect::deployApp('.', appName='shinyescape', account='dczhang')"
 ```
 
 ## Tests

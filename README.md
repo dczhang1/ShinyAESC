@@ -4,7 +4,7 @@
 
 ESCAPE is an [R Shiny](https://shiny.posit.co/) application that turns traditional effect sizes (correlations, *d*, etc.) into **probabilities, success rates, and visual summaries** so results are easier to explain to stakeholders who do not read statistics journals.
 
-**Live app:** [https://dczhang.shinyapps.io/shinyaesc/](https://dczhang.shinyapps.io/shinyaesc/)
+**Live app:** [https://dczhang.shinyapps.io/shinyescape/](https://dczhang.shinyapps.io/shinyescape/)
 
 ---
 
