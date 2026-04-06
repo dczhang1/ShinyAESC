@@ -34,6 +34,32 @@ get_sample_data_path <- function() {
   NULL
 }
 
+resolve_www_path <- function(relative_path) {
+  ca <- commandArgs(trailingOnly = FALSE)
+  file_from_cmd <- sub("^--file=", "", ca[grep("^--file=", ca)])
+  roots <- list()
+  if (length(file_from_cmd) && nzchar(file_from_cmd[1])) {
+    roots <- c(roots, list(tryCatch(
+      dirname(normalizePath(file_from_cmd[1], winslash = "/", mustWork = TRUE)),
+      error = function(e) NULL
+    )))
+  }
+  roots <- c(roots, list(
+    tryCatch(getShinyOption("appDir", NULL), error = function(e) NULL),
+    Sys.getenv("SHINY_APP_DIR", unset = ""),
+    getwd()
+  ))
+  for (r in roots) {
+    if (!is.null(r) && length(r) == 1 && !is.na(r) && nzchar(r)) {
+      p <- file.path(r, "www", relative_path)
+      if (file.exists(p)) {
+        return(normalizePath(p, winslash = "/", mustWork = TRUE))
+      }
+    }
+  }
+  normalizePath(file.path(getwd(), "www", relative_path), winslash = "/", mustWork = FALSE)
+}
+
 # ============================================
 # UI COMPONENTS
 # ============================================
@@ -1011,14 +1037,14 @@ ui <- page_fillable(
   theme = app_theme,
 
   tags$head(
-    tags$link(rel = "stylesheet", href = "css/main.css"),
-    tags$link(rel = "stylesheet", href = "css/landing.css"),
+    includeCSS(resolve_www_path("css/main.css")),
+    includeCSS(resolve_www_path("css/landing.css")),
     tags$link(
       rel = "stylesheet",
       href = "https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,700&family=JetBrains+Mono:wght@400;500&display=swap"
     ),
     tags$script(src = "https://unpkg.com/lucide@latest/dist/umd/lucide.js"),
-    tags$script(src = "js/main.js")
+    includeScript(resolve_www_path("js/main.js"))
   ),
 
   tags$a(
