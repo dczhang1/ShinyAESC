@@ -38,22 +38,6 @@ get_sample_data_path <- function() {
 # UI COMPONENTS
 # ============================================
 
-site_footer_ui <- function() {
-  tags$footer(
-    class = "app-site-footer",
-    role = "contentinfo",
-    p(
-      class = "app-site-footer__text",
-      "\u00A9 2026 Don Zhang, Louisiana State University. ",
-      tags$a(
-        class = "app-site-footer__email",
-        href = "mailto:zhang1@lsu.edu",
-        "zhang1@lsu.edu"
-      )
-    )
-  )
-}
-
 # Landing Page Component
 landing_page_ui <- function() {
   div(
@@ -256,6 +240,51 @@ landing_page_ui <- function() {
     ),
 
     div(
+      class = "creator-bio-section scroll-section",
+      h2(class = "section-title section-title--landing", "About the creator"),
+      div(
+        class = "creator-bio-card",
+        div(class = "creator-bio-avatar", `aria-hidden` = "true", "DZ"),
+        div(
+          class = "creator-bio-body",
+          h3(class = "creator-bio-name", "Don Zhang"),
+          p(
+            class = "creator-bio-text",
+            "Don Zhang, Ph.D. is associate professor of industrial and organizational psychology at Louisiana State University. He is the Director of the I/O psychology PhD program and leads the Risk and Decision Making Lab",
+            "He has received over $2.9 million in research funding from the National Science Foundation and is the recipient of the NSF CAREER Award.",
+            "His research focuses on employee selection, decision making, risk taking, and science communication."
+          ),
+          div(
+            class = "creator-bio-actions",
+            tags$a(
+              class = "creator-bio-btn",
+              href = "https://scholar.google.com/citations?user=sRa9gKgAAAAJ",
+              target = "_blank",
+              rel = "noopener noreferrer",
+              tags$i(`data-lucide` = "library"),
+              tags$span("Google Scholar")
+            ),
+            tags$a(
+              class = "creator-bio-btn",
+              href = "mailto:zhang1@lsu.edu",
+              `aria-label` = "Email zhang1@lsu.edu",
+              tags$i(`data-lucide` = "mail"),
+              tags$span("Email")
+            ),
+            tags$a(
+              class = "creator-bio-btn",
+              href = "https://www.lsu.edu/hss/psychology/faculty/industrial/zhang.php",
+              target = "_blank",
+              rel = "noopener noreferrer",
+              tags$i(`data-lucide` = "building-2"),
+              tags$span("LSU faculty page")
+            )
+          )
+        )
+      )
+    ),
+
+    div(
       class = "landing-citations scroll-section",
       h2(class = "section-title section-title--landing", "How to cite"),
       p(
@@ -281,8 +310,7 @@ landing_page_ui <- function() {
           )
         )
       )
-    ),
-    site_footer_ui()
+    )
   )
 }
 
@@ -917,8 +945,7 @@ analysis_ui <- function() {
           )
         )
       )
-    ),
-    site_footer_ui()
+    )
   )
   )
 )
