@@ -38,20 +38,249 @@ get_sample_data_path <- function() {
 # UI COMPONENTS
 # ============================================
 
-# Landing Page Component
+landing_cite_format_labels <- c(
+  bibtex = "BibTeX",
+  apa = "APA 7",
+  mla = "MLA 9",
+  chicago = "Chicago",
+  ris = "RIS",
+  vancouver = "Vancouver"
+)
+
+landing_cite_fpsyg <- list(
+  bibtex = paste0(
+    "@article{Zhang2018ShinyAESC,\n",
+    "  author  = {Zhang, Don C.},\n",
+    "  title   = {Utility of Alternative Effect Size Statistics and the Development of a Web-Based Calculator: {Shiny-AESC}},\n",
+    "  journal = {Frontiers in Psychology},\n",
+    "  volume  = {9},\n",
+    "  pages   = {1221},\n",
+    "  year    = {2018},\n",
+    "  doi     = {10.3389/fpsyg.2018.01221}\n",
+    "}"
+  ),
+  apa = paste0(
+    "Zhang, D. C. (2018). Utility of alternative effect size statistics and the development of ",
+    "a web-based calculator: Shiny-AESC. Frontiers in Psychology, 9, Article 1221. ",
+    "https://doi.org/10.3389/fpsyg.2018.01221"
+  ),
+  mla = paste0(
+    "Zhang, Don C. \"Utility of Alternative Effect Size Statistics and the Development of a ",
+    "Web-Based Calculator: Shiny-AESC.\" Frontiers in Psychology, vol. 9, 2018, ",
+    "doi:10.3389/fpsyg.2018.01221."
+  ),
+  chicago = paste0(
+    "Zhang, Don C. 2018. \"Utility of Alternative Effect Size Statistics and the Development ",
+    "of a Web-Based Calculator: Shiny-AESC.\" Frontiers in Psychology 9:1221. ",
+    "https://doi.org/10.3389/fpsyg.2018.01221."
+  ),
+  ris = paste0(
+    "TY  - JOUR\n",
+    "AU  - Zhang, Don C.\n",
+    "TI  - Utility of alternative effect size statistics and the development of a web-based ",
+    "calculator: Shiny-AESC\n",
+    "JO  - Frontiers in Psychology\n",
+    "VL  - 9\n",
+    "SP  - 1221\n",
+    "PY  - 2018\n",
+    "DO  - 10.3389/fpsyg.2018.01221\n",
+    "ER  - "
+  ),
+  vancouver = paste0(
+    "Zhang DC. Utility of alternative effect size statistics and the development of a web-based ",
+    "calculator: Shiny-AESC. Front Psychol. 2018;9:1221. doi:10.3389/fpsyg.2018.01221"
+  )
+)
+
+landing_cite_ijsa <- list(
+  bibtex = paste0(
+    "@article{Zhang2018GraphicalInterview,\n",
+    "  author  = {Zhang, Don C. and Highhouse, Scott and Brooks, Margaret E. and Zhang, Yu},\n",
+    "  title   = {Communicating the Validity of Structured Job Interviews with Graphical Visual Aids},\n",
+    "  journal = {International Journal of Selection and Assessment},\n",
+    "  volume  = {26},\n",
+    "  number  = {2-4},\n",
+    "  pages   = {93--108},\n",
+    "  year    = {2018},\n",
+    "  doi     = {10.1111/ijsa.12220}\n",
+    "}"
+  ),
+  apa = paste0(
+    "Zhang, D. C., Highhouse, S., Brooks, M. E., & Zhang, Y. (2018). Communicating the validity ",
+    "of structured job interviews with graphical visual aids. International Journal of Selection ",
+    "and Assessment, 26(2-4), 93-108. https://doi.org/10.1111/ijsa.12220"
+  ),
+  mla = paste0(
+    "Zhang, Don C., et al. \"Communicating the Validity of Structured Job Interviews with ",
+    "Graphical Visual Aids.\" International Journal of Selection and Assessment, vol. 26, ",
+    "no. 2-4, 2018, pp. 93-108. doi:10.1111/ijsa.12220."
+  ),
+  chicago = paste0(
+    "Zhang, Don C., Scott Highhouse, Margaret E. Brooks, and Yu Zhang. 2018. \"Communicating ",
+    "the Validity of Structured Job Interviews with Graphical Visual Aids.\" International ",
+    "Journal of Selection and Assessment 26 (2-4): 93-108. ",
+    "https://doi.org/10.1111/ijsa.12220."
+  ),
+  ris = paste0(
+    "TY  - JOUR\n",
+    "AU  - Zhang, Don C.\n",
+    "AU  - Highhouse, Scott\n",
+    "AU  - Brooks, Margaret E.\n",
+    "AU  - Zhang, Yu\n",
+    "TI  - Communicating the validity of structured job interviews with graphical visual aids\n",
+    "JO  - International Journal of Selection and Assessment\n",
+    "VL  - 26\n",
+    "IS  - 2-4\n",
+    "SP  - 93\n",
+    "EP  - 108\n",
+    "PY  - 2018\n",
+    "DO  - 10.1111/ijsa.12220\n",
+    "ER  - "
+  ),
+  vancouver = paste0(
+    "Zhang DC, Highhouse S, Brooks ME, Zhang Y. Communicating the validity of structured job ",
+    "interviews with graphical visual aids. Int J Sel Assess. 2018;26(2-4):93-108. ",
+    "doi:10.1111/ijsa.12220"
+  )
+)
+
+landing_cite_combined <- function() {
+  fmt_names <- names(landing_cite_fpsyg)
+  papers <- list(
+    list(
+      id = "fpsyg",
+      label = "Frontiers in Psychology (2018)",
+      doi = "https://doi.org/10.3389/fpsyg.2018.01221",
+      doi_short = "Frontiers",
+      texts = landing_cite_fpsyg
+    ),
+    list(
+      id = "ijsa",
+      label = "International Journal of Selection and Assessment (2018)",
+      doi = "https://doi.org/10.1111/ijsa.12220",
+      doi_short = "IJSA",
+      texts = landing_cite_ijsa
+    )
+  )
+
+  panel_elts <- list()
+  for (pj in seq_along(papers)) {
+    pd <- papers[[pj]]
+    for (i in seq_along(fmt_names)) {
+      nm <- fmt_names[[i]]
+      is_active <- identical(pd$id, "fpsyg") && i == 1L
+      panel_elts[[length(panel_elts) + 1L]] <- tags$pre(
+        class = if (is_active) "landing-cite-panel is-active" else "landing-cite-panel",
+        `data-paper` = pd$id,
+        `data-format` = nm,
+        pd$texts[[nm]]
+      )
+    }
+  }
+
+  panel_wrap <- tags$div(class = "landing-cite-panel-wrap")
+  for (k in seq_along(panel_elts)) {
+    panel_wrap <- htmltools::tagAppendChild(panel_wrap, panel_elts[[k]])
+  }
+
+  div(
+    class = "landing-cite-card landing-cite-card--combined",
+    div(
+      class = "landing-cite-combined-top",
+      div(
+        class = "landing-cite-paper-bar",
+        role = "tablist",
+        `aria-label` = "Publication",
+        lapply(seq_along(papers), function(j) {
+          pd <- papers[[j]]
+          tags$button(
+            type = "button",
+            class = if (j == 1L) "landing-cite-paper-btn is-active" else "landing-cite-paper-btn",
+            `data-paper` = pd$id,
+            role = "tab",
+            `aria-selected` = if (j == 1L) "true" else "false",
+            pd$label
+          )
+        })
+      ),
+      div(
+        class = "landing-cite-doi-row",
+        lapply(papers, function(pd) {
+          tags$a(
+            href = pd$doi,
+            class = "landing-cite-doi-mini",
+            target = "_blank",
+            rel = "noopener noreferrer",
+            pd$doi_short
+          )
+        })
+      )
+    ),
+    div(
+      class = "landing-cite-format-bar",
+      role = "tablist",
+      `aria-label` = "Citation format",
+      lapply(seq_along(fmt_names), function(i) {
+        nm <- fmt_names[[i]]
+        lab <- unname(landing_cite_format_labels[nm])
+        lab <- if (length(lab) == 1L && !is.na(lab) && nzchar(lab)) as.character(lab) else nm
+        tags$button(
+          type = "button",
+          class = if (i == 1L) "landing-cite-format-btn is-active" else "landing-cite-format-btn",
+          `data-format` = nm,
+          role = "tab",
+          `aria-selected` = if (i == 1L) "true" else "false",
+          lab
+        )
+      })
+    ),
+    panel_wrap,
+    tags$button(
+      type = "button",
+      class = "landing-cite-copy",
+      tags$i(`data-lucide` = "copy", `aria-hidden` = "true"),
+      tags$span("Copy")
+    )
+  )
+}
+
 landing_page_ui <- function() {
   div(
     class = "landing-page",
 
+    tags$header(
+      class = "landing-nav",
+      div(
+        class = "landing-nav-inner",
+        tags$a(
+          class = "landing-nav-brand",
+          href = "#landing-get-started",
+          `aria-label` = "ESCAPE, go to top",
+          "ESCAPE"
+        ),
+        tags$nav(
+          class = "landing-nav-links",
+          role = "navigation",
+          `aria-label` = "Landing sections",
+          tags$a(class = "landing-nav-link", href = "#landing-about", "About"),
+          actionButton(
+            "nav_get_started",
+            "Get Started",
+            class = "btn btn-primary landing-nav-cta"
+          )
+        )
+      )
+    ),
+
     div(
+      id = "landing-get-started",
       class = "hero-section hero-section--observatory",
       tags$canvas(class = "hero-particles", id = "hero-particles-canvas", `aria-hidden` = "true"),
       div(
         class = "hero-content",
         p(class = "hero-tagline hero-reveal", "Effect Size Calculator for Practical Effects"),
-        h1(class = "hero-brand-title hero-reveal", "ESCAPE"),
+        h1(class = "hero-headline hero-reveal", "Stop reporting correlations. Start communicating results."),
         span(class = "hero-brand-accent-line hero-reveal", role = "presentation", `aria-hidden` = "true"),
-        h2(class = "hero-title hero-reveal", "Stop reporting correlations. Start communicating results."),
         p(
           class = "hero-subtitle hero-reveal",
           "ESCAPE converts r, d, and g into probabilities, success rates, and visual summaries ",
@@ -240,19 +469,30 @@ landing_page_ui <- function() {
     ),
 
     div(
+      id = "landing-about",
       class = "creator-bio-section scroll-section",
       h2(class = "section-title section-title--landing", "About the creator"),
       div(
         class = "creator-bio-card",
-        div(class = "creator-bio-avatar", `aria-hidden` = "true", "DZ"),
+        div(
+          class = "creator-bio-avatar",
+          tags$img(
+            src = "images/head.png",
+            alt = "Portrait of Don Zhang",
+            class = "creator-bio-avatar-img",
+            width = "96",
+            height = "96",
+            loading = "lazy",
+            decoding = "async"
+          )
+        ),
         div(
           class = "creator-bio-body",
           h3(class = "creator-bio-name", "Don Zhang"),
           p(
             class = "creator-bio-text",
-            "Don Zhang, Ph.D. is associate professor of industrial and organizational psychology at Louisiana State University. He is the Director of the I/O psychology PhD program and leads the Risk and Decision Making Lab",
-            "He has received over $2.9 million in research funding from the National Science Foundation and is the recipient of the NSF CAREER Award.",
-            "His research focuses on employee selection, decision making, risk taking, and science communication."
+            "Don Zhang, Ph.D. is associate professor of industrial and organizational psychology at Louisiana State University. He is the Director of the I/O psychology PhD program and leads the Risk and Decision Making Lab.",
+            "His research focuses on employee selection, decision making, risk taking, and science communication.",
           ),
           div(
             class = "creator-bio-actions",
@@ -291,27 +531,9 @@ landing_page_ui <- function() {
       h2(class = "section-title section-title--landing", "How to cite"),
       p(
         class = "landing-citations-intro",
-        "If ESCAPE informs your research or practice, consider citing:"
+        "If ESCAPE informs your research or practice, pick a format and copy the citation."
       ),
-      tags$ul(
-        class = "landing-citations-list",
-        tags$li(
-          tags$a(
-            href = "https://doi.org/10.3389/fpsyg.2018.01221",
-            target = "_blank",
-            rel = "noopener noreferrer",
-            "Zhang, D. C. (2018). Utility of alternative effect size statistics and the development of a web-based calculator: Shiny-AESC. Frontiers in Psychology, 9, 1221."
-          )
-        ),
-        tags$li(
-          tags$a(
-            href = "https://doi.org/10.1111/ijsa.12220",
-            target = "_blank",
-            rel = "noopener noreferrer",
-            "Zhang, D. C., Highhouse, S., Brooks, M. E., & Zhang, Y. (2018). Communicating the validity of structured job interviews with graphical visual aids. International Journal of Selection and Assessment, 26(2-4), 93-108."
-          )
-        )
-      )
+      landing_cite_combined()
     )
   )
 }
@@ -1009,8 +1231,7 @@ server <- function(input, output, session) {
     app_state$guided_entry_from_landing <- FALSE
   })
 
-  # Open guided upload from landing page
-  observeEvent(input$open_guided_upload, {
+  open_guided_from_landing <- function() {
     app_state$landing_file <- NULL
     guided_file_meta(NULL)
     app_state$view <- "analysis"
@@ -1023,6 +1244,14 @@ server <- function(input, output, session) {
       app_state$guided_done <- TRUE
       app_state$guided_entry_from_landing <- FALSE
     }
+  }
+
+  observeEvent(input$open_guided_upload, {
+    open_guided_from_landing()
+  })
+
+  observeEvent(input$nav_get_started, {
+    open_guided_from_landing()
   })
 
   # Upload file from guided modal step 1

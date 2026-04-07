@@ -12,6 +12,7 @@
     initHeroParticles();
     initInsightMorph();
     initLivePreviewChartReveal();
+    initLandingCiteBlocks();
   });
 
   if (typeof Shiny !== 'undefined') {
@@ -22,6 +23,7 @@
       setTimeout(initHeroParticles, 50);
       setTimeout(initInsightMorph, 50);
       setTimeout(initLivePreviewChartReveal, 50);
+      setTimeout(initLandingCiteBlocks, 50);
     });
 
     Shiny.addCustomMessageHandler('initIcons', function(data) {
@@ -346,6 +348,103 @@
       { threshold: 0.2 }
     );
     io.observe(chart);
+  }
+
+  function initLandingCiteBlocks() {
+    document.querySelectorAll('.landing-cite-card--combined').forEach(function(card) {
+      if (card.getAttribute('data-cite-init') === '1') return;
+      card.setAttribute('data-cite-init', '1');
+
+      var paperBar = card.querySelector('.landing-cite-paper-bar');
+      var formatBar = card.querySelector('.landing-cite-format-bar');
+      var panels = card.querySelectorAll('.landing-cite-panel');
+      var copyBtn = card.querySelector('.landing-cite-copy');
+      if (!formatBar || !panels.length || !copyBtn) return;
+
+      function activePaperId() {
+        if (!paperBar) return 'fpsyg';
+        var b = paperBar.querySelector('.landing-cite-paper-btn.is-active');
+        return b ? b.getAttribute('data-paper') : 'fpsyg';
+      }
+
+      function activeFormatId() {
+        var b = formatBar.querySelector('.landing-cite-format-btn.is-active');
+        return b ? b.getAttribute('data-format') : 'bibtex';
+      }
+
+      function syncPanels() {
+        var pid = activePaperId();
+        var fid = activeFormatId();
+        panels.forEach(function(p) {
+          var on =
+            p.getAttribute('data-paper') === pid &&
+            p.getAttribute('data-format') === fid;
+          p.classList.toggle('is-active', on);
+        });
+      }
+
+      if (paperBar) {
+        paperBar.addEventListener('click', function(e) {
+          var btn = e.target.closest('.landing-cite-paper-btn');
+          if (!btn || !paperBar.contains(btn)) return;
+          paperBar.querySelectorAll('.landing-cite-paper-btn').forEach(function(b) {
+            var on = b === btn;
+            b.classList.toggle('is-active', on);
+            b.setAttribute('aria-selected', on ? 'true' : 'false');
+          });
+          syncPanels();
+        });
+      }
+
+      formatBar.addEventListener('click', function(e) {
+        var btn = e.target.closest('.landing-cite-format-btn');
+        if (!btn || !formatBar.contains(btn)) return;
+        formatBar.querySelectorAll('.landing-cite-format-btn').forEach(function(b) {
+          var on = b === btn;
+          b.classList.toggle('is-active', on);
+          b.setAttribute('aria-selected', on ? 'true' : 'false');
+        });
+        syncPanels();
+      });
+
+      copyBtn.addEventListener('click', function() {
+        var active = card.querySelector('.landing-cite-panel.is-active');
+        if (!active) return;
+        var text = active.textContent || '';
+
+        function done() {
+          if (typeof showToast === 'function') {
+            showToast('Citation copied to clipboard', 'success', 2800);
+          }
+        }
+
+        function fallbackCopy() {
+          var ta = document.createElement('textarea');
+          ta.value = text;
+          ta.setAttribute('readonly', '');
+          ta.style.position = 'absolute';
+          ta.style.left = '-9999px';
+          document.body.appendChild(ta);
+          ta.select();
+          try {
+            if (document.execCommand('copy')) {
+              done();
+            }
+          } catch (err) {}
+          document.body.removeChild(ta);
+        }
+
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(done).catch(function() {
+            fallbackCopy();
+          });
+        } else {
+          fallbackCopy();
+        }
+      });
+
+      syncPanels();
+    });
   }
 
 })();
