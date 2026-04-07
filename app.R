@@ -1928,17 +1928,32 @@ server <- function(input, output, session) {
   # --- Expectancy Tab Outputs ---
 
   output$expectancyPlot <- renderPlot({
-    p <- plot_expectancy(df_exp(), predictor_display_name(), cutoff_y_input())
+    p <- plot_expectancy(
+      df_exp(),
+      predictor_display_name(),
+      cutoff_y_input(),
+      criterion_display_name()
+    )
     print(p)
   }, width = 720, height = 420, res = 96) |> bindCache(
     df_exp(),
     predictor_display_name(),
-    cutoff_y_input()
+    cutoff_y_input(),
+    criterion_display_name()
   )
 
   output$expectancyTable <- renderTable({
+    criterion_col <- paste0("Proportion (", criterion_display_name(), " > ", round(cutoff_y_input(), 3), ")")
+    count_col <- paste0("Count (", criterion_display_name(), " > ", round(cutoff_y_input(), 3), ")")
+
     df_exp() %>%
-      select(Bin = ntile_X, Range = xlabels, Proportion = proportion, Count = frequency, Total = n)
+      transmute(
+        Bin = ntile_X,
+        Range = xlabels,
+        !!criterion_col := proportion,
+        !!count_col := as.integer(round(frequency)),
+        Total = as.integer(round(n))
+      )
   }, digits = 3)
 
   # --- Statistics Tab Outputs ---
@@ -2206,7 +2221,12 @@ server <- function(input, output, session) {
       )
     },
     content = function(file) {
-      p <- plot_expectancy(df_exp(), predictor_display_name(), input$cutoffInput)
+      p <- plot_expectancy(
+        df_exp(),
+        predictor_display_name(),
+        input$cutoffInput,
+        criterion_display_name()
+      )
       ggplot2::ggsave(
         filename = file,
         plot = p,
@@ -2452,7 +2472,7 @@ server <- function(input, output, session) {
       besd_empirical = besd_emp,
       besd_theoretical = besd_theory,
       scatter_plot = plot_scatter(df, pd, cd),
-      exp_plot = plot_expectancy(df_exp(), pd, cutoff_y_input()),
+      exp_plot = plot_expectancy(df_exp(), pd, cutoff_y_input(), cd),
       icon_plot = icon_plot_obj
     )
   }

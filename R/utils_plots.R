@@ -57,8 +57,9 @@ theme_minimal_linear <- function() {
 #' @param df Expectancy data frame from calc_expectancy()
 #' @param predictor_name Name of predictor variable
 #' @param cutoff_y Criterion cutoff value
+#' @param criterion_name Name of criterion variable
 #' @return ggplot object
-plot_expectancy <- function(df, predictor_name, cutoff_y) {
+plot_expectancy <- function(df, predictor_name, cutoff_y, criterion_name = "Criterion") {
   ggplot(df, aes(x = xlabels, y = proportion)) +
     geom_col(fill = plot_colors$primary, width = 0.7) +
     scale_y_continuous(
@@ -68,7 +69,7 @@ plot_expectancy <- function(df, predictor_name, cutoff_y) {
     ) +
     labs(
       x = predictor_name,
-      y = paste("Proportion above", cutoff_y)
+      y = paste("Proportion of", criterion_name, "above", cutoff_y)
     ) +
     theme_minimal_linear() +
     theme(
