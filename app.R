@@ -520,6 +520,15 @@ landing_page_ui <- function() {
               `aria-label` = "LSU faculty profile",
               title = "LSU faculty page",
               tags$i(`data-lucide` = "building-2", `aria-hidden` = "true")
+            ),
+            tags$a(
+              class = "creator-bio-icon-link",
+              href = "https://randmlab.com",
+              target = "_blank",
+              rel = "noopener noreferrer",
+              `aria-label` = "Risk and Decision Making Lab website",
+              title = "R&DM Lab website",
+              tags$i(`data-lucide` = "flask-conical", `aria-hidden` = "true")
             )
           )
         )

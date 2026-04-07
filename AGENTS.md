@@ -17,7 +17,7 @@ Deployed at https://dczhang.shinyapps.io/shinyescape/
 
 ```bash
 # Run locally
-Rscript app.R
+Rscript -e "shiny::runApp('.', host='127.0.0.1', port=5521, launch.browser=FALSE)"
 
 # Check R syntax (run for each modified R file)
 Rscript -e "tryCatch(parse('app.R'), error=function(e) cat('ERROR:', e\$message, '\n')); cat('OK\n')"
@@ -32,11 +32,13 @@ node -c www/js/main.js
 Rscript -e "rsconnect::deployApp('.', appName='shinyescape', account='dczhang')"
 ```
 
+Local preview should be started with `shiny::runApp('.')` (not `Rscript app.R`) so Shiny serves the `www` static assets correctly (`css/main.css`, `css/landing.css`, JS, and images).
+
 ## Tests
 
 No formal test suite. Verify changes by:
 
-1. Running `Rscript app.R` and checking the app loads in the browser
+1. Running `Rscript -e "shiny::runApp('.', host='127.0.0.1', port=5521, launch.browser=FALSE)"` and checking the app loads in the browser
 2. Checking R syntax with `tryCatch(parse(...))` for each modified R file
 3. Checking JS syntax with `node -c www/js/main.js`
 4. Visually inspecting plots (expectancy chart, icon arrays, scatter plots)
