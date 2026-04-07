@@ -16,14 +16,21 @@
   });
 
   if (typeof Shiny !== 'undefined') {
+    var shinyValueInitTimer = null;
     $(document).on('shiny:value', function() {
-      setTimeout(initLucideIcons, 50);
-      setTimeout(initScrollAnimations, 50);
-      setTimeout(initMiniIconWave, 50);
-      setTimeout(initHeroParticles, 50);
-      setTimeout(initInsightMorph, 50);
-      setTimeout(initLivePreviewChartReveal, 50);
-      setTimeout(initLandingCiteBlocks, 50);
+      if (shinyValueInitTimer) {
+        clearTimeout(shinyValueInitTimer);
+      }
+      shinyValueInitTimer = setTimeout(function() {
+        initLucideIcons();
+        initScrollAnimations();
+        initMiniIconWave();
+        initHeroParticles();
+        initInsightMorph();
+        initLivePreviewChartReveal();
+        initLandingCiteBlocks();
+        initDragDropEnhancement();
+      }, 80);
     });
 
     Shiny.addCustomMessageHandler('initIcons', function(data) {
@@ -151,6 +158,8 @@
       var container = input.closest('.shiny-input-container');
       if (!container) return;
       var dropZone = container.querySelector('.input-group') || container;
+      if (dropZone.getAttribute('data-dragdrop-init') === '1') return;
+      dropZone.setAttribute('data-dragdrop-init', '1');
 
       ['dragenter', 'dragover'].forEach(function(eventName) {
         dropZone.addEventListener(eventName, function(e) {
@@ -169,9 +178,12 @@
       });
     });
 
-    var style = document.createElement('style');
-    style.textContent = '.drag-over{border-color:#2d5a3d!important;background:rgba(45,90,61,0.08)!important;}';
-    document.head.appendChild(style);
+    if (!document.getElementById('escape-dragdrop-style')) {
+      var style = document.createElement('style');
+      style.id = 'escape-dragdrop-style';
+      style.textContent = '.drag-over{border-color:#2d5a3d!important;background:rgba(45,90,61,0.08)!important;}';
+      document.head.appendChild(style);
+    }
   }
 
   function animateNumber(element, start, end, duration) {

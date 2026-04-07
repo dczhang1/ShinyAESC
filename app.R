@@ -15,6 +15,7 @@ library(DT)
 source("R/utils_theme.R")
 source("R/utils_stats.R")
 source("R/utils_plots.R")
+source("R/ui_helpers.R")
 
 # Resolve sample data path (works from project root or app dir)
 get_sample_data_path <- function() {
@@ -477,7 +478,7 @@ landing_page_ui <- function() {
         div(
           class = "creator-bio-avatar",
           tags$img(
-            src = "images/head.png",
+            src = "images/head.jpg",
             alt = "Portrait of Don Zhang",
             class = "creator-bio-avatar-img",
             width = "96",
@@ -544,20 +545,6 @@ landing_page_ui <- function() {
       ),
       landing_cite_combined()
     )
-  )
-}
-
-# Feature Card Helper (with micro-example)
-feature_card_micro <- function(icon, title, description, micro, color_class = "feature-icon--purple") {
-  div(
-    class = "feature-card",
-    div(
-      class = paste("feature-icon", color_class),
-      tags$i(`data-lucide` = icon)
-    ),
-    h3(class = "feature-title", title),
-    p(class = "feature-description", description),
-    code(class = "feature-micro", micro)
   )
 }
 
@@ -1192,12 +1179,8 @@ ui <- page_fillable(
   theme = app_theme,
 
   tags$head(
-    tags$link(
-      rel = "stylesheet",
-      href = "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Source+Sans+3:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
-    ),
     tags$link(rel = "stylesheet", type = "text/css", href = "css/main.css"),
-    tags$link(rel = "stylesheet", type = "text/css", href = "css/landing.css"),
+    uiOutput("view_specific_css"),
     tags$script(src = "https://unpkg.com/lucide@latest/dist/umd/lucide.js"),
     tags$script(src = "js/main.js")
   ),
@@ -1301,13 +1284,22 @@ server <- function(input, output, session) {
     }
   })
 
-  # Re-initialize Lucide icons after UI switch
+  output$view_specific_css <- renderUI({
+    if (app_state$view == "landing") {
+      tags$link(rel = "stylesheet", type = "text/css", href = "css/landing.css")
+    } else {
+      NULL
+    }
+  })
+
+  # Re-initialize Lucide icons once after UI switch
   observe({
-    invalidateLater(100)
     session$sendCustomMessage("initIcons", list())
-  }) |> bindEvent(app_state$view)
+  }) |> bindEvent(app_state$view, ignoreInit = TRUE)
 
   # --- Data Loading ---
+  last_load_signature <- reactiveVal(NULL)
+  last_load_error <- reactiveVal(NULL)
 
   data_set <- reactive({
     # Prefer preserved landing upload, then sidebar file
@@ -1340,22 +1332,32 @@ server <- function(input, output, session) {
         sas7bdat = haven::read_sas(inFile$datapath),
         NULL
       )
-
-      session$sendCustomMessage("showToast", list(
-        message = paste("Loaded", nrow(df), "rows from", inFile$name),
-        type = "success",
-        duration = 3000
-      ))
-
+      last_load_error(NULL)
+      sig <- paste0(inFile$name, "::", nrow(df), "::", as.numeric(file.info(inFile$datapath)$mtime))
+      last_load_signature(sig)
       return(df)
     }, error = function(e) {
-      session$sendCustomMessage("showToast", list(
-        message = paste("Error loading file:", e$message),
-        type = "error",
-        duration = 5000
-      ))
+      last_load_error(paste("Error loading file:", e$message))
       return(NULL)
     })
+  })
+
+  observeEvent(last_load_signature(), ignoreNULL = TRUE, {
+    df <- data_set()
+    req(df)
+    session$sendCustomMessage("showToast", list(
+      message = paste("Loaded", nrow(df), "rows from your file"),
+      type = "success",
+      duration = 3000
+    ))
+  })
+
+  observeEvent(last_load_error(), ignoreNULL = TRUE, {
+    session$sendCustomMessage("showToast", list(
+      message = last_load_error(),
+      type = "error",
+      duration = 5000
+    ))
   })
 
   guided_step2_state <- reactive({
@@ -1700,8 +1702,12 @@ server <- function(input, output, session) {
     df <- data_set()
     if (is.null(df) || is.null(ev$predictor)) return(NULL)
     dsnames <- names(df)
-    updateSelectInput(session, "predictorVar", choices = dsnames, selected = ev$predictor)
-    updateSelectInput(session, "criterionVar", choices = dsnames, selected = ev$criterion)
+    if (!identical(input$predictorVar, ev$predictor)) {
+      updateSelectInput(session, "predictorVar", choices = dsnames, selected = ev$predictor)
+    }
+    if (!identical(input$criterionVar, ev$criterion)) {
+      updateSelectInput(session, "criterionVar", choices = dsnames, selected = ev$criterion)
+    }
   })
 
   observeEvent(input$predictorVar, {
@@ -1738,6 +1744,9 @@ server <- function(input, output, session) {
   })
 
   # --- Calculations ---
+  cutoff_x_input <- reactive(input$cutoff.X) |> debounce(250)
+  cutoff_y_input <- reactive(input$cutoffInput) |> debounce(250)
+  bins_input <- reactive(input$bins) |> debounce(250)
 
   validity_stats <- reactive({
     df <- selected_data()
@@ -1746,12 +1755,12 @@ server <- function(input, output, session) {
 
   cutoff_X_val <- reactive({
     df <- selected_data()
-    quantile(df$Predictor, probs = input$cutoff.X, na.rm = TRUE)
+    quantile(df$Predictor, probs = cutoff_x_input(), na.rm = TRUE)
   })
 
   df_exp <- reactive({
     df <- selected_data()
-    calc_expectancy(df, input$bins, input$cutoffInput)
+    calc_expectancy(df, bins_input(), cutoff_y_input())
   })
 
   df_cles <- reactive({
@@ -1769,9 +1778,9 @@ server <- function(input, output, session) {
   })
 
   effect_sizes <- reactive({
-    df <- df_cles()
-    above_vals <- df %>% filter(Group == "Above") %>% pull(Criterion)
-    below_vals <- df %>% filter(Group == "Below") %>% pull(Criterion)
+    slices <- group_slices()
+    above_vals <- slices$above_vals
+    below_vals <- slices$below_vals
 
     if (length(above_vals) < 2 || length(below_vals) < 2) {
       return(list(d = NA, cles = NA))
@@ -1780,6 +1789,18 @@ server <- function(input, output, session) {
     list(
       d = calc_cohens_d(above_vals, below_vals),
       cles = calc_cles(above_vals, below_vals)
+    )
+  })
+
+  group_slices <- reactive({
+    df <- df_cles()
+    above_vals <- df %>% filter(Group == "Above") %>% pull(Criterion)
+    below_vals <- df %>% filter(Group == "Below") %>% pull(Criterion)
+    list(
+      above_vals = above_vals,
+      below_vals = below_vals,
+      n_above = length(above_vals),
+      n_below = length(below_vals)
     )
   })
 
@@ -1826,7 +1847,11 @@ server <- function(input, output, session) {
   output$overview_scatter <- renderPlot({
     p <- plot_scatter(selected_data(), predictor_display_name(), criterion_display_name())
     print(p)
-  }, width = 560, height = 340, res = 96)
+  }, width = 560, height = 340, res = 96) |> bindCache(
+    selected_data(),
+    predictor_display_name(),
+    criterion_display_name()
+  )
 
   output$overview_insight <- renderUI({
     pd <- predictor_display_name()
@@ -1834,8 +1859,9 @@ server <- function(input, output, session) {
     r <- validity_stats()$r
     cles <- effect_sizes()$cles
     d <- effect_sizes()$d
-    n_above <- sum(df_cles()$Group == "Above")
-    n_below <- sum(df_cles()$Group == "Below")
+    slices <- group_slices()
+    n_above <- slices$n_above
+    n_below <- slices$n_below
     d_ci <- calc_d_ci(d, n_above, n_below)
     r_ci <- calc_r_ci(r, nrow(selected_data()))
 
@@ -1846,12 +1872,12 @@ server <- function(input, output, session) {
     cles_text <- if (!is.na(cles)) {
       paste0(
         "A randomly selected person from the top ",
-        round(input$cutoff.X * 100), "% on ",
+        round(cutoff_x_input() * 100), "% on ",
         pd, " has a ",
         tags$strong(paste0(round(cles * 100, 1), "%")),
         " probability of scoring higher on ",
         cd, " than someone from the bottom ",
-        round((1 - input$cutoff.X) * 100), "%."
+        round((1 - cutoff_x_input()) * 100), "%."
       )
     } else {
       "Adjust the cutoff percentile to see CLES insights."
@@ -1902,9 +1928,13 @@ server <- function(input, output, session) {
   # --- Expectancy Tab Outputs ---
 
   output$expectancyPlot <- renderPlot({
-    p <- plot_expectancy(df_exp(), predictor_display_name(), input$cutoffInput)
+    p <- plot_expectancy(df_exp(), predictor_display_name(), cutoff_y_input())
     print(p)
-  }, width = 720, height = 420, res = 96)
+  }, width = 720, height = 420, res = 96) |> bindCache(
+    df_exp(),
+    predictor_display_name(),
+    cutoff_y_input()
+  )
 
   output$expectancyTable <- renderTable({
     df_exp() %>%
@@ -1939,17 +1969,21 @@ server <- function(input, output, session) {
   output$histogram.X <- renderPlot({
     p <- plot_histogram(selected_data()$Predictor, fill_color = plot_colors$primary)
     print(p)
-  }, width = 560, height = 340, res = 96)
+  }, width = 560, height = 340, res = 96) |> bindCache(selected_data()$Predictor)
 
   output$histogram.Y <- renderPlot({
     p <- plot_histogram(selected_data()$Criterion, fill_color = plot_colors$success)
     print(p)
-  }, width = 560, height = 340, res = 96)
+  }, width = 560, height = 340, res = 96) |> bindCache(selected_data()$Criterion)
 
   output$corplot <- renderPlot({
     p <- plot_scatter(selected_data(), predictor_display_name(), criterion_display_name())
     print(p)
-  }, width = 720, height = 480, res = 96)
+  }, width = 720, height = 480, res = 96) |> bindCache(
+    selected_data(),
+    predictor_display_name(),
+    criterion_display_name()
+  )
 
   # --- Effect Sizes Tab Outputs ---
 
@@ -1966,8 +2000,9 @@ server <- function(input, output, session) {
 
     if (nrow(stats) < 2) return(NULL)
 
-    above_vals <- df_cles() %>% filter(Group == "Above") %>% pull(Criterion)
-    below_vals <- df_cles() %>% filter(Group == "Below") %>% pull(Criterion)
+    slices <- group_slices()
+    above_vals <- slices$above_vals
+    below_vals <- slices$below_vals
 
     if (length(above_vals) < 2 || length(below_vals) < 2) return(NULL)
 
@@ -1975,9 +2010,9 @@ server <- function(input, output, session) {
   })
 
   output$cles.verbal <- renderText({
-    df <- df_cles()
-    above_vals <- df %>% filter(Group == "Above") %>% pull(Criterion)
-    below_vals <- df %>% filter(Group == "Below") %>% pull(Criterion)
+    slices <- group_slices()
+    above_vals <- slices$above_vals
+    below_vals <- slices$below_vals
 
     if (length(above_vals) < 2 || length(below_vals) < 2) {
       return("Insufficient data for CLES calculation.")
@@ -1990,11 +2025,16 @@ server <- function(input, output, session) {
   output$histogram.overlap <- renderPlot({
     p <- plot_density_overlap(df_cles(), criterion_display_name(), predictor_display_name(), cutoff_X_val())
     print(p)
-  }, width = 680, height = 380, res = 96)
+  }, width = 680, height = 380, res = 96) |> bindCache(
+    df_cles(),
+    criterion_display_name(),
+    predictor_display_name(),
+    cutoff_X_val()
+  )
 
   output$besd <- renderTable({
     df <- selected_data()
-    calc_besd(df, cutoff_X_val(), input$cutoffInput, predictor_display_name(), criterion_display_name())
+    calc_besd(df, cutoff_X_val(), cutoff_y_input(), predictor_display_name(), criterion_display_name())
   }, rownames = TRUE, digits = 3)
 
   output$besd_theoretical <- renderTable({
@@ -2348,9 +2388,9 @@ server <- function(input, output, session) {
     pd <- predictor_display_name()
     cd <- criterion_display_name()
     df <- selected_data()
-    df_grouped <- df_cles()
-    above_vals <- df_grouped %>% filter(Group == "Above") %>% pull(Criterion)
-    below_vals <- df_grouped %>% filter(Group == "Below") %>% pull(Criterion)
+    slices <- group_slices()
+    above_vals <- slices$above_vals
+    below_vals <- slices$below_vals
     corr <- validity_stats()$r
     corr_abs <- abs(corr)
     effect_band <- if (corr_abs < 0.10) "very small" else if (corr_abs < 0.30) "small" else if (corr_abs < 0.50) "moderate" else "large"
@@ -2381,7 +2421,7 @@ server <- function(input, output, session) {
         frequency,
         n
       )
-    besd_emp <- calc_besd(df, cutoff_X_val(), input$cutoffInput, pd, cd) %>%
+    besd_emp <- calc_besd(df, cutoff_X_val(), cutoff_y_input(), pd, cd) %>%
       as.data.frame() %>%
       tibble::rownames_to_column("Group")
     besd_theory <- calc_besd_theoretical(corr, pd, cd) %>%
@@ -2400,8 +2440,8 @@ server <- function(input, output, session) {
       criterion = cd,
       n_obs = nrow(df),
       bins = input$bins,
-      cutoff_y = input$cutoffInput,
-      cutoff_x_pct = round(input$cutoff.X * 100),
+      cutoff_y = cutoff_y_input(),
+      cutoff_x_pct = round(cutoff_x_input() * 100),
       r = corr,
       r2 = corr^2,
       practical_message = practical_message,
@@ -2412,7 +2452,7 @@ server <- function(input, output, session) {
       besd_empirical = besd_emp,
       besd_theoretical = besd_theory,
       scatter_plot = plot_scatter(df, pd, cd),
-      exp_plot = plot_expectancy(df_exp(), pd, input$cutoffInput),
+      exp_plot = plot_expectancy(df_exp(), pd, cutoff_y_input()),
       icon_plot = icon_plot_obj
     )
   }

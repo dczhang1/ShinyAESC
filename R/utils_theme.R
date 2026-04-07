@@ -30,9 +30,9 @@ app_theme <- bs_theme(
   light = colors$gray_100,
   dark = "#0f2416",
 
-  base_font = font_google("Source Sans 3", wght = "400;500;600;700"),
-  heading_font = font_google("Space Grotesk", wght = "500;600;700"),
-  code_font = font_google("JetBrains Mono", wght = "400;500"),
+  base_font = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+  heading_font = '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+  code_font = 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace',
 
   font_size_base = "1.0625rem",
 
