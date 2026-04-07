@@ -257,27 +257,29 @@ landing_page_ui <- function() {
           div(
             class = "creator-bio-actions",
             tags$a(
-              class = "creator-bio-btn",
-              href = "https://scholar.google.com/citations?user=sRa9gKgAAAAJ",
+              class = "creator-bio-icon-link",
+              href = "https://scholar.google.com/citations?user=GTukwAEAAAAJ&hl=en",
               target = "_blank",
               rel = "noopener noreferrer",
-              tags$i(`data-lucide` = "library"),
-              tags$span("Google Scholar")
+              `aria-label` = "Google Scholar profile",
+              title = "Google Scholar",
+              tags$i(`data-lucide` = "library", `aria-hidden` = "true")
             ),
             tags$a(
-              class = "creator-bio-btn",
+              class = "creator-bio-icon-link",
               href = "mailto:zhang1@lsu.edu",
               `aria-label` = "Email zhang1@lsu.edu",
-              tags$i(`data-lucide` = "mail"),
-              tags$span("Email")
+              title = "Email",
+              tags$i(`data-lucide` = "mail", `aria-hidden` = "true")
             ),
             tags$a(
-              class = "creator-bio-btn",
+              class = "creator-bio-icon-link",
               href = "https://www.lsu.edu/hss/psychology/faculty/industrial/zhang.php",
               target = "_blank",
               rel = "noopener noreferrer",
-              tags$i(`data-lucide` = "building-2"),
-              tags$span("LSU faculty page")
+              `aria-label` = "LSU faculty profile",
+              title = "LSU faculty page",
+              tags$i(`data-lucide` = "building-2", `aria-hidden` = "true")
             )
           )
         )
