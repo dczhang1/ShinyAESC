@@ -3,15 +3,15 @@
 (function() {
   'use strict';
 
-  var carouselTimer = null;
-
   document.addEventListener('DOMContentLoaded', function() {
     initLucideIcons();
     initToastContainer();
     initDragDropEnhancement();
     initScrollAnimations();
     initMiniIconWave();
-    initCarousel();
+    initHeroParticles();
+    initInsightMorph();
+    initLivePreviewChartReveal();
   });
 
   if (typeof Shiny !== 'undefined') {
@@ -19,7 +19,9 @@
       setTimeout(initLucideIcons, 50);
       setTimeout(initScrollAnimations, 50);
       setTimeout(initMiniIconWave, 50);
-      setTimeout(initCarousel, 50);
+      setTimeout(initHeroParticles, 50);
+      setTimeout(initInsightMorph, 50);
+      setTimeout(initLivePreviewChartReveal, 50);
     });
 
     Shiny.addCustomMessageHandler('initIcons', function(data) {
@@ -27,19 +29,11 @@
     });
   }
 
-  /* ============================================
-     LUCIDE ICONS
-     ============================================ */
-
   function initLucideIcons() {
     if (typeof lucide !== 'undefined') {
       lucide.createIcons();
     }
   }
-
-  /* ============================================
-     TOAST NOTIFICATIONS
-     ============================================ */
 
   function initToastContainer() {
     if (!document.getElementById('toast-container')) {
@@ -64,19 +58,19 @@
     toast.className = 'toast toast-' + type;
 
     var colors = {
-      info: { bg: '#5E6AD2', icon: 'info' },
-      success: { bg: '#3CCB7F', icon: 'check-circle' },
-      warning: { bg: '#FFBB38', icon: 'alert-triangle' },
-      error: { bg: '#F87171', icon: 'x-circle' }
+      info: { bg: '#2d5a3d', icon: 'info' },
+      success: { bg: '#3d7a52', icon: 'check-circle' },
+      warning: { bg: '#d4af37', icon: 'alert-triangle' },
+      error: { bg: '#b4534a', icon: 'x-circle' }
     };
 
     var config = colors[type] || colors.info;
 
     toast.style.cssText =
       'display:flex;align-items:center;gap:0.75rem;padding:0.75rem 1rem;' +
-      'background:#18181B;color:white;border-radius:0.5rem;' +
+      'background:#1a1a1a;color:white;border-radius:0.5rem;' +
       'box-shadow:0 4px 12px rgba(0,0,0,0.15);font-size:0.875rem;' +
-      'font-family:Inter,sans-serif;transform:translateX(100%);opacity:0;' +
+      'font-family:system-ui,sans-serif;transform:translateX(100%);opacity:0;' +
       'transition:all 200ms ease-out;max-width:350px;';
 
     var iconWrap = document.createElement('span');
@@ -149,10 +143,6 @@
     });
   }
 
-  /* ============================================
-     DRAG & DROP FILE UPLOAD ENHANCEMENT
-     ============================================ */
-
   function initDragDropEnhancement() {
     var fileInputs = document.querySelectorAll('.shiny-input-container input[type="file"]');
     fileInputs.forEach(function(input) {
@@ -178,13 +168,9 @@
     });
 
     var style = document.createElement('style');
-    style.textContent = '.drag-over{border-color:#5E6AD2!important;background:rgba(94,106,210,0.1)!important;}';
+    style.textContent = '.drag-over{border-color:#2d5a3d!important;background:rgba(45,90,61,0.08)!important;}';
     document.head.appendChild(style);
   }
-
-  /* ============================================
-     NUMBER ANIMATION
-     ============================================ */
 
   function animateNumber(element, start, end, duration) {
     duration = duration || 500;
@@ -202,10 +188,6 @@
 
   window.animateNumber = animateNumber;
 
-  /* ============================================
-     MINI ICON WAVE ANIMATION
-     ============================================ */
-
   function initMiniIconWave() {
     var container = document.querySelector('.transformation-icon-array');
     if (!container) return;
@@ -215,97 +197,155 @@
     });
   }
 
-  /* ============================================
-     INTERSECTION OBSERVER FOR ANIMATIONS
-     ============================================ */
+  var scrollAnimObserver = null;
 
   function initScrollAnimations() {
-    var observer = new IntersectionObserver(
+    if (scrollAnimObserver) {
+      scrollAnimObserver.disconnect();
+      scrollAnimObserver = null;
+    }
+    scrollAnimObserver = new IntersectionObserver(
       function(entries) {
         entries.forEach(function(entry) {
           if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
             entry.target.classList.add('fade-in');
-            observer.unobserve(entry.target);
+            scrollAnimObserver.unobserve(entry.target);
           }
         });
       },
-      { threshold: 0.1 }
+      { threshold: 0.2 }
     );
-    document.querySelectorAll('.feature-card, .step-card, .use-case-card, .problem-callout').forEach(function(el) {
-      observer.observe(el);
+
+    document.querySelectorAll(
+      '.feature-card, .step-card, .scroll-section'
+    ).forEach(function(el) {
+      if (!el.classList.contains('is-visible')) {
+        scrollAnimObserver.observe(el);
+      }
     });
   }
 
-  /* ============================================
-     AUTO-ADVANCING CAROUSEL
-     ============================================ */
+  function initHeroParticles() {
+    var canvas = document.getElementById('hero-particles-canvas');
+    if (!canvas || !canvas.getContext) return;
+    if (canvas.getAttribute('data-particles-on') === '1') return;
+    canvas.setAttribute('data-particles-on', '1');
 
-  function initCarousel() {
-    var carousel = document.querySelector('.use-cases-carousel');
-    if (!carousel) return;
+    var ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-    var track = carousel.querySelector('.carousel-track');
-    var slides = carousel.querySelectorAll('.use-case-card');
-    var prevBtn = carousel.querySelector('.carousel-prev');
-    var nextBtn = carousel.querySelector('.carousel-next');
-    var dots = carousel.querySelectorAll('.carousel-dot');
+    var particles = [];
+    var n = 42;
+    var w = 0;
+    var h = 0;
 
-    if (!track || slides.length === 0) return;
-
-    var current = 0;
-    var total = slides.length;
-    var interval = 6000;
-
-    function goTo(index) {
-      if (index < 0) index = total - 1;
-      if (index >= total) index = 0;
-      current = index;
-      track.style.transform = 'translateX(-' + (current * 100) + '%)';
-      dots.forEach(function(dot, i) {
-        dot.classList.toggle('active', i === current);
-      });
+    function resize() {
+      var section = canvas.closest('.hero-section--observatory');
+      if (!section) return;
+      w = section.offsetWidth;
+      h = section.offsetHeight;
+      if (w < 1 || h < 1) return;
+      canvas.width = w;
+      canvas.height = h;
+      particles.length = 0;
+      for (var i = 0; i < n; i++) {
+        particles.push({
+          x: Math.random() * w,
+          y: Math.random() * h,
+          r: 0.6 + Math.random() * 1.8,
+          vx: (Math.random() - 0.5) * 0.12,
+          vy: (Math.random() - 0.5) * 0.12,
+          a: 0.15 + Math.random() * 0.35
+        });
+      }
     }
 
-    function next() { goTo(current + 1); }
-    function prev() { goTo(current - 1); }
-
-    if (nextBtn) nextBtn.addEventListener('click', function() {
-      next();
-      resetTimer();
-    });
-
-    if (prevBtn) prevBtn.addEventListener('click', function() {
-      prev();
-      resetTimer();
-    });
-
-    dots.forEach(function(dot, i) {
-      dot.addEventListener('click', function() {
-        goTo(i);
-        resetTimer();
-      });
-    });
-
-    function startTimer() {
-      if (carouselTimer) clearInterval(carouselTimer);
-      carouselTimer = setInterval(next, interval);
+    function tick() {
+      if (canvas.getAttribute('data-particles-on') !== '1') return;
+      if (w < 1) {
+        requestAnimationFrame(tick);
+        return;
+      }
+      ctx.clearRect(0, 0, w, h);
+      for (var i = 0; i < particles.length; i++) {
+        var p = particles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        if (p.x < -5) p.x = w + 5;
+        if (p.x > w + 5) p.x = -5;
+        if (p.y < -5) p.y = h + 5;
+        if (p.y > h + 5) p.y = -5;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(212, 175, 55, ' + p.a + ')';
+        ctx.fill();
+      }
+      requestAnimationFrame(tick);
     }
 
-    function resetTimer() {
-      if (carouselTimer) clearInterval(carouselTimer);
-      startTimer();
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return;
     }
 
-    carousel.addEventListener('mouseenter', function() {
-      if (carouselTimer) clearInterval(carouselTimer);
-    });
+    resize();
+    window.addEventListener('resize', resize);
+    requestAnimationFrame(tick);
+  }
 
-    carousel.addEventListener('mouseleave', function() {
-      startTimer();
-    });
+  var insightMorphTimer = null;
 
-    goTo(0);
-    startTimer();
+  function initInsightMorph() {
+    var morph = document.querySelector('.insight-morph');
+    if (!morph || morph.getAttribute('data-morph-bound') === '1') return;
+    morph.setAttribute('data-morph-bound', '1');
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return;
+    }
+
+    var started = false;
+
+    function startFlipping() {
+      if (started) return;
+      started = true;
+      if (insightMorphTimer) clearInterval(insightMorphTimer);
+      insightMorphTimer = setInterval(function() {
+        morph.classList.toggle('insight-morph--flip');
+      }, 3200);
+    }
+
+    var io = new IntersectionObserver(
+      function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            startFlipping();
+            io.disconnect();
+          }
+        });
+      },
+      { threshold: 0.25 }
+    );
+    io.observe(morph);
+  }
+
+  function initLivePreviewChartReveal() {
+    var chart = document.querySelector('.live-preview-chart');
+    if (!chart || chart.getAttribute('data-chart-io') === '1') return;
+    chart.setAttribute('data-chart-io', '1');
+
+    var io = new IntersectionObserver(
+      function(entries) {
+        entries.forEach(function(entry) {
+          if (entry.isIntersecting) {
+            chart.classList.add('is-chart-revealed');
+            io.disconnect();
+          }
+        });
+      },
+      { threshold: 0.2 }
+    );
+    io.observe(chart);
   }
 
 })();

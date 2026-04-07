@@ -34,73 +34,58 @@ get_sample_data_path <- function() {
   NULL
 }
 
-resolve_www_path <- function(relative_path) {
-  ca <- commandArgs(trailingOnly = FALSE)
-  file_from_cmd <- sub("^--file=", "", ca[grep("^--file=", ca)])
-  roots <- list()
-  if (length(file_from_cmd) && nzchar(file_from_cmd[1])) {
-    roots <- c(roots, list(tryCatch(
-      dirname(normalizePath(file_from_cmd[1], winslash = "/", mustWork = TRUE)),
-      error = function(e) NULL
-    )))
-  }
-  roots <- c(roots, list(
-    tryCatch(getShinyOption("appDir", NULL), error = function(e) NULL),
-    Sys.getenv("SHINY_APP_DIR", unset = ""),
-    getwd()
-  ))
-  for (r in roots) {
-    if (!is.null(r) && length(r) == 1 && !is.na(r) && nzchar(r)) {
-      p <- file.path(r, "www", relative_path)
-      if (file.exists(p)) {
-        return(normalizePath(p, winslash = "/", mustWork = TRUE))
-      }
-    }
-  }
-  normalizePath(file.path(getwd(), "www", relative_path), winslash = "/", mustWork = FALSE)
-}
-
 # ============================================
 # UI COMPONENTS
 # ============================================
+
+site_footer_ui <- function() {
+  tags$footer(
+    class = "app-site-footer",
+    role = "contentinfo",
+    p(
+      class = "app-site-footer__text",
+      "\u00A9 2026 Don Zhang, Louisiana State University. ",
+      tags$a(
+        class = "app-site-footer__email",
+        href = "mailto:zhang1@lsu.edu",
+        "zhang1@lsu.edu"
+      )
+    )
+  )
+}
 
 # Landing Page Component
 landing_page_ui <- function() {
   div(
     class = "landing-page",
 
-    # ---- Hero Section ----
     div(
-      class = "hero-section",
+      class = "hero-section hero-section--observatory",
+      tags$canvas(class = "hero-particles", id = "hero-particles-canvas", `aria-hidden` = "true"),
       div(
         class = "hero-content",
-        p(class = "hero-tagline", "Effect Size Calculator for Practical Effects"),
-        div(
-          class = "app-name-badge",
-          tags$strong("ESCAPE")
-        ),
-        h1(class = "hero-title", "Stop reporting correlations. Start communicating results."),
+        p(class = "hero-tagline hero-reveal", "Effect Size Calculator for Practical Effects"),
+        h1(class = "hero-brand-title hero-reveal", "ESCAPE"),
+        span(class = "hero-brand-accent-line hero-reveal", role = "presentation", `aria-hidden` = "true"),
+        h2(class = "hero-title hero-reveal", "Stop reporting correlations. Start communicating results."),
         p(
-          class = "hero-subtitle",
-          "Effect sizes satisfy reviewers. They rarely move anyone else. ",
+          class = "hero-subtitle hero-reveal",
           "ESCAPE converts r, d, and g into probabilities, success rates, and visual summaries ",
-          "that hiring managers, clinicians, and policy teams can actually understand \u2014 and act on."
+          "that people who are not statisticians can understand \u2014 and act on."
         ),
         div(
-          class = "hero-actions",
-          actionButton("try_sample", "Try with Sample Data", class = "btn-primary"),
-          actionButton("open_guided_upload", "Upload Your Data", class = "btn-outline-primary")
+          class = "hero-actions hero-reveal",
+          actionButton("open_guided_upload", "Start Analyzing", class = "btn btn-primary btn-hero-cta")
         ),
-        p(class = "hero-trust-signal",
-          "No account needed \u00B7 Your data never leaves your browser \u00B7 Works with CSV, Excel, SPSS, SAS"
+        p(class = "hero-trust-signal hero-reveal",
+          "No account needed \u00B7 Your data stays in your browser \u00B7 CSV, Excel, SPSS, SAS"
         )
       ),
 
-      # Hero Visual - Before / After transformation card
       div(
-        class = "hero-visual",
+        class = "hero-visual hero-reveal hero-reveal--delay",
         div(
-          class = "transformation-card",
+          class = "transformation-card transformation-card--tilt",
           div(class = "transformation-panel transformation-before",
             span(class = "transformation-label", "BEFORE"),
             div(class = "apa-excerpt",
@@ -138,63 +123,53 @@ landing_page_ui <- function() {
       )
     ),
 
-    # ---- The Problem Section ----
     div(
-      class = "problem-section",
-      h2(class = "section-title", "The problem with reporting statistics"),
+      class = "insight-section scroll-section",
+      h2(class = "section-title section-title--landing", "The insight"),
+      p(class = "insight-lead",
+        "Reviewers ask for ",
+        tags$strong("p-values and effect sizes."),
+        " Decision-makers ask ",
+        tags$strong("what it means in practice."),
+        " The gap between those two sentences is where ESCAPE works."
+      ),
       div(
-        class = "problem-callout",
-        div(class = "problem-row",
-          code("r = 0.35, p < .001"),
-          span(class = "problem-arrow", "\u2192"),
-          span("means nothing to a hiring manager")
-        ),
-        div(class = "problem-row",
-          code("Cohen's d = 0.74"),
-          span(class = "problem-arrow", "\u2192"),
-          span("means nothing to a hospital board")
-        ),
-        div(class = "problem-row",
-          code("R\u00B2 = 0.12"),
-          span(class = "problem-arrow", "\u2192"),
-          span("means nothing to a school parent")
-        ),
-        p(class = "problem-summary",
-          "ESCAPE translates these numbers into language that drives decisions."
-        )
+        class = "insight-morph",
+        `aria-live` = "polite",
+        span(class = "insight-morph-line insight-morph-line--a", "r = 0.42"),
+        span(class = "insight-morph-line insight-morph-line--b", "71% success rate")
       )
     ),
 
-    # ---- How It Works Section ----
     div(
       class = "how-it-works-section",
-      h2(class = "section-title", "How it works"),
+      h2(class = "section-title section-title--landing", "How it works"),
       div(
-        class = "steps-grid",
+        class = "steps-grid steps-grid--plain",
         div(class = "step-card",
           span(class = "step-number", "1"),
+          div(class = "step-icon-wrap", tags$i(`data-lucide` = "upload")),
           h3(class = "step-title", "Upload"),
           p(class = "step-description", "Drop in your CSV, Excel, SPSS, or SAS file.")
         ),
-        div(class = "step-connector", tags$i(`data-lucide` = "chevron-right")),
         div(class = "step-card",
           span(class = "step-number", "2"),
+          div(class = "step-icon-wrap", tags$i(`data-lucide` = "line-chart")),
           h3(class = "step-title", "Analyze"),
-          p(class = "step-description", "Select variables and effect size metrics.")
+          p(class = "step-description", "Choose predictor, criterion, and metrics.")
         ),
-        div(class = "step-connector", tags$i(`data-lucide` = "chevron-right")),
         div(class = "step-card step-card--highlight",
           span(class = "step-number", "3"),
+          div(class = "step-icon-wrap", tags$i(`data-lucide` = "messages-square")),
           h3(class = "step-title", "Communicate"),
-          p(class = "step-description", "Get plain-language reports with icon arrays and charts.")
+          p(class = "step-description", "Export expectancy charts, icon arrays, and plain language.")
         )
       )
     ),
 
-    # ---- Sample Data Preview (moved up) ----
     div(
-      class = "sample-section",
-      h2(class = "section-title", "See it in action"),
+      class = "sample-section live-preview-section scroll-section",
+      h2(class = "section-title section-title--landing", "Live preview"),
       p(class = "section-subtitle", "Our sample dataset shows vigorous leisure-time activity and self-rated health in U.S. adults (NHIS 2024 public-use data)"),
       div(
         class = "sample-preview",
@@ -230,7 +205,7 @@ landing_page_ui <- function() {
                 tags$strong("about 1.2\u00D7 as likely"),
                 " to score above a middling self-rated health threshold as those in the bottom fifth \u2014 see the expectancy chart."
               ),
-              div(class = "sample-insight-chart", plotOutput("landing_expectancy_plot", width = "100%", height = "300px"))
+              div(class = "sample-insight-chart live-preview-chart", plotOutput("landing_expectancy_plot", width = "100%", height = "300px"))
             )
           )
       ),
@@ -238,137 +213,76 @@ landing_page_ui <- function() {
         "try_sample_bottom",
         label = tagList(
           tags$i(`data-lucide` = "arrow-right", style = "width: 16px; height: 16px;"),
-          "Explore This Dataset"
+          "Try this dataset"
         ),
-        class = "btn-primary"
+        class = "btn btn-primary btn-sample-cta"
       )
     ),
 
-    # ---- Use Cases Section (auto-advancing carousel) ----
     div(
-      class = "use-cases-section",
-      h2(class = "section-title", "From the lab to the boardroom"),
-      p(class = "section-subtitle", "See how ESCAPE helps researchers in HR, healthcare, and education make their findings unignorable"),
+      class = "features-section scroll-section",
+      h2(class = "section-title section-title--landing", "What you get"),
       div(
-        class = "use-cases-carousel",
-        tags$button(
-          type = "button", class = "carousel-nav carousel-prev",
-          `aria-label` = "Previous",
-          tags$i(`data-lucide` = "chevron-left")
-        ),
-        div(
-          class = "carousel-viewport",
-          div(
-            class = "carousel-track",
-            use_case_card("user-check", "Selection Tool Validity",
-              "67% of high-scoring applicants outperform",
-              "HR departments assess whether pre-employment tests predict job performance. Instead of reporting r = 0.35, ESCAPE shows that 67% of high-scoring applicants outperform low-scoring applicants\u2014helping hiring managers make informed decisions.",
-              "assets/selection.jpg"
-            ),
-            use_case_card("heart-pulse", "Health Intervention Effectiveness",
-              "71% chance of better outcomes",
-              "Clinical trials evaluate treatment outcomes. A correlation of r = 0.42 becomes: \"Patients receiving the new treatment have a 71% chance of better outcomes compared to standard care.\" This makes results accessible to patients and policymakers.",
-              "assets/health.jpg"
-            ),
-            use_case_card("graduation-cap", "Educational Assessment",
-              "2.3\u00D7 more likely to graduate on time",
-              "Schools analyze whether entrance exams predict academic success. Rather than abstract correlations, educators can say: \"Students scoring above the 75th percentile are 2.3 times more likely to graduate on time.\"",
-              "assets/education.jpg"
-            ),
-            use_case_card("scale", "Psychological Scale Validation",
-              "78% of individuals correctly identified",
-              "Researchers validate new measurement instruments. Instead of technical metrics, they can demonstrate: \"The new anxiety scale correctly identifies 78% of individuals who need clinical intervention.\"",
-              "assets/validation.jpg"
-            ),
-            use_case_card("target", "Program Evaluation",
-              "64% more likely to achieve positive outcomes",
-              "Nonprofits and government agencies evaluate program impact. A correlation of r = 0.28 translates to: \"Participants are 64% more likely to achieve positive outcomes than non-participants.\"",
-              "assets/program.jpg"
-            ),
-            use_case_card("trending-up", "Predictive Analytics",
-              "73% more likely to make repeat purchases",
-              "Business analysts forecast customer behavior. Rather than r = 0.45, stakeholders understand: \"Customers with high engagement scores are 73% more likely to make repeat purchases.\"",
-              "assets/predictive.jpg"
-            )
-          )
-        ),
-        tags$button(
-          type = "button", class = "carousel-nav carousel-next",
-          `aria-label` = "Next",
-          tags$i(`data-lucide` = "chevron-right")
-        ),
-        div(
-          class = "carousel-indicators",
-          tags$button(class = "carousel-dot active", `data-slide` = "0", `aria-label` = "Slide 1"),
-          tags$button(class = "carousel-dot", `data-slide` = "1", `aria-label` = "Slide 2"),
-          tags$button(class = "carousel-dot", `data-slide` = "2", `aria-label` = "Slide 3"),
-          tags$button(class = "carousel-dot", `data-slide` = "3", `aria-label` = "Slide 4"),
-          tags$button(class = "carousel-dot", `data-slide` = "4", `aria-label` = "Slide 5"),
-          tags$button(class = "carousel-dot", `data-slide` = "5", `aria-label` = "Slide 6")
-        )
-      )
-    ),
-
-    # ---- Features Section ----
-    div(
-      class = "features-section",
-      h2(class = "section-title", "From raw numbers to boardroom-ready insight"),
-      div(
-        class = "features-grid",
+        class = "features-grid features-grid--four",
         feature_card_micro(
           "shield-check",
-          "Privacy First",
-          "All analysis happens in your browser. Your data never leaves your computer.",
-          "Runs entirely in your browser \u2014 no server, no uploads",
-          "feature-icon--green"
+          "Privacy first",
+          "All analysis runs in your browser. Your file never leaves your device.",
+          "No upload to a server \u2014 full client-side workflow",
+          "feature-icon--gold"
         ),
         feature_card_micro(
           "bar-chart-3",
-          "Expectancy Charts",
-          "Show \"out of 100 people\" style probabilities instead of abstract coefficients.",
-          "r = 0.35 \u2192 \"67 out of 100 top scorers succeed\"",
-          "feature-icon--blue"
+          "Expectancy charts",
+          "Turn coefficients into \"out of 100\" style probabilities stakeholders recognize.",
+          "Quintile bars with proportions above a cutoff",
+          "feature-icon--gold"
         ),
         feature_card_micro(
           "layers",
-          "Multiple Effect Sizes",
-          "Calculate Cohen's d, Hedges' g, CLES, and BESD, all in one view.",
-          "Cohen's d, Hedges' g, CLES, BESD \u2014 all in one view",
-          "feature-icon--purple"
-        ),
-        feature_card_micro(
-          "trending-up",
-          "Bridge Traditional Statistics",
-          "Keep familiar descriptives and correlations, paired with consumer-friendly translations.",
-          "Pair every r value with a plain-language equivalent",
-          "feature-icon--teal"
+          "Many effect sizes",
+          "Cohen's d, Hedges' g, CLES, BESD, and correlations in one place.",
+          "Traditional and practical metrics side by side",
+          "feature-icon--gold"
         ),
         feature_card_micro(
           "download",
-          "Export Reports",
-          "Generate professional HTML reports with effect sizes explained in clear, shareable language.",
-          "One-click HTML report, ready to email to stakeholders",
-          "feature-icon--emerald"
-        ),
-        feature_card_micro(
-          "file-spreadsheet",
-          "Multiple Formats",
-          "Import data from CSV, Excel (.xlsx), SPSS (.sav), and SAS (.sas7bdat) files.",
-          "CSV, Excel, SPSS, SAS \u2014 drag and drop any format",
-          "feature-icon--orange"
+          "Export reports",
+          "Generate HTML you can share with teams who do not read APA prose.",
+          "One-click report with charts and explanations",
+          "feature-icon--gold"
         )
       )
     ),
 
-    # ---- Footer ----
     div(
-      class = "landing-footer",
-      div(class = "footer-content",
-        p(class = "footer-brand",
-          tags$strong("ESCAPE"), " \u2014 Effect Size Calculator for Practical Effects"
+      class = "landing-citations scroll-section",
+      h2(class = "section-title section-title--landing", "How to cite"),
+      p(
+        class = "landing-citations-intro",
+        "If ESCAPE informs your research or practice, consider citing:"
+      ),
+      tags$ul(
+        class = "landing-citations-list",
+        tags$li(
+          tags$a(
+            href = "https://doi.org/10.3389/fpsyg.2018.01221",
+            target = "_blank",
+            rel = "noopener noreferrer",
+            "Zhang, D. C. (2018). Utility of alternative effect size statistics and the development of a web-based calculator: Shiny-AESC. Frontiers in Psychology, 9, 1221."
+          )
+        ),
+        tags$li(
+          tags$a(
+            href = "https://doi.org/10.1111/ijsa.12220",
+            target = "_blank",
+            rel = "noopener noreferrer",
+            "Zhang, D. C., Highhouse, S., Brooks, M. E., & Zhang, Y. (2018). Communicating the validity of structured job interviews with graphical visual aids. International Journal of Selection and Assessment, 26(2-4), 93-108."
+          )
         )
       )
-    )
+    ),
+    site_footer_ui()
   )
 }
 
@@ -383,26 +297,6 @@ feature_card_micro <- function(icon, title, description, micro, color_class = "f
     h3(class = "feature-title", title),
     p(class = "feature-description", description),
     code(class = "feature-micro", micro)
-  )
-}
-
-# Use Case Card Helper (carousel slide with stock image)
-use_case_card <- function(icon, title, stat, description, image) {
-  div(
-    class = "use-case-card",
-    div(class = "use-case-image",
-      tags$img(src = image, alt = title, class = "use-case-img")
-    ),
-    div(
-      class = "use-case-content",
-      div(
-        class = "use-case-icon-badge",
-        tags$i(`data-lucide` = icon)
-      ),
-      span(class = "use-case-stat", stat),
-      h3(class = "use-case-title", title),
-      p(class = "use-case-description", description)
-    )
   )
 }
 
@@ -625,19 +519,19 @@ analysis_ui <- function() {
                     value_box(
                       title = "Correlation",
                       value = textOutput("overview_r", inline = TRUE),
-                      showcase = tags$i(`data-lucide` = "trending-up", style = "width: 32px; height: 32px; color: var(--color-primary);"),
+                      showcase = tags$i(`data-lucide` = "trending-up", style = "width: 32px; height: 32px; color: rgba(255,255,255,0.95);"),
                       theme = "light"
                     ),
                     value_box(
                       title = "Cohen's d",
                       value = textOutput("overview_d", inline = TRUE),
-                      showcase = tags$i(`data-lucide` = "layers", style = "width: 32px; height: 32px; color: var(--color-success);"),
+                      showcase = tags$i(`data-lucide` = "layers", style = "width: 32px; height: 32px; color: rgba(255,255,255,0.95);"),
                       theme = "light"
                     ),
                     value_box(
                       title = "CLES",
                       value = textOutput("overview_cles", inline = TRUE),
-                      showcase = tags$i(`data-lucide` = "percent", style = "width: 32px; height: 32px; color: var(--color-warning);"),
+                      showcase = tags$i(`data-lucide` = "percent", style = "width: 32px; height: 32px; color: rgba(228,199,103,0.95);"),
                       theme = "light"
                     )
                   ),
@@ -1023,7 +917,8 @@ analysis_ui <- function() {
           )
         )
       )
-    )
+    ),
+    site_footer_ui()
   )
   )
 )
@@ -1037,14 +932,14 @@ ui <- page_fillable(
   theme = app_theme,
 
   tags$head(
-    includeCSS(resolve_www_path("css/main.css")),
-    includeCSS(resolve_www_path("css/landing.css")),
     tags$link(
       rel = "stylesheet",
-      href = "https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,700&family=JetBrains+Mono:wght@400;500&display=swap"
+      href = "https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Source+Sans+3:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
     ),
+    tags$link(rel = "stylesheet", type = "text/css", href = "css/main.css"),
+    tags$link(rel = "stylesheet", type = "text/css", href = "css/landing.css"),
     tags$script(src = "https://unpkg.com/lucide@latest/dist/umd/lucide.js"),
-    includeScript(resolve_www_path("js/main.js"))
+    tags$script(src = "js/main.js")
   ),
 
   tags$a(
@@ -1078,13 +973,6 @@ server <- function(input, output, session) {
   guided_file_meta <- reactiveVal(NULL)
 
   # --- Navigation ---
-
-  # Try sample data buttons
-  observeEvent(input$try_sample, {
-    app_state$view <- "analysis"
-    app_state$data_source <- "sample"
-    app_state$guided_entry_from_landing <- FALSE
-  })
 
   observeEvent(input$try_sample_bottom, {
     app_state$view <- "analysis"

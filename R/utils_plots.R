@@ -4,16 +4,16 @@
 
 library(ggplot2)
 
-# Color palette for plots
+# Color palette for plots (Scholar's Observatory: forest, gold, coral)
 plot_colors <- list(
-  primary = "#5E6AD2",
-  secondary = "#A1A1AA",
-  success = "#3CCB7F",
-  warning = "#FFBB38",
-  danger = "#F87171",
-  text = "#18181B",
-  text_muted = "#71717A",
-  grid = "#E4E4E7",
+  primary = "#2d5a3d",
+  secondary = "#c97b63",
+  success = "#3d7a52",
+  warning = "#d4af37",
+  danger = "#b4534a",
+  text = "#141414",
+  text_muted = "#2c2a27",
+  grid = "#c9cfc4",
   background = "transparent",
   surface = "#FFFFFF"
 )
@@ -21,16 +21,16 @@ plot_colors <- list(
 #' Create a minimal ggplot2 theme
 #' @return ggplot2 theme object
 theme_minimal_linear <- function() {
-  theme_minimal(base_family = "Inter") +
+  theme_minimal(base_family = "sans") +
     theme(
       # Text
-      text = element_text(color = plot_colors$text),
-      plot.title = element_text(size = 14, face = "bold", margin = margin(b = 10)),
-      plot.subtitle = element_text(size = 12, color = plot_colors$text_muted),
+      text = element_text(color = plot_colors$text, size = 12),
+      plot.title = element_text(size = 16, face = "bold", margin = margin(b = 10)),
+      plot.subtitle = element_text(size = 13, color = plot_colors$text_muted),
 
       # Axes
-      axis.title = element_text(size = 11, color = plot_colors$text_muted),
-      axis.text = element_text(size = 10, color = plot_colors$text_muted),
+      axis.title = element_text(size = 12, color = plot_colors$text_muted),
+      axis.text = element_text(size = 11, color = plot_colors$text_muted),
       axis.line = element_line(color = plot_colors$grid, linewidth = 0.5),
       axis.ticks = element_line(color = plot_colors$grid, linewidth = 0.5),
 
@@ -39,8 +39,8 @@ theme_minimal_linear <- function() {
       panel.grid.minor = element_blank(),
 
       # Legend
-      legend.title = element_text(size = 11, face = "bold"),
-      legend.text = element_text(size = 10),
+      legend.title = element_text(size = 12, face = "bold"),
+      legend.text = element_text(size = 11),
       legend.background = element_rect(fill = "transparent"),
       legend.key = element_rect(fill = "transparent"),
 
@@ -72,7 +72,7 @@ plot_expectancy <- function(df, predictor_name, cutoff_y) {
     ) +
     theme_minimal_linear() +
     theme(
-      axis.text.x = element_text(angle = 45, hjust = 1, size = 9)
+      axis.text.x = element_text(angle = 45, hjust = 1, size = 10)
     )
 }
 
@@ -82,7 +82,8 @@ plot_expectancy <- function(df, predictor_name, cutoff_y) {
 #' @param cutoff_y Criterion cutoff value
 #' @return ggplot object
 plot_expectancy_landing <- function(df, predictor_name, cutoff_y) {
-  primary_light <- paste0(plot_colors$primary, "99")
+  fill_high <- plot_colors$warning
+  fill_low <- paste0(plot_colors$primary, "88")
   df$pct_label <- scales::percent(df$proportion, accuracy = 1)
   df$tier <- ifelse(df$proportion >= 0.5, "above", "below")
   ggplot(df, aes(x = xlabels, y = proportion, fill = tier)) +
@@ -97,11 +98,11 @@ plot_expectancy_landing <- function(df, predictor_name, cutoff_y) {
       aes(y = proportion / 2, label = pct_label),
       color = "white",
       fontface = "bold",
-      size = 3.2,
+      size = 3.6,
       vjust = 0.5
     ) +
     scale_fill_manual(
-      values = c("above" = plot_colors$primary, "below" = primary_light),
+      values = c("above" = fill_high, "below" = fill_low),
       guide = "none"
     ) +
     scale_y_continuous(
@@ -117,8 +118,8 @@ plot_expectancy_landing <- function(df, predictor_name, cutoff_y) {
     theme_minimal_linear() +
     theme(
       axis.title.y = element_blank(),
-      axis.text.x = element_text(angle = 38, hjust = 1, size = 10, color = plot_colors$text_muted),
-      axis.text.y = element_text(size = 9, color = plot_colors$text_muted),
+      axis.text.x = element_text(angle = 38, hjust = 1, size = 11, color = plot_colors$text_muted),
+      axis.text.y = element_text(size = 10, color = plot_colors$text_muted),
       axis.line = element_line(color = paste0(plot_colors$grid, "CC"), linewidth = 0.5),
       panel.grid.major.y = element_line(color = paste0(plot_colors$grid, "99"), linewidth = 0.25),
       panel.grid.major.x = element_blank(),
@@ -305,8 +306,8 @@ plot_icon_array <- function(cles_prob, total_icons = 100, icon_type = "person", 
       axis.text = element_blank(),
       panel.grid = element_blank(),
       legend.position = "none",
-      plot.title = element_text(size = 14, face = "bold", hjust = 0.5),
-      plot.subtitle = element_text(size = 11, color = plot_colors$text_muted, hjust = 0.5)
+      plot.title = element_text(size = 15, face = "bold", hjust = 0.5),
+      plot.subtitle = element_text(size = 12, color = plot_colors$text_muted, hjust = 0.5)
     )
   
   p
