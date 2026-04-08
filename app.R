@@ -280,12 +280,12 @@ landing_page_ui <- function() {
       div(
         class = "hero-content",
         p(class = "hero-tagline hero-reveal", "Effect Size Calculator for Practical Effects"),
-        h1(class = "hero-headline hero-reveal", "Stop reporting correlations. Start communicating results."),
+        h1(class = "hero-headline hero-reveal", "Make your findings impossible to misunderstand."),
         span(class = "hero-brand-accent-line hero-reveal", role = "presentation", `aria-hidden` = "true"),
         p(
           class = "hero-subtitle hero-reveal",
           "ESCAPE converts r, d, and g into probabilities, success rates, and visual summaries ",
-          "that people who are not statisticians can understand \u2014 and act on."
+          "that HR professionals, managers, and policy makers can understand \u2014 and act on."
         ),
         div(
           class = "hero-actions hero-reveal",
@@ -465,6 +465,107 @@ landing_page_ui <- function() {
           "Generate HTML you can share with teams who do not read APA prose.",
           "One-click report with charts and explanations",
           "feature-icon--gold"
+        )
+      )
+    ),
+
+    div(
+      class = "teaching-section scroll-section",
+      div(
+        style = "max-width: 1000px; margin: 0 auto; padding: var(--space-12) var(--space-8); text-align: center;",
+        h2(class = "section-title section-title--landing", "For Teaching"),
+        p(
+          style = "font-size: 1.125rem; color: var(--stone-700); line-height: 1.65; margin: 0 auto var(--space-8); max-width: 42rem;",
+          "Use ESCAPE in statistics, research methods, and domain courses to help students interpret and communicate findings."
+        ),
+        div(
+          class = "steps-grid--plain",
+          div(class = "step-card",
+            div(class = "step-icon-wrap", tags$i(`data-lucide` = "bar-chart-3")),
+            h3(class = "step-title", "Statistics"),
+            p(class = "step-description", "Compare traditional vs. practical effect sizes, demonstrate CLES and BESD.")
+          ),
+          div(class = "step-card",
+            div(class = "step-icon-wrap", tags$i(`data-lucide` = "book-open")),
+            h3(class = "step-title", "Research Methods"),
+            p(class = "step-description", "Bridge statistical and practical significance. Write for non-technical audiences.")
+          ),
+          div(class = "step-card",
+            div(class = "step-icon-wrap", tags$i(`data-lucide` = "users")),
+            h3(class = "step-title", "Domain Courses"),
+            p(class = "step-description", "I/O psychology, education, business analytics, and related fields.")
+          )
+        )
+      )
+    ),
+
+    div(
+      class = "workflow-section scroll-section",
+      div(
+        style = "max-width: 800px; margin: 0 auto; padding: var(--space-12) var(--space-8); text-align: center;",
+        h2(class = "section-title section-title--landing", "In Your Research Workflow"),
+        p(
+          style = "font-size: 1.125rem; color: var(--stone-700); line-height: 1.65; margin: 0 auto var(--space-8); max-width: 42rem;",
+          "ESCAPE fits naturally into your existing analysis pipeline. Use it alongside your standard statistical software."
+        ),
+        div(
+          style = "max-width: 600px; margin: 0 auto; text-align: left;",
+          div(
+            style = "display: flex; gap: var(--space-4); margin-bottom: var(--space-6); align-items: flex-start;",
+            div(
+              style = "flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%; background: var(--gold-100); color: var(--forest-600); display: flex; align-items: center; justify-content: center; font-weight: 700; font-family: var(--font-sans);",
+              "1"
+            ),
+            div(
+              style = "flex: 1;",
+              h3(style = "font-family: var(--font-sans); font-size: var(--text-lg); font-weight: 600; color: var(--forest-900); margin: 0 0 var(--space-2) 0;", "Upload your data"),
+              p(style = "font-size: var(--text-base); color: var(--stone-700); margin: 0; line-height: 1.6;",
+                "CSV, Excel, SPSS, or SAS files. Your data never leaves your browser."
+              )
+            )
+          ),
+          div(
+            style = "display: flex; gap: var(--space-4); margin-bottom: var(--space-6); align-items: flex-start;",
+            div(
+              style = "flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%; background: var(--gold-100); color: var(--forest-600); display: flex; align-items: center; justify-content: center; font-weight: 700; font-family: var(--font-sans);",
+              "2"
+            ),
+            div(
+              style = "flex: 1;",
+              h3(style = "font-family: var(--font-sans); font-size: var(--text-lg); font-weight: 600; color: var(--forest-900); margin: 0 0 var(--space-2) 0;", "Select variables"),
+              p(style = "font-size: var(--text-base); color: var(--stone-700); margin: 0; line-height: 1.6;",
+                "Choose your predictor (X) and criterion (Y) from dropdown menus."
+              )
+            )
+          ),
+          div(
+            style = "display: flex; gap: var(--space-4); margin-bottom: var(--space-6); align-items: flex-start;",
+            div(
+              style = "flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%; background: var(--gold-100); color: var(--forest-600); display: flex; align-items: center; justify-content: center; font-weight: 700; font-family: var(--font-sans);",
+              "3"
+            ),
+            div(
+              style = "flex: 1;",
+              h3(style = "font-family: var(--font-sans); font-size: var(--text-lg); font-weight: 600; color: var(--forest-900); margin: 0 0 var(--space-2) 0;", "Export practical metrics"),
+              p(style = "font-size: var(--text-base); color: var(--stone-700); margin: 0; line-height: 1.6;",
+                "Generate expectancy charts, icon arrays, CLES, BESD, and traditional effect sizes."
+              )
+            )
+          ),
+          div(
+            style = "display: flex; gap: var(--space-4); align-items: flex-start;",
+            div(
+              style = "flex-shrink: 0; width: 32px; height: 32px; border-radius: 50%; background: var(--gold-100); color: var(--forest-600); display: flex; align-items: center; justify-content: center; font-weight: 700; font-family: var(--font-sans);",
+              "4"
+            ),
+            div(
+              style = "flex: 1;",
+              h3(style = "font-family: var(--font-sans); font-size: var(--text-lg); font-weight: 600; color: var(--forest-900); margin: 0 0 var(--space-2) 0;", "Cite in your methods section"),
+              p(style = "font-size: var(--text-base); color: var(--stone-700); margin: 0; line-height: 1.6;",
+                "Practical effect sizes calculated using ESCAPE (Zhang, 2018). See citation formats below."
+              )
+            )
+          )
         )
       )
     ),
