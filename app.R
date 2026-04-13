@@ -30,7 +30,9 @@ get_sample_data_path <- function() {
     file.path(app_dir, "sampleData.csv")
   )
   for (path in candidates) {
-    if (length(path) && !is.na(path) && file.exists(path)) return(path)
+    if (length(path) && !is.na(path) && file.exists(path)) {
+      return(path)
+    }
   }
   NULL
 }
@@ -248,7 +250,6 @@ landing_cite_combined <- function() {
 landing_page_ui <- function() {
   div(
     class = "landing-page",
-
     tags$header(
       class = "landing-nav",
       div(
@@ -264,6 +265,7 @@ landing_page_ui <- function() {
           role = "navigation",
           `aria-label` = "Landing sections",
           tags$a(class = "landing-nav-link", href = "#landing-about", "About"),
+          actionButton("nav_learn", "Learn", class = "btn btn-secondary landing-nav-link-btn"),
           actionButton(
             "nav_get_started",
             "Get Started",
@@ -272,7 +274,6 @@ landing_page_ui <- function() {
         )
       )
     ),
-
     div(
       id = "landing-get-started",
       class = "hero-section hero-section--observatory",
@@ -289,21 +290,25 @@ landing_page_ui <- function() {
         ),
         div(
           class = "hero-actions hero-reveal",
-          actionButton("open_guided_upload", "Start Analyzing", class = "btn btn-primary btn-hero-cta")
+          actionButton("open_guided_upload", "Start Communicating", class = "btn btn-primary btn-hero-cta"),
+          actionButton("hero_learn", "Learn", class = "btn btn-outline-hero btn-hero-cta")
         ),
-        p(class = "hero-trust-signal hero-reveal",
+        p(
+          class = "hero-trust-signal hero-reveal",
           "No account needed \u00B7 Your data stays in your browser \u00B7 CSV, Excel, SPSS, SAS"
         )
       ),
-
       div(
         class = "hero-visual hero-reveal hero-reveal--delay",
         div(
           class = "transformation-card transformation-card--tilt",
-          div(class = "transformation-panel transformation-before",
+          div(
+            class = "transformation-panel transformation-before",
             span(class = "transformation-label", "BEFORE"),
-            div(class = "apa-excerpt",
-              p(class = "apa-text",
+            div(
+              class = "apa-excerpt",
+              p(
+                class = "apa-text",
                 "A Pearson correlation analysis revealed a statistically significant relationship between structured interview scores and first-year job performance, ",
                 em("r"),
                 "(98) = .42, ",
@@ -312,18 +317,22 @@ landing_page_ui <- function() {
                 em("d"),
                 ", was 0.90."
               ),
-              p(class = "apa-text apa-text--faded",
+              p(
+                class = "apa-text apa-text--faded",
                 "These results suggest..."
               )
             )
           ),
-          div(class = "transformation-arrow",
+          div(
+            class = "transformation-arrow",
             tags$i(`data-lucide` = "chevron-right")
           ),
-          div(class = "transformation-panel transformation-after",
+          div(
+            class = "transformation-panel transformation-after",
             span(class = "transformation-label", "AFTER"),
             div(class = "transformation-stat", "71 out of 100"),
-            div(class = "transformation-icon-array",
+            div(
+              class = "transformation-icon-array",
               tagList(lapply(1:71, function(i) {
                 div(class = paste0("mini-icon mini-success"), tags$i(`data-lucide` = "user-check"))
               })),
@@ -336,11 +345,11 @@ landing_page_ui <- function() {
         )
       )
     ),
-
     div(
       class = "insight-section scroll-section",
       h2(class = "section-title section-title--landing", "The insight"),
-      p(class = "insight-lead",
+      p(
+        class = "insight-lead",
         "Reviewers ask for ",
         tags$strong("p-values and effect sizes."),
         " Decision-makers ask ",
@@ -354,25 +363,27 @@ landing_page_ui <- function() {
         span(class = "insight-morph-line insight-morph-line--b", "71% success rate")
       )
     ),
-
     div(
       class = "how-it-works-section",
       h2(class = "section-title section-title--landing", "How it works"),
       div(
         class = "steps-grid steps-grid--plain",
-        div(class = "step-card",
+        div(
+          class = "step-card",
           span(class = "step-number", "1"),
           div(class = "step-icon-wrap", tags$i(`data-lucide` = "upload")),
           h3(class = "step-title", "Upload"),
           p(class = "step-description", "Drop in your CSV, Excel, SPSS, or SAS file.")
         ),
-        div(class = "step-card",
+        div(
+          class = "step-card",
           span(class = "step-number", "2"),
           div(class = "step-icon-wrap", tags$i(`data-lucide` = "line-chart")),
           h3(class = "step-title", "Analyze"),
           p(class = "step-description", "Choose predictor, criterion, and metrics.")
         ),
-        div(class = "step-card step-card--highlight",
+        div(
+          class = "step-card step-card--highlight",
           span(class = "step-number", "3"),
           div(class = "step-icon-wrap", tags$i(`data-lucide` = "messages-square")),
           h3(class = "step-title", "Communicate"),
@@ -380,48 +391,57 @@ landing_page_ui <- function() {
         )
       )
     ),
-
     div(
       class = "sample-section live-preview-section scroll-section",
       h2(class = "section-title section-title--landing", "Live preview"),
       p(class = "section-subtitle", "Our sample dataset shows vigorous leisure-time activity and self-rated health in U.S. adults (NHIS 2024 public-use data)"),
       div(
         class = "sample-preview",
-          div(
-            class = "sample-table-container",
-            tags$caption(class = "sample-caption",
-              "Sample dataset: vigorous activity (days per week) vs. self-rated health (n = 1,000; higher health = better)"
+        div(
+          class = "sample-table-container",
+          tags$caption(
+            style = "text-align: left; padding: var(--space-4); caption-side: top; border-bottom: 1px solid rgba(45, 90, 61, 0.08);",
+            div(
+              style = "display: flex; align-items: center; gap: var(--space-2); margin-bottom: 4px;",
+              tags$div(style = "font-family: var(--font-sans); font-size: 1rem; font-weight: 600; color: var(--forest-900);", "NHIS 2024 Data"),
+              tags$span(class = "data-info-badge", style = "margin-bottom: 0; padding: 2px 6px; font-size: 0.75rem;", "n = 1,000")
             ),
-            tags$table(
-              class = "sample-table",
-              tags$thead(
-                tags$tr(
-                  tags$th("Vigorous days/week"),
-                  tags$th("Self-rated health")
-                )
-              ),
-              tags$tbody(
-                tags$tr(tags$td("1"), tags$td("2")),
-                tags$tr(tags$td("2"), tags$td("4")),
-                tags$tr(tags$td("2"), tags$td("4")),
-                tags$tr(tags$td("4"), tags$td("4")),
-                tags$tr(tags$td("4"), tags$td("5")),
-                tags$tr(class = "sample-more", tags$td(colspan = "2", "...and 995 more rows"))
-              )
+            div(
+              class = "text-muted", style = "font-size: 0.85em; font-weight: normal; line-height: 1.4;",
+              "Vigorous activity (days/week) vs. Self-rated health"
             )
           ),
-          div(
-            class = "sample-insight",
-            tags$i(`data-lucide` = "lightbulb", class = "insight-icon"),
-            div(
-              tags$strong("Key Insight"),
-              p("Adults in the top fifth for vigorous activity days are ",
-                tags$strong("about 1.2\u00D7 as likely"),
-                " to score above a middling self-rated health threshold as those in the bottom fifth \u2014 see the expectancy chart."
-              ),
-              div(class = "sample-insight-chart live-preview-chart", plotOutput("landing_expectancy_plot", width = "100%", height = "300px"))
+          tags$table(
+            class = "sample-table",
+            tags$thead(
+              tags$tr(
+                tags$th("Vigorous days/week"),
+                tags$th("Self-rated health")
+              )
+            ),
+            tags$tbody(
+              tags$tr(tags$td("1"), tags$td("2")),
+              tags$tr(tags$td("2"), tags$td("4")),
+              tags$tr(tags$td("2"), tags$td("4")),
+              tags$tr(tags$td("4"), tags$td("4")),
+              tags$tr(tags$td("4"), tags$td("5")),
+              tags$tr(class = "sample-more", tags$td(colspan = "2", "...and 995 more rows"))
             )
           )
+        ),
+        div(
+          class = "sample-insight",
+          tags$i(`data-lucide` = "lightbulb", class = "insight-icon"),
+          div(
+            tags$strong("Key Insight"),
+            p(
+              "Adults in the top fifth for vigorous activity days are ",
+              tags$strong("about 1.2\u00D7 as likely"),
+              " to score above a middling self-rated health threshold as those in the bottom fifth \u2014 see the expectancy chart."
+            ),
+            div(class = "sample-insight-chart live-preview-chart", plotOutput("landing_expectancy_plot", width = "100%", height = "300px"))
+          )
+        )
       ),
       actionButton(
         "try_sample_bottom",
@@ -432,7 +452,6 @@ landing_page_ui <- function() {
         class = "btn btn-primary btn-sample-cta"
       )
     ),
-
     div(
       class = "features-section scroll-section",
       h2(class = "section-title section-title--landing", "What you get"),
@@ -468,7 +487,6 @@ landing_page_ui <- function() {
         )
       )
     ),
-
     div(
       class = "teaching-section scroll-section",
       div(
@@ -480,17 +498,20 @@ landing_page_ui <- function() {
         ),
         div(
           class = "steps-grid--plain",
-          div(class = "step-card",
+          div(
+            class = "step-card",
             div(class = "step-icon-wrap", tags$i(`data-lucide` = "bar-chart-3")),
             h3(class = "step-title", "Statistics"),
             p(class = "step-description", "Compare traditional vs. practical effect sizes, demonstrate CLES and BESD.")
           ),
-          div(class = "step-card",
+          div(
+            class = "step-card",
             div(class = "step-icon-wrap", tags$i(`data-lucide` = "book-open")),
             h3(class = "step-title", "Research Methods"),
             p(class = "step-description", "Bridge statistical and practical significance. Write for non-technical audiences.")
           ),
-          div(class = "step-card",
+          div(
+            class = "step-card",
             div(class = "step-icon-wrap", tags$i(`data-lucide` = "users")),
             h3(class = "step-title", "Domain Courses"),
             p(class = "step-description", "I/O psychology, education, business analytics, and related fields.")
@@ -498,7 +519,6 @@ landing_page_ui <- function() {
         )
       )
     ),
-
     div(
       class = "workflow-section scroll-section",
       div(
@@ -519,7 +539,8 @@ landing_page_ui <- function() {
             div(
               style = "flex: 1;",
               h3(style = "font-family: var(--font-sans); font-size: var(--text-lg); font-weight: 600; color: var(--forest-900); margin: 0 0 var(--space-2) 0;", "Upload your data"),
-              p(style = "font-size: var(--text-base); color: var(--stone-700); margin: 0; line-height: 1.6;",
+              p(
+                style = "font-size: var(--text-base); color: var(--stone-700); margin: 0; line-height: 1.6;",
                 "CSV, Excel, SPSS, or SAS files. Your data never leaves your browser."
               )
             )
@@ -533,7 +554,8 @@ landing_page_ui <- function() {
             div(
               style = "flex: 1;",
               h3(style = "font-family: var(--font-sans); font-size: var(--text-lg); font-weight: 600; color: var(--forest-900); margin: 0 0 var(--space-2) 0;", "Select variables"),
-              p(style = "font-size: var(--text-base); color: var(--stone-700); margin: 0; line-height: 1.6;",
+              p(
+                style = "font-size: var(--text-base); color: var(--stone-700); margin: 0; line-height: 1.6;",
                 "Choose your predictor (X) and criterion (Y) from dropdown menus."
               )
             )
@@ -547,7 +569,8 @@ landing_page_ui <- function() {
             div(
               style = "flex: 1;",
               h3(style = "font-family: var(--font-sans); font-size: var(--text-lg); font-weight: 600; color: var(--forest-900); margin: 0 0 var(--space-2) 0;", "Export practical metrics"),
-              p(style = "font-size: var(--text-base); color: var(--stone-700); margin: 0; line-height: 1.6;",
+              p(
+                style = "font-size: var(--text-base); color: var(--stone-700); margin: 0; line-height: 1.6;",
                 "Generate expectancy charts, icon arrays, CLES, BESD, and traditional effect sizes."
               )
             )
@@ -561,7 +584,8 @@ landing_page_ui <- function() {
             div(
               style = "flex: 1;",
               h3(style = "font-family: var(--font-sans); font-size: var(--text-lg); font-weight: 600; color: var(--forest-900); margin: 0 0 var(--space-2) 0;", "Cite in your methods section"),
-              p(style = "font-size: var(--text-base); color: var(--stone-700); margin: 0; line-height: 1.6;",
+              p(
+                style = "font-size: var(--text-base); color: var(--stone-700); margin: 0; line-height: 1.6;",
                 "Practical effect sizes calculated using ESCAPE (Zhang, 2018). See citation formats below."
               )
             )
@@ -569,7 +593,6 @@ landing_page_ui <- function() {
         )
       )
     ),
-
     div(
       id = "landing-about",
       class = "creator-bio-section scroll-section",
@@ -636,7 +659,6 @@ landing_page_ui <- function() {
         )
       )
     ),
-
     div(
       class = "landing-citations scroll-section",
       h2(class = "section-title section-title--landing", "How to cite"),
@@ -645,6 +667,71 @@ landing_page_ui <- function() {
         "If ESCAPE informs your research or practice, pick a format and copy the citation."
       ),
       landing_cite_combined()
+    )
+  )
+}
+
+learn_page_ui <- function() {
+  div(
+    class = "landing-page learn-page",
+    tags$header(
+      class = "landing-nav",
+      div(
+        class = "landing-nav-inner",
+        tags$a(
+          class = "landing-nav-brand",
+          href = "#",
+          `aria-label` = "ESCAPE, go to home",
+          onclick = "Shiny.setInputValue('learn_go_home', Date.now(), {priority: 'event'}); return false;",
+          "ESCAPE"
+        ),
+        tags$nav(
+          class = "landing-nav-links",
+          role = "navigation",
+          `aria-label` = "Learn page navigation",
+          actionButton("learn_go_home", "Home", class = "btn btn-secondary landing-nav-link-btn"),
+          actionButton("nav_get_started_learn", "Get Started", class = "btn btn-primary landing-nav-cta")
+        )
+      )
+    ),
+    div(
+      class = "learn-hero",
+      div(
+        class = "learn-hero-inner",
+        h1(class = "learn-hero-title", "Interpretation Resources"),
+        p(
+          class = "learn-hero-subtitle",
+          "Learn how to read, interpret, and communicate effect sizes with confidence."
+        )
+      )
+    ),
+    div(
+      class = "learn-sections",
+      div(
+        class = "learn-section",
+        div(
+          class = "learn-card",
+          div(class = "learn-card-body")
+        )
+      ),
+      div(
+        class = "learn-section",
+        div(
+          class = "learn-card",
+          div(class = "learn-card-body")
+        )
+      ),
+      div(
+        class = "learn-section",
+        div(
+          class = "learn-card",
+          div(class = "learn-card-body")
+        )
+      )
+    ),
+    div(
+      class = "learn-back",
+      actionButton("learn_go_home_bottom", "Back to Home", class = "btn btn-outline-hero")
     )
   )
 }
@@ -667,598 +754,569 @@ analysis_ui <- function() {
       sidebar = sidebar(
         width = 400,
         open = list(desktop = "open", mobile = "always"),
-
-      div(
-        class = "sidebar-panel",
-
-        # Panel header
         div(
-          class = "sidebar-panel-header",
+          class = "sidebar-panel",
+
+          # Panel header
           div(
-            class = "sidebar-panel-title",
-            span(class = "sidebar-panel-accent"),
-            span("Analysis Controls")
+            class = "sidebar-panel-header",
+            div(
+              class = "sidebar-panel-title",
+              span(class = "sidebar-panel-accent"),
+              span("Analysis Controls")
+            ),
+            span(class = "sidebar-panel-tag", "Setup")
           ),
-          span(class = "sidebar-panel-tag", "Setup")
-        ),
 
-        # Back to Landing
-        actionButton(
-          "back_to_landing",
-          label = tagList(
-            tags$i(`data-lucide` = "arrow-left", style = "width: 14px; height: 14px;"),
-            "New Analysis"
+          # Back to Landing
+          actionButton(
+            "back_to_landing",
+            label = tagList(
+              tags$i(`data-lucide` = "arrow-left", style = "width: 14px; height: 14px;"),
+              "New Analysis"
+            ),
+            class = "btn-ghost btn-sm w-100 mb-3"
           ),
-          class = "btn-ghost btn-sm w-100 mb-3"
-        ),
 
-        # Data Info
-        uiOutput("data_info"),
+          # Data Info
+          uiOutput("data_info"),
+          div(class = "sidebar-panel-divider"),
 
-        div(class = "sidebar-panel-divider"),
+          # File Upload Section
+          div(
+            class = "sidebar-section sidebar-section--data",
+            h4(
+              class = "sidebar-section-title",
+              tags$i(`data-lucide` = "upload", style = "width: 14px; height: 14px;"),
+              "Data"
+            ),
+            fileInput(
+              "file1",
+              label = NULL,
+              accept = c(".csv", ".xlsx", ".sav", ".sas7bdat"),
+              placeholder = "Drop file or click",
+              buttonLabel = tags$span(
+                tags$i(`data-lucide` = "folder-open", style = "width: 14px; height: 14px;")
+              )
+            )
+          ),
 
-        # File Upload Section
+          # Variables Section
+          div(
+            class = "sidebar-section sidebar-section--vars",
+            h4(
+              class = "sidebar-section-title",
+              tags$i(`data-lucide` = "sliders", style = "width: 14px; height: 14px;"),
+              "Variables"
+            ),
+            selectInput("predictorVar", "Predictor (X)", choices = NULL),
+            selectInput("criterionVar", "Criterion (Y)", choices = NULL),
+            textInput(
+              "predictor_display_name",
+              "Predictor display name",
+              value = "",
+              placeholder = "Uses column name if empty"
+            ),
+            textInput(
+              "criterion_display_name",
+              "Criterion display name",
+              value = "",
+              placeholder = "Uses column name if empty"
+            )
+          ),
+
+          # Parameters Section
+          div(
+            class = "sidebar-section sidebar-section--params",
+            h4(
+              class = "sidebar-section-title",
+              tags$i(`data-lucide` = "settings", style = "width: 14px; height: 14px;"),
+              "Parameters"
+            ),
+            numericInput("bins", "Number of bins", value = 5, min = 3, max = 12, step = 1),
+            numericInput("cutoffInput", "Criterion cutoff (Y)", value = 3.5, step = 0.1),
+            actionButton(
+              "setmean",
+              label = tags$span(
+                tags$i(`data-lucide` = "target", style = "width: 12px; height: 12px; margin-right: 4px;"),
+                "Set to mean"
+              ),
+              class = "btn-secondary btn-sm w-100 mb-3"
+            ),
+            sliderInput(
+              "cutoff.X",
+              "Predictor percentile (X)",
+              min = 0.01, max = 0.99, value = 0.5, step = 0.01
+            )
+          ),
+
+          # Export Section
+          div(
+            class = "sidebar-section sidebar-section--export",
+            downloadButton(
+              "report",
+              label = tags$span(
+                tags$i(`data-lucide` = "download", style = "width: 14px; height: 14px;"),
+                "Export HTML Report"
+              ),
+              class = "btn-primary w-100"
+            ),
+            downloadButton(
+              "report_pdf",
+              label = tags$span(
+                tags$i(`data-lucide` = "file-text", style = "width: 14px; height: 14px;"),
+                "Export PDF Report"
+              ),
+              class = "btn-outline-primary w-100 mt-2"
+            )
+          )
+        )
+      ),
+      fillable = FALSE,
+      border = FALSE,
+      border_radius = FALSE,
+      tags$main(
+        class = "bslib-page-main bslib-gap-spacing html-fill-item html-fill-container",
+
+        # Main Content - Tabbed Navigation or Empty State
         div(
-          class = "sidebar-section sidebar-section--data",
-          h4(
-            class = "sidebar-section-title",
-            tags$i(`data-lucide` = "upload", style = "width: 14px; height: 14px;"),
-            "Data"
-          ),
-          fileInput(
-            "file1",
-            label = NULL,
-            accept = c(".csv", ".xlsx", ".sav", ".sas7bdat"),
-            placeholder = "Drop file or click",
-            buttonLabel = tags$span(
-              tags$i(`data-lucide` = "folder-open", style = "width: 14px; height: 14px;")
+          style = "display: none;",
+          textOutput("data_ready", inline = TRUE)
+        ),
+        conditionalPanel(
+          condition = "output.data_ready !== 'yes'",
+          card(
+            card_body(
+              class = "d-flex flex-column align-items-center justify-content-center py-5",
+              tags$i(`data-lucide` = "database", style = "width: 48px; height: 48px; color: var(--bs-secondary); margin-bottom: 1rem;"),
+              p(class = "mb-0 text-muted", "Load a dataset or use sample data to get started.")
             )
           )
         ),
+        conditionalPanel(
+          condition = "output.data_ready === 'yes'",
+          navset_card_underline(
+            # Bookmark values: summary, traditional, practical, converter, help
+            id = "main_tabs",
 
-        # Variables Section
-        div(
-          class = "sidebar-section sidebar-section--vars",
-          h4(
-            class = "sidebar-section-title",
-            tags$i(`data-lucide` = "sliders", style = "width: 14px; height: 14px;"),
-            "Variables"
-          ),
-          selectInput("predictorVar", "Predictor (X)", choices = NULL),
-          selectInput("criterionVar", "Criterion (Y)", choices = NULL),
-          textInput(
-            "predictor_display_name",
-            "Predictor display name",
-            value = "",
-            placeholder = "Uses column name if empty"
-          ),
-          textInput(
-            "criterion_display_name",
-            "Criterion display name",
-            value = "",
-            placeholder = "Uses column name if empty"
-          )
-        ),
-
-        # Parameters Section
-        div(
-          class = "sidebar-section sidebar-section--params",
-          h4(
-            class = "sidebar-section-title",
-            tags$i(`data-lucide` = "settings", style = "width: 14px; height: 14px;"),
-            "Parameters"
-          ),
-          numericInput("bins", "Number of bins", value = 5, min = 3, max = 12, step = 1),
-          numericInput("cutoffInput", "Criterion cutoff (Y)", value = 3.5, step = 0.1),
-          actionButton(
-            "setmean",
-            label = tags$span(
-              tags$i(`data-lucide` = "target", style = "width: 12px; height: 12px; margin-right: 4px;"),
-              "Set to mean"
-            ),
-            class = "btn-secondary btn-sm w-100 mb-3"
-          ),
-          sliderInput(
-            "cutoff.X",
-            "Predictor percentile (X)",
-            min = 0.01, max = 0.99, value = 0.5, step = 0.01
-          )
-        ),
-
-        # Export Section
-        div(
-          class = "sidebar-section sidebar-section--export",
-          downloadButton(
-            "report",
-            label = tags$span(
-              tags$i(`data-lucide` = "download", style = "width: 14px; height: 14px;"),
-              "Export HTML Report"
-            ),
-            class = "btn-primary w-100"
-          ),
-          downloadButton(
-            "report_pdf",
-            label = tags$span(
-              tags$i(`data-lucide` = "file-text", style = "width: 14px; height: 14px;"),
-              "Export PDF Report"
-            ),
-            class = "btn-outline-primary w-100 mt-2"
-          )
-        )
-      )
-    ),
-
-    fillable = FALSE,
-    border = FALSE,
-    border_radius = FALSE,
-
-    tags$main(
-      class = "bslib-page-main bslib-gap-spacing html-fill-item html-fill-container",
-
-      # Main Content - Tabbed Navigation or Empty State
-      div(
-        style = "display: none;",
-        textOutput("data_ready", inline = TRUE)
-      ),
-    conditionalPanel(
-      condition = "output.data_ready !== 'yes'",
-      card(
-        card_body(
-          class = "d-flex flex-column align-items-center justify-content-center py-5",
-          tags$i(`data-lucide` = "database", style = "width: 48px; height: 48px; color: var(--bs-secondary); margin-bottom: 1rem;"),
-          p(class = "mb-0 text-muted", "Load a dataset or use sample data to get started.")
-        )
-      )
-    ),
-    conditionalPanel(
-      condition = "output.data_ready === 'yes'",
-      navset_card_underline(
-        # Bookmark values: summary, traditional, practical, converter, help
-        id = "main_tabs",
-
-        # ---- Summary (getting started, overview, descriptives, data) ----
-        nav_panel(
-          title = tags$span(
-            tags$i(`data-lucide` = "layout-dashboard", style = "width: 14px; height: 14px; margin-right: 6px;"),
-            "Summary"
-          ),
-          value = "summary",
-          div(
-            class = "analysis-page analysis-page--nested",
-            navset_pill(
-              id = "summary_sections",
-              nav_panel(
-                title = "Getting started",
-                value = "summary_start",
-                div(
-                  class = "analysis-subsection",
-                  card(
-                    card_header("Guided Workflow"),
-                    card_body(
-                      class = "start-guide-card",
-                      div(
-                        class = "start-guide",
-                        tags$ol(
-                          tags$li("Choose Predictor (X) and Criterion (Y) in the sidebar."),
-                          tags$li("Optionally set display names so plots and reports use clearer labels than raw column names."),
-                          tags$li("Set Criterion cutoff and Predictor percentile."),
-                          tags$li("Use Summary (Overview and Descriptives) for a quick read of your data."),
-                          tags$li("Use Practical effect sizes for alternative (CLES, BESD) and graphical (expectancy, icon array) presentations."),
-                          tags$li("Use Traditional effect sizes for classical indices and group summaries."),
-                          tags$li("Use the Converter tab when you only have a published r or d and need the other form (theoretical)."),
-                          tags$li("Export report from the sidebar when ready."),
-                          tags$li("Open the Help tab for the app guide and (soon) interpretation resources.")
-                        )
-                      )
-                    )
-                  ),
-                  card(
-                    card_header("Your current analysis question"),
-                    card_body(class = "start-brief-card", uiOutput("start_here_blurb"))
-                  )
-                )
+            # ---- Summary (getting started, overview, descriptives, data) ----
+            nav_panel(
+              title = tags$span(
+                tags$i(`data-lucide` = "layout-dashboard", style = "width: 14px; height: 14px; margin-right: 6px;"),
+                "Summary"
               ),
-              nav_panel(
-                title = "Overview",
-                value = "summary_overview",
-                div(
-                  class = "analysis-subsection",
-                  layout_columns(
-                    col_widths = c(4, 4, 4),
-                    value_box(
-                      title = "Correlation",
-                      value = textOutput("overview_r", inline = TRUE),
-                      showcase = tags$i(`data-lucide` = "trending-up", style = "width: 32px; height: 32px; color: rgba(255,255,255,0.95);"),
-                      theme = "light"
-                    ),
-                    value_box(
-                      title = "Cohen's d",
-                      value = textOutput("overview_d", inline = TRUE),
-                      showcase = tags$i(`data-lucide` = "layers", style = "width: 32px; height: 32px; color: rgba(255,255,255,0.95);"),
-                      theme = "light"
-                    ),
-                    value_box(
-                      title = "CLES",
-                      value = textOutput("overview_cles", inline = TRUE),
-                      showcase = tags$i(`data-lucide` = "percent", style = "width: 32px; height: 32px; color: rgba(228,199,103,0.95);"),
-                      theme = "light"
-                    )
-                  ),
-                  layout_columns(
-                    col_widths = c(7, 5),
-                    card(
-                      card_header(
-                        div(
-                          class = "d-flex justify-content-between align-items-center w-100",
-                          span("Scatterplot"),
-                          downloadButton(
-                            "download_overview_scatter",
-                            label = "Download",
-                            class = "btn-ghost btn-sm"
+              value = "summary",
+              div(
+                class = "analysis-page analysis-page--nested",
+                navset_pill(
+                  id = "summary_sections",
+                  nav_panel(
+                    title = "Getting started",
+                    value = "summary_start",
+                    div(
+                      class = "analysis-subsection",
+                      card(
+                        card_header("Guided Workflow"),
+                        card_body(
+                          class = "start-guide-card",
+                          div(
+                            class = "start-guide",
+                            tags$ol(
+                              tags$li("Choose Predictor (X) and Criterion (Y) in the sidebar."),
+                              tags$li("Optionally set display names so plots and reports use clearer labels than raw column names."),
+                              tags$li("Set Criterion cutoff and Predictor percentile."),
+                              tags$li("Use Summary (Overview and Descriptives) for a quick read of your data."),
+                              tags$li("Use Practical effect sizes for alternative (CLES, BESD) and graphical (expectancy, icon array) presentations."),
+                              tags$li("Use Traditional effect sizes for classical indices and group summaries."),
+                              tags$li("Use the Converter tab when you only have a published r or d and need the other form (theoretical)."),
+                              tags$li("Export report from the sidebar when ready."),
+                              tags$li("Open the Help tab for the app guide.")
+                            )
                           )
                         )
                       ),
-                      card_body(
-                        class = "analysis-plot-wrap",
-                        style = "height: 340px;",
-                        plotOutput("overview_scatter", width = "100%", height = "340px")
-                      )
-                    ),
-                    card(
-                      card_header("Key Insight"),
-                      card_body(class = "analysis-insight-wrap", uiOutput("overview_insight"))
-                    )
-                  )
-                )
-              ),
-              nav_panel(
-                title = "Descriptives",
-                value = "summary_descriptives",
-                div(
-                  class = "analysis-subsection",
-                  card(
-                    card_header("Descriptive Statistics & Correlation"),
-                    card_body(
-                      class = "card-body-scroll",
-                      tableOutput("descriptable"),
-                      div(
-                        class = "correlation-line mt-3 pt-3",
-                        tags$span(class = "correlation-r", textOutput("validity_r", inline = TRUE)),
-                        tags$span(class = "text-muted ms-2", textOutput("validity_r2", inline = TRUE))
+                      card(
+                        card_header("Your current analysis question"),
+                        card_body(class = "start-brief-card", uiOutput("start_here_blurb"))
                       )
                     )
                   ),
+                  nav_panel(
+                    title = "Overview",
+                    value = "summary_overview",
+                    div(
+                      class = "analysis-subsection",
+                      layout_columns(
+                        col_widths = c(4, 4, 4),
+                        value_box(
+                          title = "Correlation",
+                          value = textOutput("overview_r", inline = TRUE),
+                          showcase = tags$i(`data-lucide` = "trending-up", style = "width: 32px; height: 32px; color: rgba(255,255,255,0.95);"),
+                          theme = "light"
+                        ),
+                        value_box(
+                          title = "Cohen's d",
+                          value = textOutput("overview_d", inline = TRUE),
+                          showcase = tags$i(`data-lucide` = "layers", style = "width: 32px; height: 32px; color: rgba(255,255,255,0.95);"),
+                          theme = "light"
+                        ),
+                        value_box(
+                          title = "CLES",
+                          value = textOutput("overview_cles", inline = TRUE),
+                          showcase = tags$i(`data-lucide` = "percent", style = "width: 32px; height: 32px; color: rgba(228,199,103,0.95);"),
+                          theme = "light"
+                        )
+                      ),
+                      layout_columns(
+                        col_widths = c(7, 5),
+                        card(
+                          card_header(
+                            div(
+                              class = "d-flex justify-content-between align-items-center w-100",
+                              span("Scatterplot"),
+                              downloadButton(
+                                "download_overview_scatter",
+                                label = "Download",
+                                class = "btn-ghost btn-sm"
+                              )
+                            )
+                          ),
+                          card_body(
+                            class = "analysis-plot-wrap",
+                            style = "height: 340px;",
+                            plotOutput("overview_scatter", width = "100%", height = "340px")
+                          )
+                        ),
+                        card(
+                          card_header("Key Insight"),
+                          card_body(class = "analysis-insight-wrap", uiOutput("overview_insight"))
+                        )
+                      )
+                    )
+                  ),
+                  nav_panel(
+                    title = "Descriptives",
+                    value = "summary_descriptives",
+                    div(
+                      class = "analysis-subsection",
+                      card(
+                        card_header("Descriptive Statistics & Correlation"),
+                        card_body(
+                          class = "card-body-scroll",
+                          tableOutput("descriptable"),
+                          div(
+                            class = "correlation-line mt-3 pt-3",
+                            tags$span(class = "correlation-r", textOutput("validity_r", inline = TRUE)),
+                            tags$span(class = "text-muted ms-2", textOutput("validity_r2", inline = TRUE))
+                          )
+                        )
+                      ),
+                      layout_columns(
+                        col_widths = c(6, 6),
+                        card(
+                          card_header(
+                            div(
+                              class = "d-flex justify-content-between align-items-center w-100",
+                              span(textOutput("hist_x_title", inline = TRUE)),
+                              downloadButton(
+                                "download_histogram_x",
+                                label = "Download",
+                                class = "btn-ghost btn-sm"
+                              )
+                            )
+                          ),
+                          card_body(
+                            class = "analysis-plot-wrap",
+                            style = "height: 340px;",
+                            plotOutput("histogram.X", width = "100%", height = "340px")
+                          )
+                        ),
+                        card(
+                          card_header(
+                            div(
+                              class = "d-flex justify-content-between align-items-center w-100",
+                              span(textOutput("hist_y_title", inline = TRUE)),
+                              downloadButton(
+                                "download_histogram_y",
+                                label = "Download",
+                                class = "btn-ghost btn-sm"
+                              )
+                            )
+                          ),
+                          card_body(
+                            class = "analysis-plot-wrap",
+                            style = "height: 340px;",
+                            plotOutput("histogram.Y", width = "100%", height = "340px")
+                          )
+                        )
+                      )
+                    )
+                  ),
+                  nav_panel(
+                    title = "Data",
+                    value = "summary_data",
+                    div(
+                      class = "analysis-subsection",
+                      card(
+                        card_header("Raw Data"),
+                        card_body(style = "overflow-x: auto;", DTOutput("contents"))
+                      )
+                    )
+                  )
+                )
+              )
+            ),
+
+            # ---- Traditional effect sizes ----
+            nav_panel(
+              title = tags$span(
+                tags$i(`data-lucide` = "layers", style = "width: 14px; height: 14px; margin-right: 6px;"),
+                "Traditional effect sizes"
+              ),
+              value = "traditional",
+              div(
+                class = "analysis-page",
+                div(
+                  class = "analysis-subsection",
                   layout_columns(
                     col_widths = c(6, 6),
                     card(
-                      card_header(
-                        div(
-                          class = "d-flex justify-content-between align-items-center w-100",
-                          span(textOutput("hist_x_title", inline = TRUE)),
-                          downloadButton(
-                            "download_histogram_x",
-                            label = "Download",
-                            class = "btn-ghost btn-sm"
-                          )
-                        )
-                      ),
-                      card_body(
-                        class = "analysis-plot-wrap",
-                        style = "height: 340px;",
-                        plotOutput("histogram.X", width = "100%", height = "340px")
-                      )
+                      card_header("Effect Size Indices"),
+                      card_body(tableOutput("cles"))
                     ),
                     card(
-                      card_header(
-                        div(
-                          class = "d-flex justify-content-between align-items-center w-100",
-                          span(textOutput("hist_y_title", inline = TRUE)),
-                          downloadButton(
-                            "download_histogram_y",
-                            label = "Download",
-                            class = "btn-ghost btn-sm"
+                      card_header("Group Statistics"),
+                      card_body(tableOutput("clestable"))
+                    )
+                  )
+                )
+              )
+            ),
+
+            # ---- Practical effect sizes ----
+            nav_panel(
+              title = tags$span(
+                tags$i(`data-lucide` = "bar-chart-3", style = "width: 14px; height: 14px; margin-right: 6px;"),
+                "Practical effect sizes"
+              ),
+              value = "practical",
+              div(
+                class = "analysis-page analysis-page--nested",
+                navset_pill(
+                  id = "practical_sections",
+                  nav_panel(
+                    title = "Alternative effect sizes",
+                    value = "practical_alternative",
+                    div(
+                      class = "analysis-subsection",
+                      tags$p(
+                        class = "text-muted small mb-3",
+                        "CLES and BESD translate the effect into probabilities and success rates rather than only standardized mean differences."
+                      ),
+                      card(
+                        card_header(
+                          div(
+                            class = "d-flex justify-content-between align-items-center w-100",
+                            span("Common Language Effect Size (CLES)"),
+                            downloadButton(
+                              "download_cles_plot",
+                              label = "Download",
+                              class = "btn-ghost btn-sm"
+                            )
+                          )
+                        ),
+                        card_body(
+                          class = "card-body-scroll",
+                          div(
+                            class = "cles-verbal-callout",
+                            textOutput("cles.verbal")
+                          ),
+                          div(
+                            class = "analysis-plot-wrap",
+                            style = "height: 380px;",
+                            plotOutput("histogram.overlap", width = "100%", height = "380px")
                           )
                         )
                       ),
-                      card_body(
-                        class = "analysis-plot-wrap",
-                        style = "height: 340px;",
-                        plotOutput("histogram.Y", width = "100%", height = "340px")
-                      )
-                    )
-                  )
-                )
-              ),
-              nav_panel(
-                title = "Data",
-                value = "summary_data",
-                div(
-                  class = "analysis-subsection",
-                  card(
-                    card_header("Raw Data"),
-                    card_body(style = "overflow-x: auto;", DTOutput("contents"))
-                  )
-                )
-              )
-            )
-          )
-        ),
-
-        # ---- Traditional effect sizes ----
-        nav_panel(
-          title = tags$span(
-            tags$i(`data-lucide` = "layers", style = "width: 14px; height: 14px; margin-right: 6px;"),
-            "Traditional effect sizes"
-          ),
-          value = "traditional",
-          div(
-            class = "analysis-page",
-            div(
-              class = "analysis-subsection",
-              layout_columns(
-                col_widths = c(6, 6),
-                card(
-                  card_header("Effect Size Indices"),
-                  card_body(tableOutput("cles"))
-                ),
-                card(
-                  card_header("Group Statistics"),
-                  card_body(tableOutput("clestable"))
-                )
-              )
-            )
-          )
-        ),
-
-        # ---- Practical effect sizes ----
-        nav_panel(
-          title = tags$span(
-            tags$i(`data-lucide` = "bar-chart-3", style = "width: 14px; height: 14px; margin-right: 6px;"),
-            "Practical effect sizes"
-          ),
-          value = "practical",
-          div(
-            class = "analysis-page analysis-page--nested",
-            navset_pill(
-              id = "practical_sections",
-              nav_panel(
-                title = "Alternative effect sizes",
-                value = "practical_alternative",
-                div(
-                  class = "analysis-subsection",
-                  tags$p(
-                    class = "text-muted small mb-3",
-                    "CLES and BESD translate the effect into probabilities and success rates rather than only standardized mean differences."
-                  ),
-                  card(
-                    card_header(
-                      div(
-                        class = "d-flex justify-content-between align-items-center w-100",
-                        span("Common Language Effect Size (CLES)"),
-                        downloadButton(
-                          "download_cles_plot",
-                          label = "Download",
-                          class = "btn-ghost btn-sm"
+                      card(
+                        card_header("Binomial Effect Size Display (BESD)"),
+                        card_body(
+                          tags$h6("Empirical (cutoff-based)"),
+                          tableOutput("besd"),
+                          tags$hr(),
+                          tags$h6("Theoretical (from r)"),
+                          tableOutput("besd_theoretical")
                         )
                       )
-                    ),
-                    card_body(
-                      class = "card-body-scroll",
-                      div(
-                        class = "cles-verbal-callout",
-                        textOutput("cles.verbal")
+                    )
+                  ),
+                  nav_panel(
+                    title = "Graphical effect sizes",
+                    value = "practical_graphical",
+                    div(
+                      class = "analysis-subsection",
+                      tags$p(
+                        class = "text-muted small mb-3",
+                        "Expectancy charts and icon arrays show the same ideas in visual form for communication and intuition."
                       ),
-                      div(
-                        class = "analysis-plot-wrap",
-                        style = "height: 380px;",
-                        plotOutput("histogram.overlap", width = "100%", height = "380px")
+                      card(
+                        card_header(
+                          div(
+                            class = "d-flex justify-content-between align-items-center w-100",
+                            span("Expectancy Chart"),
+                            downloadButton(
+                              "download_expectancy_plot",
+                              label = "Download",
+                              class = "btn-ghost btn-sm"
+                            )
+                          )
+                        ),
+                        card_body(
+                          class = "analysis-plot-wrap",
+                          style = "height: 420px;",
+                          plotOutput("expectancyPlot", width = "100%", height = "420px")
+                        )
+                      ),
+                      card(
+                        card_header("Expectancy Table"),
+                        card_body(class = "card-body-scroll", tableOutput("expectancyTable"))
+                      ),
+                      card(
+                        card_header(
+                          div(
+                            class = "d-flex justify-content-between align-items-center w-100",
+                            span("Icon Array Visualization"),
+                            downloadButton(
+                              "download_icon_array",
+                              label = "Download",
+                              class = "btn-ghost btn-sm"
+                            )
+                          )
+                        ),
+                        card_body(
+                          class = "card-body-scroll",
+                          div(
+                            class = "d-flex gap-3 mb-3",
+                            style = "flex-wrap: wrap;",
+                            div(
+                              class = "flex-grow-1",
+                              style = "min-width: 150px;",
+                              selectInput(
+                                "iconarray_type",
+                                "Icon type",
+                                choices = c("Person" = "person", "Circle" = "circle", "Square" = "square"),
+                                selected = "person"
+                              )
+                            ),
+                            div(
+                              class = "flex-grow-1",
+                              style = "min-width: 120px;",
+                              numericInput(
+                                "iconarray_total",
+                                "Total icons",
+                                value = 100,
+                                min = 10,
+                                max = 500,
+                                step = 10
+                              )
+                            ),
+                            div(
+                              class = "flex-grow-1",
+                              style = "min-width: 120px;",
+                              selectInput(
+                                "iconarray_layout",
+                                "Layout",
+                                choices = c("Auto" = "auto", "10x10" = "10x10", "20x20" = "20x20", "25x25" = "25x25"),
+                                selected = "auto"
+                              )
+                            )
+                          ),
+                          tags$p(class = "mb-3", textOutput("iconarray_description")),
+                          div(
+                            class = "analysis-plot-wrap",
+                            style = "height: 420px;",
+                            plotOutput("iconarray_plot", width = "100%", height = "420px")
+                          )
+                        )
+                      ),
+                      card(
+                        card_header("Icon Array Settings"),
+                        card_body(
+                          div(
+                            class = "iconarray-legend",
+                            tags$div(
+                              class = "legend-item",
+                              tags$span(class = "legend-color", style = paste0("background-color: ", plot_colors$primary)),
+                              tags$span("Success (CLES)")
+                            ),
+                            tags$div(
+                              class = "legend-item",
+                              tags$span(class = "legend-color", style = paste0("background-color: ", plot_colors$secondary)),
+                              tags$span("Failure (1 - CLES)")
+                            )
+                          ),
+                          div(
+                            class = "iconarray-stats mt-3",
+                            tags$p(class = "mb-1", textOutput("iconarray_stats"))
+                          )
+                        )
                       )
+                    )
+                  )
+                )
+              )
+            ),
+
+            # ---- Converter (theoretical r ↔ d) ----
+            nav_panel(
+              title = tags$span(
+                tags$i(`data-lucide` = "arrow-left-right", style = "width: 14px; height: 14px; margin-right: 6px;"),
+                "Converter"
+              ),
+              value = "converter",
+              div(
+                class = "analysis-page",
+                div(
+                  class = "analysis-subsection",
+                  card(
+                    card_header("Effect Size Converter (Theoretical)"),
+                    card_body(
+                      class = "converter-controls-card",
+                      layout_columns(
+                        col_widths = c(4, 4, 4),
+                        selectInput("converter_input_type", "Input type", choices = c("Correlation (r)" = "r", "Cohen's d" = "d")),
+                        numericInput("converter_value", "Input value", value = 0.3, step = 0.01),
+                        uiOutput("converter_validity")
+                      ),
+                      tags$p(class = "text-muted", "Use this tab when you only have published summary effect sizes and need the other form.")
                     )
                   ),
                   card(
-                    card_header("Binomial Effect Size Display (BESD)"),
+                    card_header("Converted Metrics"),
                     card_body(
-                      tags$h6("Empirical (cutoff-based)"),
-                      tableOutput("besd"),
+                      class = "converter-output-card",
+                      tableOutput("converter_table"),
                       tags$hr(),
-                      tags$h6("Theoretical (from r)"),
-                      tableOutput("besd_theoretical")
-                    )
-                  )
-                )
-              ),
-              nav_panel(
-                title = "Graphical effect sizes",
-                value = "practical_graphical",
-                div(
-                  class = "analysis-subsection",
-                  tags$p(
-                    class = "text-muted small mb-3",
-                    "Expectancy charts and icon arrays show the same ideas in visual form for communication and intuition."
-                  ),
-                  card(
-                    card_header(
-                      div(
-                        class = "d-flex justify-content-between align-items-center w-100",
-                        span("Expectancy Chart"),
-                        downloadButton(
-                          "download_expectancy_plot",
-                          label = "Download",
-                          class = "btn-ghost btn-sm"
-                        )
-                      )
-                    ),
-                    card_body(
-                      class = "analysis-plot-wrap",
-                      style = "height: 420px;",
-                      plotOutput("expectancyPlot", width = "100%", height = "420px")
-                    )
-                  ),
-                  card(
-                    card_header("Expectancy Table"),
-                    card_body(class = "card-body-scroll", tableOutput("expectancyTable"))
-                  ),
-                  card(
-                    card_header(
-                      div(
-                        class = "d-flex justify-content-between align-items-center w-100",
-                        span("Icon Array Visualization"),
-                        downloadButton(
-                          "download_icon_array",
-                          label = "Download",
-                          class = "btn-ghost btn-sm"
-                        )
-                      )
-                    ),
-                    card_body(
-                      class = "card-body-scroll",
-                      div(
-                        class = "d-flex gap-3 mb-3",
-                        style = "flex-wrap: wrap;",
-                        div(
-                          class = "flex-grow-1",
-                          style = "min-width: 150px;",
-                          selectInput(
-                            "iconarray_type",
-                            "Icon type",
-                            choices = c("Person" = "person", "Circle" = "circle", "Square" = "square"),
-                            selected = "person"
-                          )
-                        ),
-                        div(
-                          class = "flex-grow-1",
-                          style = "min-width: 120px;",
-                          numericInput(
-                            "iconarray_total",
-                            "Total icons",
-                            value = 100,
-                            min = 10,
-                            max = 500,
-                            step = 10
-                          )
-                        ),
-                        div(
-                          class = "flex-grow-1",
-                          style = "min-width: 120px;",
-                          selectInput(
-                            "iconarray_layout",
-                            "Layout",
-                            choices = c("Auto" = "auto", "10x10" = "10x10", "20x20" = "20x20", "25x25" = "25x25"),
-                            selected = "auto"
-                          )
-                        )
-                      ),
-                      tags$p(class = "mb-3", textOutput("iconarray_description")),
-                      div(
-                        class = "analysis-plot-wrap",
-                        style = "height: 420px;",
-                        plotOutput("iconarray_plot", width = "100%", height = "420px")
-                      )
-                    )
-                  ),
-                  card(
-                    card_header("Icon Array Settings"),
-                    card_body(
-                      div(
-                        class = "iconarray-legend",
-                        tags$div(
-                          class = "legend-item",
-                          tags$span(class = "legend-color", style = paste0("background-color: ", plot_colors$primary)),
-                          tags$span("Success (CLES)")
-                        ),
-                        tags$div(
-                          class = "legend-item",
-                          tags$span(class = "legend-color", style = paste0("background-color: ", plot_colors$secondary)),
-                          tags$span("Failure (1 - CLES)")
-                        )
-                      ),
-                      div(
-                        class = "iconarray-stats mt-3",
-                        tags$p(class = "mb-1", textOutput("iconarray_stats"))
-                      )
+                      uiOutput("converter_interpretation")
                     )
                   )
                 )
               )
-            )
-          )
-        ),
+            ),
 
-        # ---- Converter (theoretical r ↔ d) ----
-        nav_panel(
-          title = tags$span(
-            tags$i(`data-lucide` = "arrow-left-right", style = "width: 14px; height: 14px; margin-right: 6px;"),
-            "Converter"
-          ),
-          value = "converter",
-          div(
-            class = "analysis-page",
-            div(
-              class = "analysis-subsection",
-              card(
-                card_header("Effect Size Converter (Theoretical)"),
-                card_body(
-                  class = "converter-controls-card",
-                  layout_columns(
-                    col_widths = c(4, 4, 4),
-                    selectInput("converter_input_type", "Input type", choices = c("Correlation (r)" = "r", "Cohen's d" = "d")),
-                    numericInput("converter_value", "Input value", value = 0.3, step = 0.01),
-                    uiOutput("converter_validity")
-                  ),
-                  tags$p(class = "text-muted", "Use this tab when you only have published summary effect sizes and need the other form.")
-                )
+            # ---- Help (app guide + future interpretation / educational content) ----
+            nav_panel(
+              title = tags$span(
+                tags$i(`data-lucide` = "help-circle", style = "width: 14px; height: 14px; margin-right: 6px;"),
+                "Help"
               ),
-              card(
-                card_header("Converted Metrics"),
-                card_body(
-                  class = "converter-output-card",
-                  tableOutput("converter_table"),
-                  tags$hr(),
-                  uiOutput("converter_interpretation")
-                )
-              )
-            )
-          )
-        ),
-
-        # ---- Help (app guide + future interpretation / educational content) ----
-        nav_panel(
-          title = tags$span(
-            tags$i(`data-lucide` = "help-circle", style = "width: 14px; height: 14px; margin-right: 6px;"),
-            "Help"
-          ),
-          value = "help",
-          div(
-            class = "analysis-page analysis-page--nested",
-            navset_pill(
-              id = "help_sections",
-              nav_panel(
-                title = "App guide",
-                value = "help_app",
+              value = "help",
+              div(
+                class = "analysis-page analysis-page--nested",
                 div(
                   class = "analysis-subsection analysis-page--help",
                   card(
                     card_body(class = "help-body", htmlOutput("instructions"))
-                  )
-                )
-              ),
-              nav_panel(
-                title = "Interpretation resources",
-                value = "help_interpretation",
-                div(
-                  class = "analysis-subsection",
-                  card(
-                    card_header("Effect sizes in context"),
-                    card_body(
-                      tags$p(
-                        class = "mb-3 text-muted",
-                        "Planned for a future update: short guides on reading effect sizes from scientific papers, common pitfalls, and how to judge whether an effect is practically meaningful in your setting—not only whether it is statistically nonzero."
-                      ),
-                      tags$p(
-                        class = "mb-0",
-                        tags$em("This section will host educational material and optional technical notes when they are ready.")
-                      )
-                    )
                   )
                 )
               )
@@ -1268,8 +1326,6 @@ analysis_ui <- function() {
       )
     )
   )
-  )
-)
 }
 
 # ============================================
@@ -1278,14 +1334,12 @@ analysis_ui <- function() {
 
 ui <- page_fillable(
   theme = app_theme,
-
   tags$head(
     tags$link(rel = "stylesheet", type = "text/css", href = "css/main.css"),
     uiOutput("view_specific_css"),
     tags$script(src = "https://unpkg.com/lucide@latest/dist/umd/lucide.js"),
     tags$script(src = "js/main.js")
   ),
-
   tags$a(
     class = "skip-link",
     href = "#main-content",
@@ -1303,12 +1357,11 @@ ui <- page_fillable(
 # ============================================
 
 server <- function(input, output, session) {
-
   # --- App State ---
   app_state <- reactiveValues(
-    view = "landing",  # "landing" or "analysis"
-    data_source = NULL,  # "sample" or "uploaded"
-    landing_file = NULL,  # preserved file from landing upload (lost when DOM switches)
+    view = "landing", # "landing", "learn", or "analysis"
+    data_source = NULL, # "sample" or "uploaded"
+    landing_file = NULL, # preserved file from landing upload (lost when DOM switches)
     guided_done = FALSE,
     guided_step = 1,
     guided_entry_from_landing = FALSE,
@@ -1347,6 +1400,26 @@ server <- function(input, output, session) {
     open_guided_from_landing()
   })
 
+  observeEvent(input$nav_learn, {
+    app_state$view <- "learn"
+  })
+
+  observeEvent(input$hero_learn, {
+    app_state$view <- "learn"
+  })
+
+  observeEvent(input$learn_go_home, {
+    app_state$view <- "landing"
+  })
+
+  observeEvent(input$learn_go_home_bottom, {
+    app_state$view <- "landing"
+  })
+
+  observeEvent(input$nav_get_started_learn, {
+    open_guided_from_landing()
+  })
+
   # Upload file from guided modal step 1
   observeEvent(input$guided_file, {
     req(input$guided_file)
@@ -1380,13 +1453,15 @@ server <- function(input, output, session) {
   output$main_ui <- renderUI({
     if (app_state$view == "landing") {
       landing_page_ui()
+    } else if (app_state$view == "learn") {
+      learn_page_ui()
     } else {
       analysis_ui()
     }
   })
 
   output$view_specific_css <- renderUI({
-    if (app_state$view == "landing") {
+    if (app_state$view %in% c("landing", "learn")) {
       tags$link(rel = "stylesheet", type = "text/css", href = "css/landing.css")
     } else {
       NULL
@@ -1425,22 +1500,25 @@ server <- function(input, output, session) {
 
     ext <- tools::file_ext(inFile$name)
 
-    tryCatch({
-      df <- switch(ext,
-        csv = read.csv(inFile$datapath, header = TRUE),
-        xlsx = readxl::read_excel(inFile$datapath),
-        sav = haven::read_sav(inFile$datapath),
-        sas7bdat = haven::read_sas(inFile$datapath),
-        NULL
-      )
-      last_load_error(NULL)
-      sig <- paste0(inFile$name, "::", nrow(df), "::", as.numeric(file.info(inFile$datapath)$mtime))
-      last_load_signature(sig)
-      return(df)
-    }, error = function(e) {
-      last_load_error(paste("Error loading file:", e$message))
-      return(NULL)
-    })
+    tryCatch(
+      {
+        df <- switch(ext,
+          csv = read.csv(inFile$datapath, header = TRUE),
+          xlsx = readxl::read_excel(inFile$datapath),
+          sav = haven::read_sav(inFile$datapath),
+          sas7bdat = haven::read_sas(inFile$datapath),
+          NULL
+        )
+        last_load_error(NULL)
+        sig <- paste0(inFile$name, "::", nrow(df), "::", as.numeric(file.info(inFile$datapath)$mtime))
+        last_load_signature(sig)
+        return(df)
+      },
+      error = function(e) {
+        last_load_error(paste("Error loading file:", e$message))
+        return(NULL)
+      }
+    )
   })
 
   observeEvent(last_load_signature(), ignoreNULL = TRUE, {
@@ -1463,7 +1541,9 @@ server <- function(input, output, session) {
 
   guided_step2_state <- reactive({
     is_numeric_like <- function(x) {
-      if (is.numeric(x) || is.integer(x)) return(TRUE)
+      if (is.numeric(x) || is.integer(x)) {
+        return(TRUE)
+      }
       # Accept columns that are safely coercible to numeric (e.g., labelled types)
       suppressWarnings({
         x_num <- as.numeric(x)
@@ -1542,7 +1622,9 @@ server <- function(input, output, session) {
 
   output$guided_step2_message <- renderUI({
     step2_state <- guided_step2_state()
-    if (is.null(step2_state$message)) return(NULL)
+    if (is.null(step2_state$message)) {
+      return(NULL)
+    }
     tags$p(class = "text-danger mb-0", step2_state$message)
   })
 
@@ -1688,15 +1770,18 @@ server <- function(input, output, session) {
     session$sendCustomMessage("focusGuidedWizard", list(step = step))
   }
 
-  observeEvent(list(app_state$view, app_state$data_source), {
-    if (identical(app_state$view, "analysis") &&
+  observeEvent(list(app_state$view, app_state$data_source),
+    {
+      if (identical(app_state$view, "analysis") &&
         identical(app_state$data_source, "uploaded") &&
         !isTRUE(app_state$guided_done) &&
         isTRUE(app_state$guided_entry_from_landing) &&
         !isTRUE(app_state$guided_wizard_completed_once)) {
-      show_guided_wizard()
-    }
-  }, ignoreInit = TRUE)
+        show_guided_wizard()
+      }
+    },
+    ignoreInit = TRUE
+  )
 
   observeEvent(input$guided_skip, {
     app_state$guided_wizard_completed_once <- TRUE
@@ -1733,8 +1818,12 @@ server <- function(input, output, session) {
 
   # Hidden output for empty-state conditionalPanel (only in analysis view)
   output$data_ready <- renderText({
-    if (app_state$view != "analysis") return("no")
-    if (is.null(data_set())) return("no")
+    if (app_state$view != "analysis") {
+      return("no")
+    }
+    if (is.null(data_set())) {
+      return("no")
+    }
     "yes"
   })
   outputOptions(output, "data_ready", suspendWhenHidden = FALSE)
@@ -1743,11 +1832,17 @@ server <- function(input, output, session) {
 
   # Sample data for landing page "See it in action" expectancy preview
   landing_preview_data <- reactive({
-    if (app_state$view != "landing") return(NULL)
+    if (app_state$view != "landing") {
+      return(NULL)
+    }
     path <- get_sample_data_path()
-    if (is.null(path)) return(NULL)
+    if (is.null(path)) {
+      return(NULL)
+    }
     raw <- tryCatch(read.csv(path, header = TRUE), error = function(e) NULL)
-    if (is.null(raw) || ncol(raw) < 2) return(NULL)
+    if (is.null(raw) || ncol(raw) < 2) {
+      return(NULL)
+    }
     df <- raw %>%
       dplyr::select(Predictor = 1, Criterion = 2) %>%
       na.omit()
@@ -1757,7 +1852,9 @@ server <- function(input, output, session) {
   # Expectancy chart in landing Key Insight (sample data, fixed bins=5, cutoff=3.0)
   output$landing_expectancy_plot <- renderPlot({
     preview <- landing_preview_data()
-    if (is.null(preview) || nrow(preview$df) < 2) return(invisible(NULL))
+    if (is.null(preview) || nrow(preview$df) < 2) {
+      return(invisible(NULL))
+    }
     exp_df <- calc_expectancy(preview$df, bins = 5, cutoff_y = 3.0)
     plot_expectancy_landing(exp_df, preview$predictor_name, 3.0)
   })
@@ -1765,7 +1862,9 @@ server <- function(input, output, session) {
   # Data info display
   output$data_info <- renderUI({
     df <- data_set()
-    if (is.null(df)) return(NULL)
+    if (is.null(df)) {
+      return(NULL)
+    }
 
     source_text <- if (!is.null(app_state$data_source) && app_state$data_source == "sample") {
       "Sample Data"
@@ -1788,7 +1887,9 @@ server <- function(input, output, session) {
   # Effective predictor/criterion (default to first two columns when inputs not yet valid)
   effective_vars <- reactive({
     df <- data_set()
-    if (is.null(df) || ncol(df) < 2) return(list(predictor = NULL, criterion = NULL))
+    if (is.null(df) || ncol(df) < 2) {
+      return(list(predictor = NULL, criterion = NULL))
+    }
     dsnames <- names(df)
     pred <- input$predictorVar
     crit <- input$criterionVar
@@ -1801,7 +1902,9 @@ server <- function(input, output, session) {
   observe({
     ev <- effective_vars()
     df <- data_set()
-    if (is.null(df) || is.null(ev$predictor)) return(NULL)
+    if (is.null(df) || is.null(ev$predictor)) {
+      return(NULL)
+    }
     dsnames <- names(df)
     if (!identical(input$predictorVar, ev$predictor)) {
       updateSelectInput(session, "predictorVar", choices = dsnames, selected = ev$predictor)
@@ -1811,13 +1914,21 @@ server <- function(input, output, session) {
     }
   })
 
-  observeEvent(input$predictorVar, {
-    updateTextInput(session, "predictor_display_name", value = "")
-  }, ignoreNULL = TRUE, ignoreInit = TRUE)
+  observeEvent(input$predictorVar,
+    {
+      updateTextInput(session, "predictor_display_name", value = "")
+    },
+    ignoreNULL = TRUE,
+    ignoreInit = TRUE
+  )
 
-  observeEvent(input$criterionVar, {
-    updateTextInput(session, "criterion_display_name", value = "")
-  }, ignoreNULL = TRUE, ignoreInit = TRUE)
+  observeEvent(input$criterionVar,
+    {
+      updateTextInput(session, "criterion_display_name", value = "")
+    },
+    ignoreNULL = TRUE,
+    ignoreInit = TRUE
+  )
 
   predictor_display_name <- reactive({
     ev <- effective_vars()
@@ -1895,8 +2006,12 @@ server <- function(input, output, session) {
 
   group_slices <- reactive({
     df <- df_cles()
-    above_vals <- df %>% filter(Group == "Above") %>% pull(Criterion)
-    below_vals <- df %>% filter(Group == "Below") %>% pull(Criterion)
+    above_vals <- df %>%
+      filter(Group == "Above") %>%
+      pull(Criterion)
+    below_vals <- df %>%
+      filter(Group == "Below") %>%
+      pull(Criterion)
     list(
       above_vals = above_vals,
       below_vals = below_vals,
@@ -1916,8 +2031,12 @@ server <- function(input, output, session) {
   last_criterion_var <- reactiveVal(NULL)
   observeEvent(effective_vars(), {
     ev <- effective_vars()
-    if (is.null(ev$criterion)) return(NULL)
-    if (identical(ev$criterion, last_criterion_var())) return(NULL)
+    if (is.null(ev$criterion)) {
+      return(NULL)
+    }
+    if (identical(ev$criterion, last_criterion_var())) {
+      return(NULL)
+    }
     last_criterion_var(ev$criterion)
     sd <- selected_data()
     if (!is.null(sd) && nrow(sd) > 0) {
@@ -1934,21 +2053,30 @@ server <- function(input, output, session) {
 
   output$overview_d <- renderText({
     d <- effect_sizes()$d
-    if (is.na(d)) return("--")
+    if (is.na(d)) {
+      return("--")
+    }
     direction <- if (d >= 0) "positive" else "negative"
     paste0("|d| = ", round(abs(d), 2), " (", direction, ")")
   })
 
   output$overview_cles <- renderText({
     cles <- effect_sizes()$cles
-    if (is.na(cles)) return("--")
+    if (is.na(cles)) {
+      return("--")
+    }
     paste0(round(cles * 100, 1), "%")
   })
 
-  output$overview_scatter <- renderPlot({
-    p <- plot_scatter(selected_data(), predictor_display_name(), criterion_display_name())
-    print(p)
-  }, width = 560, height = 340, res = 96) |> bindCache(
+  output$overview_scatter <- renderPlot(
+    {
+      p <- plot_scatter(selected_data(), predictor_display_name(), criterion_display_name())
+      print(p)
+    },
+    width = 560,
+    height = 340,
+    res = 96
+  ) |> bindCache(
     selected_data(),
     predictor_display_name(),
     criterion_display_name()
@@ -2019,7 +2147,7 @@ server <- function(input, output, session) {
       options = list(
         scrollX = TRUE,
         pageLength = 10,
-        dom = 'frtip',
+        dom = "frtip",
         language = list(search = "", searchPlaceholder = "Search...")
       ),
       class = "display compact"
@@ -2028,43 +2156,55 @@ server <- function(input, output, session) {
 
   # --- Expectancy Tab Outputs ---
 
-  output$expectancyPlot <- renderPlot({
-    p <- plot_expectancy(
-      df_exp(),
-      predictor_display_name(),
-      cutoff_y_input(),
-      criterion_display_name()
-    )
-    print(p)
-  }, width = 720, height = 420, res = 96) |> bindCache(
+  output$expectancyPlot <- renderPlot(
+    {
+      p <- plot_expectancy(
+        df_exp(),
+        predictor_display_name(),
+        cutoff_y_input(),
+        criterion_display_name()
+      )
+      print(p)
+    },
+    width = 720,
+    height = 420,
+    res = 96
+  ) |> bindCache(
     df_exp(),
     predictor_display_name(),
     cutoff_y_input(),
     criterion_display_name()
   )
 
-  output$expectancyTable <- renderTable({
-    criterion_col <- paste0("Proportion (", criterion_display_name(), " > ", round(cutoff_y_input(), 3), ")")
-    count_col <- paste0("Count (", criterion_display_name(), " > ", round(cutoff_y_input(), 3), ")")
+  output$expectancyTable <- renderTable(
+    {
+      criterion_col <- paste0("Proportion (", criterion_display_name(), " > ", round(cutoff_y_input(), 3), ")")
+      count_col <- paste0("Count (", criterion_display_name(), " > ", round(cutoff_y_input(), 3), ")")
 
-    df_exp() %>%
-      transmute(
-        Bin = ntile_X,
-        Range = xlabels,
-        !!criterion_col := proportion,
-        !!count_col := as.integer(round(frequency)),
-        Total = as.integer(round(n))
-      )
-  }, digits = 3)
+      df_exp() %>%
+        transmute(
+          Bin = ntile_X,
+          Range = xlabels,
+          !!criterion_col := proportion,
+          !!count_col := as.integer(round(frequency)),
+          Total = as.integer(round(n))
+        )
+    },
+    digits = 3
+  )
 
   # --- Statistics Tab Outputs ---
 
-  output$descriptable <- renderTable({
-    selected_data() %>%
-      psych::describe() %>%
-      as.data.frame() %>%
-      select(n, mean, sd, median, min, max, skew, kurtosis)
-  }, rownames = TRUE, digits = 3)
+  output$descriptable <- renderTable(
+    {
+      selected_data() %>%
+        psych::describe() %>%
+        as.data.frame() %>%
+        select(n, mean, sd, median, min, max, skew, kurtosis)
+    },
+    rownames = TRUE,
+    digits = 3
+  )
 
   output$validity_r <- renderText({
     paste0("r = ", validity_stats()$r_formatted)
@@ -2082,20 +2222,35 @@ server <- function(input, output, session) {
     paste("Distribution of", criterion_display_name())
   })
 
-  output$histogram.X <- renderPlot({
-    p <- plot_histogram(selected_data()$Predictor, fill_color = plot_colors$primary)
-    print(p)
-  }, width = 560, height = 340, res = 96) |> bindCache(selected_data()$Predictor)
+  output$histogram.X <- renderPlot(
+    {
+      p <- plot_histogram(selected_data()$Predictor, fill_color = plot_colors$primary)
+      print(p)
+    },
+    width = 560,
+    height = 340,
+    res = 96
+  ) |> bindCache(selected_data()$Predictor)
 
-  output$histogram.Y <- renderPlot({
-    p <- plot_histogram(selected_data()$Criterion, fill_color = plot_colors$success)
-    print(p)
-  }, width = 560, height = 340, res = 96) |> bindCache(selected_data()$Criterion)
+  output$histogram.Y <- renderPlot(
+    {
+      p <- plot_histogram(selected_data()$Criterion, fill_color = plot_colors$success)
+      print(p)
+    },
+    width = 560,
+    height = 340,
+    res = 96
+  ) |> bindCache(selected_data()$Criterion)
 
-  output$corplot <- renderPlot({
-    p <- plot_scatter(selected_data(), predictor_display_name(), criterion_display_name())
-    print(p)
-  }, width = 720, height = 480, res = 96) |> bindCache(
+  output$corplot <- renderPlot(
+    {
+      p <- plot_scatter(selected_data(), predictor_display_name(), criterion_display_name())
+      print(p)
+    },
+    width = 720,
+    height = 480,
+    res = 96
+  ) |> bindCache(
     selected_data(),
     predictor_display_name(),
     criterion_display_name()
@@ -2103,24 +2258,31 @@ server <- function(input, output, session) {
 
   # --- Effect Sizes Tab Outputs ---
 
-  output$clestable <- renderTable({
-    df_cles() %>%
-      group_by(Group) %>%
-      summarise(Mean = mean(Criterion), SD = sd(Criterion), n = n(), .groups = "drop")
-  }, digits = 3)
+  output$clestable <- renderTable(
+    {
+      df_cles() %>%
+        group_by(Group) %>%
+        summarise(Mean = mean(Criterion), SD = sd(Criterion), n = n(), .groups = "drop")
+    },
+    digits = 3
+  )
 
   output$cles <- renderTable({
     stats <- df_cles() %>%
       group_by(Group) %>%
       summarise(m = mean(Criterion), s = sd(Criterion), n = n(), .groups = "drop")
 
-    if (nrow(stats) < 2) return(NULL)
+    if (nrow(stats) < 2) {
+      return(NULL)
+    }
 
     slices <- group_slices()
     above_vals <- slices$above_vals
     below_vals <- slices$below_vals
 
-    if (length(above_vals) < 2 || length(below_vals) < 2) return(NULL)
+    if (length(above_vals) < 2 || length(below_vals) < 2) {
+      return(NULL)
+    }
 
     calc_all_effect_sizes(above_vals, below_vals, validity_stats()$r)
   })
@@ -2138,28 +2300,43 @@ server <- function(input, output, session) {
     cles_verbal(predictor_display_name(), criterion_display_name(), cutoff_X_val(), round(cles_val * 100, 1))
   })
 
-  output$histogram.overlap <- renderPlot({
-    p <- plot_density_overlap(df_cles(), criterion_display_name(), predictor_display_name(), cutoff_X_val())
-    print(p)
-  }, width = 680, height = 380, res = 96) |> bindCache(
+  output$histogram.overlap <- renderPlot(
+    {
+      p <- plot_density_overlap(df_cles(), criterion_display_name(), predictor_display_name(), cutoff_X_val())
+      print(p)
+    },
+    width = 680,
+    height = 380,
+    res = 96
+  ) |> bindCache(
     df_cles(),
     criterion_display_name(),
     predictor_display_name(),
     cutoff_X_val()
   )
 
-  output$besd <- renderTable({
-    df <- selected_data()
-    calc_besd(df, cutoff_X_val(), cutoff_y_input(), predictor_display_name(), criterion_display_name())
-  }, rownames = TRUE, digits = 3)
+  output$besd <- renderTable(
+    {
+      df <- selected_data()
+      calc_besd(df, cutoff_X_val(), cutoff_y_input(), predictor_display_name(), criterion_display_name())
+    },
+    rownames = TRUE,
+    digits = 3
+  )
 
-  output$besd_theoretical <- renderTable({
-    calc_besd_theoretical(validity_stats()$r, predictor_display_name(), criterion_display_name())
-  }, rownames = TRUE, digits = 3)
+  output$besd_theoretical <- renderTable(
+    {
+      calc_besd_theoretical(validity_stats()$r, predictor_display_name(), criterion_display_name())
+    },
+    rownames = TRUE,
+    digits = 3
+  )
 
   output$start_here_blurb <- renderUI({
     ev <- effective_vars()
-    if (is.null(ev$predictor) || is.null(ev$criterion)) return(tags$p("Select variables to begin."))
+    if (is.null(ev$predictor) || is.null(ev$criterion)) {
+      return(tags$p("Select variables to begin."))
+    }
     tags$div(
       tags$p(tags$strong("Primary question: "), paste0("How much does ", predictor_display_name(), " improve practical outcomes on ", criterion_display_name(), "?")),
       tags$p(
@@ -2172,10 +2349,14 @@ server <- function(input, output, session) {
   converter_metrics <- reactive({
     in_type <- input$converter_input_type
     in_val <- input$converter_value
-    if (is.null(in_type) || is.null(in_val) || !is.finite(in_val)) return(NULL)
+    if (is.null(in_type) || is.null(in_val) || !is.finite(in_val)) {
+      return(NULL)
+    }
 
     if (in_type == "r") {
-      if (in_val <= -1 || in_val >= 1) return(NULL)
+      if (in_val <= -1 || in_val >= 1) {
+        return(NULL)
+      }
       r <- in_val
       d <- r_to_d(r)
     } else {
@@ -2183,7 +2364,9 @@ server <- function(input, output, session) {
       r <- d_to_r(d)
     }
 
-    if (!is.finite(r) || !is.finite(d)) return(NULL)
+    if (!is.finite(r) || !is.finite(d)) {
+      return(NULL)
+    }
     cles <- d_to_cles(d)
     data.frame(
       Metric = c("Correlation (r)", "Cohen's d", "CLES (Probability)", "BESD High Group Success", "BESD Low Group Success"),
@@ -2191,16 +2374,21 @@ server <- function(input, output, session) {
     )
   })
 
-  output$converter_table <- renderTable({
-    cm <- converter_metrics()
-    validate(need(!is.null(cm), "Enter a valid effect size value. For r, use (-1, 1)."))
-    cm
-  }, digits = 3)
+  output$converter_table <- renderTable(
+    {
+      cm <- converter_metrics()
+      validate(need(!is.null(cm), "Enter a valid effect size value. For r, use (-1, 1)."))
+      cm
+    },
+    digits = 3
+  )
 
   output$converter_validity <- renderUI({
     in_type <- input$converter_input_type
     in_val <- input$converter_value
-    if (is.null(in_val)) return(tags$span(class = "text-muted", ""))
+    if (is.null(in_val)) {
+      return(tags$span(class = "text-muted", ""))
+    }
     if (in_type == "r" && (in_val <= -1 || in_val >= 1)) {
       return(tags$span(style = "color: var(--color-danger);", "For r input, value must be between -1 and 1 (exclusive)."))
     }
@@ -2212,7 +2400,9 @@ server <- function(input, output, session) {
     req(!is.null(cm))
     r_val <- as.numeric(cm$Value[cm$Metric == "Correlation (r)"])
     cles_val <- as.numeric(cm$Value[cm$Metric == "CLES (Probability)"])
-    if (!is.finite(r_val) || !is.finite(cles_val)) return(NULL)
+    if (!is.finite(r_val) || !is.finite(cles_val)) {
+      return(NULL)
+    }
     tags$p(
       class = "mb-0 text-muted",
       paste0(
@@ -2369,11 +2559,11 @@ server <- function(input, output, session) {
   output$iconarray_description <- renderText({
     ev <- effective_vars()
     cles_val <- effect_sizes()$cles
-    
+
     if (is.na(cles_val)) {
       return("Adjust the cutoff percentile to see CLES icon array.")
     }
-    
+
     paste0(
       "Out of ", input$iconarray_total, " random pairs, approximately ",
       round(cles_val * input$iconarray_total), " times the high-scoring person will ",
@@ -2381,36 +2571,41 @@ server <- function(input, output, session) {
     )
   })
 
-  output$iconarray_plot <- renderPlot({
-    cles_val <- effect_sizes()$cles
-    
-    if (is.na(cles_val)) {
-      # Return empty plot if no data
-      ggplot() +
-        labs(title = "No data available") +
-        theme_minimal_linear()
-    } else {
-      plot_icon_array(
-        cles_prob = cles_val,
-        total_icons = input$iconarray_total,
-        icon_type = input$iconarray_type,
-        layout = input$iconarray_layout,
-        predictor_name = predictor_display_name(),
-        criterion_name = criterion_display_name()
-      )
-    }
-  }, width = 720, height = 420, res = 96)
+  output$iconarray_plot <- renderPlot(
+    {
+      cles_val <- effect_sizes()$cles
+
+      if (is.na(cles_val)) {
+        # Return empty plot if no data
+        ggplot() +
+          labs(title = "No data available") +
+          theme_minimal_linear()
+      } else {
+        plot_icon_array(
+          cles_prob = cles_val,
+          total_icons = input$iconarray_total,
+          icon_type = input$iconarray_type,
+          layout = input$iconarray_layout,
+          predictor_name = predictor_display_name(),
+          criterion_name = criterion_display_name()
+        )
+      }
+    },
+    width = 720,
+    height = 420,
+    res = 96
+  )
 
   output$iconarray_stats <- renderText({
     cles_val <- effect_sizes()$cles
-    
+
     if (is.na(cles_val)) {
       return("CLES: Not available")
     }
-    
+
     num_success <- round(cles_val * input$iconarray_total)
     num_failure <- input$iconarray_total - num_success
-    
+
     paste0(
       "Success: ", num_success, " (", round(cles_val * 100, 1), "%) | ",
       "Failure: ", num_failure, " (", round((1 - cles_val) * 100, 1), "%)"
@@ -2431,7 +2626,7 @@ server <- function(input, output, session) {
     },
     content = function(file) {
       cles_val <- effect_sizes()$cles
-      
+
       if (!is.na(cles_val)) {
         p <- plot_icon_array(
           cles_prob = cles_val,

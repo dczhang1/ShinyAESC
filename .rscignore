@@ -1,0 +1,9 @@
+archive/
+docs/
+image/
+scripts/
+.claude/
+.cursor/
+Rplots.pdf
+AGENTS.md
+README.md

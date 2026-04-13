@@ -1,0 +1,11 @@
+archive/
+docs/
+image/
+scripts/
+.claude/
+.cursor/
+.git/
+.Rplots.pdf
+AGENTS.md
+README.md
+rsconnect/

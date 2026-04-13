@@ -5,7 +5,7 @@ Guidance for agentic coding agents working on ESCAPE — Effect Size Calculator 
 This is an R Shiny application that converts traditional effect sizes (r, d, g) into probabilities, success rates, and visual summaries.
 
 Deployed at https://dczhang.shinyapps.io/shinyescape/
-
+ 
 ## Project Overview
 
 - **Language**: R (Shiny framework using `bslib` for Bootstrap 5 theming)
