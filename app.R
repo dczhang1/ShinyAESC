@@ -11,6 +11,8 @@ library(haven)
 library(psych)
 library(DT)
 
+options(shiny.maxRequestSize = 10 * 1024^2)
+
 # Source utility modules
 source("R/utils_theme.R")
 source("R/utils_stats.R")
@@ -49,6 +51,16 @@ read_static_html_body <- function(path) {
   body_html <- gsub("(?is)<script[^>]*>.*?</script>", "", body_html, perl = TRUE)
   body_html <- gsub("<table(\\s|>)", "<table class=\"table escape-article-table\"\\1", body_html, perl = TRUE)
   body_html
+}
+
+sanitize_html <- function(x) {
+  if (is.null(x) || length(x) == 0) return(x)
+  x <- gsub("&", "&amp;", x, fixed = TRUE)
+  x <- gsub("<", "&lt;", x, fixed = TRUE)
+  x <- gsub(">", "&gt;", x, fixed = TRUE)
+  x <- gsub('"', "&quot;", x, fixed = TRUE)
+  x <- gsub("'", "&#39;", x, fixed = TRUE)
+  x
 }
 
 # ============================================
@@ -1338,7 +1350,7 @@ ui <- page_fillable(
   tags$head(
     tags$link(rel = "stylesheet", type = "text/css", href = "css/main.css"),
     tags$link(rel = "stylesheet", type = "text/css", href = "css/landing.css"),
-    tags$script(src = "https://unpkg.com/lucide@latest/dist/umd/lucide.js"),
+    tags$script(src = "https://unpkg.com/lucide@1.8.0/dist/umd/lucide.js", integrity = "sha384-bgSnYl8X5v7B1Jo4mdsVIh2rFFjtrqNJnu7TILKXhwh/dr1HvKK2D1ApUikQ6NCb", crossorigin = "anonymous"),
     tags$script(src = "js/main.js")
   ),
   tags$a(
@@ -1517,24 +1529,32 @@ server <- function(input, output, session) {
       return(NULL)
     }
 
-    ext <- tools::file_ext(inFile$name)
+    ext <- tolower(tools::file_ext(inFile$name))
+    if (!ext %in% c("csv", "xlsx", "sav", "sas7bdat")) {
+      last_load_error("Unsupported file type. Please upload CSV, Excel, SPSS, or SAS files.")
+      return(NULL)
+    }
 
     tryCatch(
       {
         df <- switch(ext,
-          csv = read.csv(inFile$datapath, header = TRUE),
-          xlsx = readxl::read_excel(inFile$datapath),
+          csv = read.csv(inFile$datapath, header = TRUE, nrows = 1e6),
+          xlsx = readxl::read_excel(inFile$datapath, n_max = 1e6),
           sav = haven::read_sav(inFile$datapath),
           sas7bdat = haven::read_sas(inFile$datapath),
           NULL
         )
+        if (is.null(df)) {
+          last_load_error("Could not parse the file. Verify the file contents match the extension.")
+          return(NULL)
+        }
         last_load_error(NULL)
         sig <- paste0(inFile$name, "::", nrow(df), "::", as.numeric(file.info(inFile$datapath)$mtime))
         last_load_signature(sig)
         return(df)
       },
       error = function(e) {
-        last_load_error(paste("Error loading file:", e$message))
+        last_load_error("Error loading file. Please check that the file is valid and try again.")
         return(NULL)
       }
     )
@@ -2117,8 +2137,8 @@ server <- function(input, output, session) {
     d_magnitude <- if (!is.na(d)) interpret_cohens_d(d) else "unknown"
     d_direction <- if (!is.na(d) && d >= 0) "higher" else "lower"
 
-    cles_text <- if (!is.na(cles)) {
-      paste0(
+    cles_content <- if (!is.na(cles)) {
+      list(
         "A randomly selected person from the top ",
         round(cutoff_x_input() * 100), "% on ",
         pd, " has a ",
@@ -2128,7 +2148,7 @@ server <- function(input, output, session) {
         round((1 - cutoff_x_input()) * 100), "%."
       )
     } else {
-      "Adjust the cutoff percentile to see CLES insights."
+      list("Adjust the cutoff percentile to see CLES insights.")
     }
 
     div(
@@ -2152,7 +2172,7 @@ server <- function(input, output, session) {
       div(
         class = "insight-row highlight",
         tags$i(`data-lucide` = "lightbulb", class = "insight-icon-small"),
-        p(HTML(cles_text))
+        p(cles_content)
       )
     )
   })
@@ -2608,7 +2628,9 @@ server <- function(input, output, session) {
       body_html <- sub("(?is).*<body[^>]*>", "", raw_html, perl = TRUE)
       body_html <- sub("(?is)</body>.*$", "", body_html, perl = TRUE)
       body_html <- gsub("(?is)<style[^>]*>.*?</style>", "", body_html, perl = TRUE)
-      body_html <- gsub("(?is)<script[^>]*>.*?</script>", "", body_html, perl = TRUE)
+  body_html <- gsub("(?is)<script[^>]*>.*?</script>", "", body_html, perl = TRUE)
+  body_html <- gsub("\\s+on\\w+\\s*=\\s*\"[^\"]*\"", "", body_html, perl = TRUE)
+  body_html <- gsub("\\s+on\\w+\\s*=\\s*'[^']*'", "", body_html, perl = TRUE)
       HTML(sprintf('<div class="help-content">%s</div>', body_html))
     } else {
       div(
@@ -2671,6 +2693,8 @@ server <- function(input, output, session) {
     req(selected_data())
     pd <- predictor_display_name()
     cd <- criterion_display_name()
+    pd_safe <- sanitize_html(pd)
+    cd_safe <- sanitize_html(cd)
     df <- selected_data()
     slices <- group_slices()
     above_vals <- slices$above_vals
@@ -2687,7 +2711,7 @@ server <- function(input, output, session) {
       " criterion outcomes."
     )
     cles_val <- calc_cles(above_vals, below_vals)
-    cles_narrative <- cles_verbal(pd, cd, cutoff_X_val(), round(cles_val * 100, 1))
+    cles_narrative <- cles_verbal(pd_safe, cd_safe, cutoff_X_val(), round(cles_val * 100, 1))
     desc_tbl <- psych::describe(df) %>%
       as.data.frame() %>%
       tibble::rownames_to_column("Variable") %>%
@@ -2720,8 +2744,8 @@ server <- function(input, output, session) {
       criterion_name = cd
     )
     list(
-      predictor = pd,
-      criterion = cd,
+      predictor = pd_safe,
+      criterion = cd_safe,
       n_obs = nrow(df),
       bins = input$bins,
       cutoff_y = cutoff_y_input(),
@@ -3012,6 +3036,7 @@ knitr::kable(params$besd_theoretical, align = c("l", "r", "r"), digits = 3)
 </small>
 '
       writeLines(rmd_content, tempReport)
+      on.exit(unlink(tempReport), add = TRUE)
 
       p <- assemble_report_params()
 
@@ -3169,6 +3194,7 @@ knitr::kable(params$besd_theoretical, booktabs = TRUE, align = c("l", "r", "r"),
 *Generated by ESCAPE (Effect Size Calculator for Practical Effects). Author: Don Zhang. Implementation: R Shiny. App URL: https://dczhang.shinyapps.io/shinyescape/*
 '
       writeLines(rmd_pdf, tempReport)
+      on.exit(unlink(tempReport), add = TRUE)
 
       err <- tryCatch(
         {
@@ -3190,14 +3216,10 @@ knitr::kable(params$besd_theoretical, booktabs = TRUE, align = c("l", "r", "r"),
 
       if (!is.null(err)) {
         session$sendCustomMessage("showToast", list(
-          message = paste0(
-            "PDF export needs a LaTeX engine (install TinyTeX: tinytex::install_tinytex()). ",
-            "Alternatively export HTML and use Print to PDF. ",
-            conditionMessage(err)
-          ),
+          message = "PDF export failed. Try exporting as HTML instead, or ensure a LaTeX engine is installed.",
           type = "error"
         ))
-        stop(conditionMessage(err))
+        stop("PDF export failed")
       }
     }
   )
