@@ -264,12 +264,12 @@ landing_page_ui <- function() {
           class = "landing-nav-links",
           role = "navigation",
           `aria-label` = "Landing sections",
-          tags$a(class = "landing-nav-link", href = "#landing-about", "About"),
-          actionButton("nav_learn", "Learn", class = "btn btn-secondary landing-nav-link-btn"),
+          tags$a(class = "landing-nav-pill landing-nav-pill--ghost", href = "#landing-about", "About"),
+          actionButton("nav_learn", "Learn", class = "landing-nav-pill landing-nav-pill--ghost"),
           actionButton(
             "nav_get_started",
             "Get Started",
-            class = "btn btn-primary landing-nav-cta"
+            class = "landing-nav-pill landing-nav-pill--cta"
           )
         )
       )
@@ -689,8 +689,8 @@ learn_page_ui <- function() {
           class = "landing-nav-links",
           role = "navigation",
           `aria-label` = "Learn page navigation",
-          actionButton("learn_go_home", "Home", class = "btn btn-secondary landing-nav-link-btn"),
-          actionButton("nav_get_started_learn", "Get Started", class = "btn btn-primary landing-nav-cta")
+          actionButton("learn_go_home", "Home", class = "landing-nav-pill landing-nav-pill--ghost"),
+          actionButton("nav_get_started_learn", "Get Started", class = "landing-nav-pill landing-nav-pill--cta")
         )
       )
     ),
@@ -1336,7 +1336,7 @@ ui <- page_fillable(
   theme = app_theme,
   tags$head(
     tags$link(rel = "stylesheet", type = "text/css", href = "css/main.css"),
-    uiOutput("view_specific_css"),
+    tags$link(rel = "stylesheet", type = "text/css", href = "css/landing.css"),
     tags$script(src = "https://unpkg.com/lucide@latest/dist/umd/lucide.js"),
     tags$script(src = "js/main.js")
   ),
@@ -1457,14 +1457,6 @@ server <- function(input, output, session) {
       learn_page_ui()
     } else {
       analysis_ui()
-    }
-  })
-
-  output$view_specific_css <- renderUI({
-    if (app_state$view %in% c("landing", "learn")) {
-      tags$link(rel = "stylesheet", type = "text/css", href = "css/landing.css")
-    } else {
-      NULL
     }
   })
 

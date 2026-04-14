@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Making Numbers Meaningful: A Guide to Communicating Effect Sizes</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1 { font-size: 2em; margin-bottom: 0.5em; }
+    h2 { font-size: 1.5em; margin-top: 1.5em; border-bottom: 1px solid #eee; padding-bottom: 0.3em; }
+    h3 { font-size: 1.2em; margin-top: 1.2em; }
+    p { margin: 1em 0; }
+    ul, ol { margin: 1em 0; padding-left: 2em; }
+    li { margin: 0.5em 0; }
+    figure { margin: 1.5em 0; text-align: center; }
+    figcaption { font-size: 0.9em; color: #666; margin-top: 0.5em; }
+    blockquote {
+      margin: 1em 0;
+      padding: 0.5em 1em;
+      border-left: 4px solid #2563EB;
+      background: #f9f9f9;
+    }
+    table { border-collapse: collapse; width: 100%; margin: 1em 0; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background: #f5f5f5; }
+    .reference-list { font-size: 0.9em; }
+    .reference-list li { margin: 0.3em 0; }
+    .svg-container { margin: 1.5em 0; }
+  </style>
+</head>
+<body>
+
+<h1>Making Numbers Meaningful: A Guide to Communicating Effect Sizes</h1>
+
+<p>A pharmaceutical company announces that its new drug reduces the risk of a heart attack. The effect size—a correlation of <em>r</em> = .03—sounds negligible. But when the same result is expressed differently, it means that out of every 1,000 patients treated, 17 fewer people will suffer a heart attack. Over millions of prescriptions, that translates to tens of thousands of lives saved. This was the real finding of the Physicians' Health Study on aspirin, one of the most consequential medical trials ever conducted (Rosenthal, 1990).</p>
+
+<p>Effect sizes are the currency of empirical research. They quantify the magnitude of a relationship or the size of a difference between groups, independent of sample size. When a researcher reports that a training program improves employee performance by <em>d</em> = 0.50, or that a personality trait correlates with job success at <em>r</em> = .30, those numbers are effect sizes. They answer the question that statistical significance cannot: not just <em>whether</em> something works, but <em>how much</em>.</p>
+
+<p>Yet for most people outside of statistics—including managers, policymakers, journalists, and even many graduate students—effect sizes are opaque. A correlation of .30 triggers no intuitive understanding. Is it large? Small? Meaningful? The answer depends on context, but the format of the number itself offers no clues. As Funder and Ozer (2019) have argued, even researchers disagree on what counts as a "small" or "large" effect, and the field's reliance on Cohen's (1988) benchmarks—<em>r</em> = .10 (small), .30 (medium), .50 (large)—has created a false sense of precision. These thresholds were based on qualitative impressions, not empirical data, and they systematically overstate what counts as typical. In individual differences research, only about 3% of meta-analytic correlations reach <em>r</em> = .50, with the median closer to .19 (Gignac & Szodorai, 2016).</p>
+
+<p>More direct evidence comes from Bosco, Aguinis, and colleagues (2015), who analyzed 147,328 correlation coefficients from 30 years of research in two flagship journals. They found the actual median correlation was |r| = .16—substantially smaller than Cohen's "medium" of .30. What Cohen called a "medium" effect falls at roughly the 73rd percentile of the actual distribution, meaning most findings in the literature are smaller than the benchmark suggests. Effect sizes also vary dramatically by relation type: behavioral relations (attitude-behavior, intention-behavior) show much smaller effects (median |r| = .10-.16) than nonbehavioral relations (attitude-attitude, attitude-intention, median |r| = .27-.28). This suggests domain-specific benchmarks may be more useful than universal rules of thumb.</p>
+
+<p>The replication crisis in psychology and related fields has pushed effect size reporting to the forefront. Journals increasingly require effect sizes alongside <em>p</em>-values, and for good reason. Reporting effect sizes is only half the job. If the numbers appear in a format that neither practitioners nor the public can interpret, the science-practice gap widens rather than narrows. The real issue is presentation: the format has to make the practical significance visible to the reader.</p>
+
+<p>This paper focuses on four translations: the Binomial Effect Size Display, the Common Language Effect Size, icon arrays, and expectancy charts. Each turns the same effect into frequencies, probabilities, or a visual comparison that readers can use without first decoding the statistic.</p>
+
+<h2>The Intuition Gap</h2>
+
+<p>People do not think in standardized units. They compare counts, odds, and relative standing. Gigerenzer and Hoffrage (1995) showed that frequency formats fit that habit better than abstract probability statements.</p>
+
+<p>Michal and Shah (2024) documented what they call the <strong>practical significance bias</strong>: when findings are described only in general terms, people assume they are large enough to matter. In their experiments, participants without effect size information were just as likely to endorse an intervention as participants told the effect was large, and more likely than participants told it was small.</p>
+
+<p>This bias has real consequences. When a news article reports that a new educational curriculum "outperforms" the standard one without specifying the magnitude of improvement, parents and school boards may invest substantial resources in a program that produces a negligible gain. When a workplace wellness program is described as "effective" without quantifying the effect, organizations may commit to expensive implementations with minimal return.</p>
+
+<p>Small effects can also matter. Prentice and Miller (1992) showed that modest effects can be striking when they emerge from small manipulations or resistant outcomes. The aspirin-heart attack finding is the cleanest example here: a correlation of .03 that prevents thousands of heart attacks per year. Squaring correlations to report "variance explained" makes that effect look smaller than it is in practice (Ozer, 1985).</p>
+
+<p>Brooks, Dalal, and Nolan (2014) found that the same effect is judged more favorably when it is described with common language formats such as the BESD or CLES rather than with traditional metrics. Participants were also willing to pay more for interventions described that way. The format changes the judgment because people answer the easier question first: does this number look big?</p>
+
+<p>Effect sizes need to be shown in a format that readers can use immediately. The four approaches below do that in different ways: BESD through a 2 × 2 table, CLES through probability, icon arrays through counts, and expectancy charts through outcome distributions.</p>
+
+<h2>Binomial Effect Size Display (BESD)</h2>
+
+<p>Rosenthal and Rubin (1982) introduced the Binomial Effect Size Display as a 2 × 2 table showing success and failure rates for two groups. It is still one of the simplest ways to turn a correlation into something a decision maker can read.</p>
+
+<p>Take a structured interview used in hiring. The validity correlation is <em>r</em> = .30, which traditional benchmarks call a "medium" effect. For a hiring manager, that label is not the useful part. The question is what it means for actual decisions.</p>
+
+<p>The BESD recasts this correlation into a scenario with equal base rates. Imagine 200 job applicants, half assigned to "pass" the interview and half to "fail." With <em>r</em> = .30, the BESD shows:</p>
+
+<table>
+  <tr>
+    <th></th>
+    <th>Succeed</th>
+    <th>Fail</th>
+    <th>Total</th>
+  </tr>
+  <tr>
+    <td>Above average on interview</td>
+    <td>65</td>
+    <td>35</td>
+    <td>100</td>
+  </tr>
+  <tr>
+    <td>Below average on interview</td>
+    <td>35</td>
+    <td>65</td>
+    <td>100</td>
+  </tr>
+</table>
+
+<div class="svg-container">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 480" width="700" height="480" font-family="'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif">
+  <defs>
+    <filter id="shadow" x="-2%" y="-2%" width="104%" height="108%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.08"/>
+    </filter>
+    <filter id="shadowCell" x="-3%" y="-3%" width="106%" height="112%">
+      <feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#000000" flood-opacity="0.06"/>
+    </filter>
+    <linearGradient id="blueGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3B82F6"/>
+      <stop offset="100%" stop-color="#2563EB"/>
+    </linearGradient>
+    <linearGradient id="redGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#EF4444" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#DC2626" stop-opacity="0.85"/>
+    </linearGradient>
+    <linearGradient id="headerGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1E3A5F"/>
+      <stop offset="100%" stop-color="#1E293B"/>
+    </linearGradient>
+    <linearGradient id="rowLabelGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#F8FAFC"/>
+      <stop offset="100%" stop-color="#F1F5F9"/>
+    </linearGradient>
+    <linearGradient id="totalGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#F9FAFB"/>
+      <stop offset="100%" stop-color="#F3F4F6"/>
+    </linearGradient>
+    <pattern id="diagBlue" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="8" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
+    </pattern>
+    <pattern id="dotsRed" patternUnits="userSpaceOnUse" width="10" height="10">
+      <circle cx="5" cy="5" r="1.2" fill="rgba(255,255,255,0.15)"/>
+    </pattern>
+  </defs>
+  <rect width="700" height="480" rx="12" fill="#FFFFFF" filter="url(#shadow)"/>
+  <text x="350" y="42" text-anchor="middle" font-size="20" font-weight="700" fill="#1E293B" letter-spacing="-0.3">Binomial Effect Size Display</text>
+  <text x="350" y="66" text-anchor="middle" font-size="15" font-weight="500" fill="#2563EB">r = .30</text>
+  <text x="350" y="88" text-anchor="middle" font-size="12.5" fill="#6B7280" font-weight="400">Success rates for applicants above vs. below average on a structured interview</text>
+  <line x1="80" y1="102" x2="620" y2="102" stroke="#E5E7EB" stroke-width="1"/>
+  <rect x="60" y="115" width="580" height="40" rx="6" fill="url(#headerGrad)" filter="url(#shadowCell)"/>
+  <line x1="225" y1="115" x2="225" y2="155" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+  <text x="142" y="140" text-anchor="middle" font-size="12" font-weight="600" fill="rgba(255,255,255,0.7)">Interview</text>
+  <line x1="370" y1="115" x2="370" y2="155" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+  <circle cx="278" cy="135" r="7" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
+  <polyline points="274,135 277,138 283,132" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="305" y="140" text-anchor="middle" font-size="13.5" font-weight="600" fill="#FFFFFF">Succeed</text>
+  <line x1="515" y1="115" x2="515" y2="155" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+  <line x1="418" y1="129" x2="426" y2="137" stroke="rgba(255,255,255,0.6)" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="426" y1="129" x2="418" y2="137" stroke="rgba(255,255,255,0.6)" stroke-width="1.8" stroke-linecap="round"/>
+  <text x="453" y="140" text-anchor="middle" font-size="13.5" font-weight="600" fill="#FFFFFF">Fail</text>
+  <text x="577" y="140" text-anchor="middle" font-size="13.5" font-weight="600" fill="rgba(255,255,255,0.75)">Total</text>
+  <rect x="60" y="162" width="165" height="73" rx="6" fill="url(#rowLabelGrad)" stroke="#E5E7EB" stroke-width="1" filter="url(#shadowCell)"/>
+  <text x="142" y="196" text-anchor="middle" font-size="12" font-weight="600" fill="#374151">Above Average</text>
+  <text x="142" y="212" text-anchor="middle" font-size="10.5" fill="#9CA3AF">on Interview</text>
+  <rect x="225" y="162" width="145" height="73" rx="6" fill="url(#blueGrad)" filter="url(#shadowCell)"/>
+  <rect x="225" y="162" width="145" height="73" rx="6" fill="url(#diagBlue)"/>
+  <text x="297" y="199" text-anchor="middle" font-size="28" font-weight="700" fill="#FFFFFF">65%</text>
+  <text x="297" y="220" text-anchor="middle" font-size="11" fill="rgba(255,255,255,0.7)" font-weight="500">n = 65</text>
+  <rect x="370" y="162" width="145" height="73" rx="6" fill="url(#redGrad)" filter="url(#shadowCell)"/>
+  <rect x="370" y="162" width="145" height="73" rx="6" fill="url(#dotsRed)"/>
+  <text x="442" y="199" text-anchor="middle" font-size="28" font-weight="700" fill="#FFFFFF">35%</text>
+  <text x="442" y="220" text-anchor="middle" font-size="11" fill="rgba(255,255,255,0.7)" font-weight="500">n = 35</text>
+  <rect x="515" y="162" width="125" height="73" rx="6" fill="url(#totalGrad)" stroke="#E5E7EB" stroke-width="1" filter="url(#shadowCell)"/>
+  <text x="577" y="205" text-anchor="middle" font-size="20" font-weight="600" fill="#9CA3AF">100</text>
+  <rect x="60" y="242" width="165" height="73" rx="6" fill="url(#rowLabelGrad)" stroke="#E5E7EB" stroke-width="1" filter="url(#shadowCell)"/>
+  <text x="142" y="276" text-anchor="middle" font-size="12" font-weight="600" fill="#374151">Below Average</text>
+  <text x="142" y="292" text-anchor="middle" font-size="10.5" fill="#9CA3AF">on Interview</text>
+  <rect x="225" y="242" width="145" height="73" rx="6" fill="url(#blueGrad)" filter="url(#shadowCell)"/>
+  <rect x="225" y="242" width="145" height="73" rx="6" fill="url(#diagBlue)"/>
+  <text x="297" y="279" text-anchor="middle" font-size="28" font-weight="700" fill="#FFFFFF">35%</text>
+  <text x="297" y="300" text-anchor="middle" font-size="11" fill="rgba(255,255,255,0.7)" font-weight="500">n = 35</text>
+  <rect x="370" y="242" width="145" height="73" rx="6" fill="url(#redGrad)" filter="url(#shadowCell)"/>
+  <rect x="370" y="242" width="145" height="73" rx="6" fill="url(#dotsRed)"/>
+  <text x="442" y="279" text-anchor="middle" font-size="28" font-weight="700" fill="#FFFFFF">65%</text>
+  <text x="442" y="300" text-anchor="middle" font-size="11" fill="rgba(255,255,255,0.7)" font-weight="500">n = 65</text>
+  <rect x="515" y="242" width="125" height="73" rx="6" fill="url(#totalGrad)" stroke="#E5E7EB" stroke-width="1" filter="url(#shadowCell)"/>
+  <text x="577" y="285" text-anchor="middle" font-size="20" font-weight="600" fill="#9CA3AF">100</text>
+  <rect x="145" y="332" width="410" height="36" rx="18" fill="#F0FDF4" stroke="#059669" stroke-width="1.5"/>
+  <circle cx="170" cy="350" r="10" fill="#059669"/>
+  <text x="170" y="354" text-anchor="middle" font-size="11" font-weight="700" fill="#FFFFFF">!</text>
+  <text x="350" y="355" text-anchor="middle" font-size="13" font-weight="600" fill="#059669">
+    <tspan fill="#374151">Difference in success rate: </tspan>
+    <tspan font-weight="700" fill="#059669">30 percentage points</tspan>
+    <tspan fill="#374151"> (65% vs 35%)</tspan>
+  </text>
+  <text x="350" y="458" text-anchor="middle" font-size="10.5" fill="#9CA3AF" font-style="italic">BESD assumes equal base rates (50/50 split)</text>
+</svg>
+</div>
+
+<p>Among those who scored above average on the interview, 65% became successful employees, compared to 35% of those who scored below average. A 30-percentage-point difference is easy to weigh against other hiring options.</p>
+
+<p>The BESD does have a built-in limitation. It assumes equal group sizes and a 50/50 base rate, so it can exaggerate the practical difference when the real base rate is uneven. Hsu (2004) showed that the gap can be several times larger than the actual difference.</p>
+
+<h2>Common Language Effect Size (Probability of Superiority)</h2>
+
+<p>McGraw and Wong (1992) introduced the Common Language Effect Size (CLES) to answer a simple question: if you pick one person at random from each of two groups, what is the probability that the person from the treatment group scores higher?</p>
+
+<p>Consider a leadership development program that produces a Cohen's <em>d</em> of 0.50—a "medium" effect by traditional benchmarks. The CLES translates this into a probability: there is a <strong>64% chance</strong> that a randomly selected trained leader will outperform a randomly selected untrained leader on the outcome measure.</p>
+
+<div class="svg-container">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 520" width="700" height="520" font-family="'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif">
+  <defs>
+    <filter id="shadow" x="-4%" y="-4%" width="108%" height="108%">
+      <feDropShadow dx="0" dy="1" stdDeviation="2" flood-opacity="0.08"/>
+    </filter>
+    <filter id="shadowLg" x="-4%" y="-4%" width="108%" height="112%">
+      <feDropShadow dx="0" dy="2" stdDeviation="4" flood-opacity="0.12"/>
+    </filter>
+    <linearGradient id="blueGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3B82F6"/>
+      <stop offset="100%" stop-color="#2563EB"/>
+    </linearGradient>
+    <linearGradient id="grayGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#9CA3AF"/>
+      <stop offset="100%" stop-color="#6B7280"/>
+    </linearGradient>
+  </defs>
+  <rect x="20" y="15" width="660" height="490" rx="12" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1" filter="url(#shadowLg)"/>
+  <rect x="20" y="15" width="660" height="4" rx="2" fill="#2563EB"/>
+  <text x="350" y="52" text-anchor="middle" font-size="20" font-weight="700" fill="#111827" letter-spacing="-0.3">Probability of Superiority (d = 0.50)</text>
+  <text x="350" y="74" text-anchor="middle" font-size="13" fill="#6B7280" font-weight="400">Random pairwise comparison: trained vs. untrained employee</text>
+  <line x1="60" y1="90" x2="640" y2="90" stroke="#F3F4F6" stroke-width="1.5"/>
+  <g transform="translate(165, 110)">
+    <circle cx="0" cy="18" r="16" fill="url(#blueGrad)"/>
+    <path d="M-22,58 C-22,42 -12,36 0,36 C12,36 22,42 22,58" fill="url(#blueGrad)"/>
+    <text x="0" y="80" text-anchor="middle" font-size="12.5" font-weight="600" fill="#2563EB">Trained</text>
+  </g>
+  <g transform="translate(535, 110)">
+    <circle cx="0" cy="18" r="16" fill="url(#grayGrad)"/>
+    <path d="M-22,58 C-22,42 -12,36 0,36 C12,36 22,42 22,58" fill="url(#grayGrad)"/>
+    <text x="0" y="80" text-anchor="middle" font-size="12.5" font-weight="600" fill="#6B7280">Untrained</text>
+  </g>
+  <line x1="280" y1="138" x2="420" y2="138" stroke="#D1D5DB" stroke-width="1.5" stroke-dasharray="4,3"/>
+  <polygon points="420,138 413,134 413,142" fill="#D1D5DB"/>
+  <g transform="translate(350, 132)">
+    <rect x="-52" y="-24" width="104" height="44" rx="22" fill="#2563EB" filter="url(#shadow)"/>
+    <text x="0" y="4" text-anchor="middle" font-size="26" font-weight="800" fill="#FFFFFF" letter-spacing="-0.5">64%</text>
+  </g>
+  <text x="350" y="176" text-anchor="middle" font-size="10.5" fill="#9CA3AF" font-weight="500" letter-spacing="0.5">PROBABILITY TRAINED WINS</text>
+  <line x1="60" y1="198" x2="640" y2="198" stroke="#F3F4F6" stroke-width="1.5"/>
+  <text x="350" y="222" text-anchor="middle" font-size="12" font-weight="600" fill="#374151" letter-spacing="0.3">10 RANDOM PAIRWISE COMPARISONS</text>
+  <g transform="translate(74, 240)" filter="url(#shadow)">
+    <rect x="0" y="0" width="50" height="50" rx="6" fill="#EFF6FF" stroke="#2563EB" stroke-width="1.5"/>
+    <text x="25" y="22" text-anchor="middle" font-size="10" font-weight="700" fill="#2563EB">T</text>
+    <line x1="10" y1="28" x2="40" y2="28" stroke="#2563EB" stroke-width="0.8"/>
+    <text x="25" y="42" text-anchor="middle" font-size="10" font-weight="600" fill="#9CA3AF">U</text>
+  </g>
+  <g transform="translate(132, 240)" filter="url(#shadow)">
+    <rect x="0" y="0" width="50" height="50" rx="6" fill="#F9FAFB" stroke="#D1D5DB" stroke-width="1.5"/>
+    <text x="25" y="22" text-anchor="middle" font-size="10" font-weight="700" fill="#9CA3AF">T</text>
+    <line x1="10" y1="28" x2="40" y2="28" stroke="#D1D5DB" stroke-width="0.8"/>
+    <text x="25" y="42" text-anchor="middle" font-size="10" font-weight="600" fill="#374151">U</text>
+  </g>
+  <g transform="translate(190, 240)" filter="url(#shadow)">
+    <rect x="0" y="0" width="50" height="50" rx="6" fill="#EFF6FF" stroke="#2563EB" stroke-width="1.5"/>
+    <text x="25" y="22" text-anchor="middle" font-size="10" font-weight="700" fill="#2563EB">T</text>
+  </g>
+  <g transform="translate(248, 240)" filter="url(#shadow)">
+    <rect x="0" y="0" width="50" height="50" rx="6" fill="#EFF6FF" stroke="#2563EB" stroke-width="1.5"/>
+    <text x="25" y="22" text-anchor="middle" font-size="10" font-weight="700" fill="#2563EB">T</text>
+  </g>
+  <g transform="translate(306, 240)" filter="url(#shadow)">
+    <rect x="0" y="0" width="50" height="50" rx="6" fill="#F9FAFB" stroke="#D1D5DB" stroke-width="1.5"/>
+    <text x="25" y="22" text-anchor="middle" font-size="10" font-weight="700" fill="#9CA3AF">T</text>
+  </g>
+  <g transform="translate(364, 240)" filter="url(#shadow)">
+    <rect x="0" y="0" width="50" height="50" rx="6" fill="#EFF6FF" stroke="#2563EB" stroke-width="1.5"/>
+    <text x="25" y="22" text-anchor="middle" font-size="10" font-weight="700" fill="#2563EB">T</text>
+  </g>
+  <g transform="translate(422, 240)" filter="url(#shadow)">
+    <rect x="0" y="0" width="50" height="50" rx="6" fill="#F9FAFB" stroke="#D1D5DB" stroke-width="1.5"/>
+    <text x="25" y="22" text-anchor="middle" font-size="10" font-weight="700" fill="#9CA3AF">T</text>
+  </g>
+  <g transform="translate(480, 240)" filter="url(#shadow)">
+    <rect x="0" y="0" width="50" height="50" rx="6" fill="#EFF6FF" stroke="#2563EB" stroke-width="1.5"/>
+    <text x="25" y="22" text-anchor="middle" font-size="10" font-weight="700" fill="#2563EB">T</text>
+  </g>
+  <g transform="translate(538, 240)" filter="url(#shadow)">
+    <rect x="0" y="0" width="50" height="50" rx="6" fill="#EFF6FF" stroke="#2563EB" stroke-width="1.5"/>
+    <text x="25" y="22" text-anchor="middle" font-size="10" font-weight="700" fill="#2563EB">T</text>
+  </g>
+  <g transform="translate(596, 240)" filter="url(#shadow)">
+    <rect x="0" y="0" width="50" height="50" rx="6" fill="#F9FAFB" stroke="#D1D5DB" stroke-width="1.5"/>
+    <text x="25" y="22" text-anchor="middle" font-size="10" font-weight="700" fill="#9CA3AF">T</text>
+  </g>
+  <g transform="translate(170, 306)">
+    <rect x="0" y="0" width="180" height="26" rx="4" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="1"/>
+    <circle cx="20" cy="13" r="7" fill="#2563EB"/>
+    <text x="95" y="17" text-anchor="middle" font-size="11.5" font-weight="700" fill="#2563EB">6 trained wins</text>
+  </g>
+  <g transform="translate(360, 306)">
+    <rect x="0" y="0" width="180" height="26" rx="4" fill="#F9FAFB" stroke="#E5E7EB" stroke-width="1"/>
+    <circle cx="20" cy="13" r="7" fill="#6B7280"/>
+    <text x="97" y="17" text-anchor="middle" font-size="11.5" font-weight="700" fill="#6B7280">4 untrained wins</text>
+  </g>
+  <text x="350" y="376" text-anchor="middle" font-size="12" fill="#374151" font-weight="500" font-style="italic">Out of every 10 random comparisons, the trained employee outperforms</text>
+  <text x="350" y="394" text-anchor="middle" font-size="12" fill="#374151" font-weight="500" font-style="italic">the untrained employee about 6 times.</text>
+  <rect x="150" y="430" width="400" height="34" rx="6" fill="#F0FDF4" stroke="#BBF7D0" stroke-width="1"/>
+  <text x="350" y="452" text-anchor="middle" font-size="13" fill="#059669" font-weight="600" font-style="italic">CLES = Φ(d / √2) where Φ is the standard normal CDF</text>
+  <text x="350" y="490" text-anchor="middle" font-size="9.5" fill="#9CA3AF" font-weight="400">Common Language Effect Size · d = 0.50 corresponds to CLES ≈ 0.638 or 64%</text>
+</svg>
+</div>
+
+<p>A 64% chance means the trained leader wins the head-to-head comparison roughly two times out of three. That is the advantage of the format: it reads like a probability, not a statistic.</p>
+
+<h2>Icon Arrays</h2>
+
+<p>Icon arrays—sometimes called iconographs or waffle charts—are grids of symbols in which filled and unfilled icons represent outcome rates for different groups. They have a long history in health communication, where they have been shown to improve risk comprehension.</p>
+
+<div class="svg-container">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 820 680" width="820" height="680" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+  <rect width="820" height="680" fill="#FFFFFF" rx="6"/>
+  <text x="410" y="34" text-anchor="middle" font-size="19px" font-weight="700" fill="#111827">Icon Array: Structured Interview Outcomes</text>
+  <text x="410" y="55" text-anchor="middle" font-size="12px" font-weight="400" fill="#6B7280">Effect size r = .30. Each row compares one interview group against the same 100-applicant benchmark.</text>
+  <line x1="30" y1="71" x2="790" y2="71" stroke="#E5E7EB" stroke-width="1"/>
+
+  <g transform="translate(30, 88)">
+    <rect x="0" y="0" width="760" height="214" rx="18" fill="#F8FAFC" stroke="#E5E7EB" stroke-width="1"/>
+    <rect x="24" y="42" width="220" height="130" rx="14" fill="#FFFFFF" stroke="#BFDBFE" stroke-width="1.2"/>
+    <rect x="24" y="42" width="5" height="130" rx="2.5" fill="#2563EB"/>
+    <text x="46" y="78" font-size="17.5px" font-weight="700" fill="#1E293B">Above average</text>
+    <text x="46" y="100" font-size="17.5px" font-weight="700" fill="#1E293B">on structured interview</text>
+    <text x="46" y="128" font-size="12px" font-weight="400" fill="#64748B">Top 50% of applicants</text>
+    <text x="46" y="152" font-size="12px" font-weight="600" fill="#2563EB">65 of 100 are successful</text>
+
+    <g transform="translate(260, 29)">
+        <rect x="0" y="0" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="16" y="0" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="32" y="0" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="48" y="0" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="64" y="0" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="80" y="0" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="96" y="0" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="112" y="0" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="128" y="0" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="144" y="0" width="13" height="13" rx="2.5" fill="#2563EB"/>
+        <rect x="0" y="16" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="16" y="16" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="32" y="16" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="48" y="16" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="64" y="16" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="80" y="16" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="96" y="16" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="112" y="16" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="128" y="16" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="144" y="16" width="13" height="13" rx="2.5" fill="#2563EB"/>
+        <rect x="0" y="32" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="16" y="32" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="32" y="32" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="48" y="32" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="64" y="32" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="80" y="32" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="96" y="32" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="112" y="32" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="128" y="32" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="144" y="32" width="13" height="13" rx="2.5" fill="#2563EB"/>
+        <rect x="0" y="48" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="16" y="48" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="32" y="48" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="48" y="48" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="64" y="48" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="80" y="48" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="96" y="48" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="112" y="48" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="128" y="48" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="144" y="48" width="13" height="13" rx="2.5" fill="#2563EB"/>
+        <rect x="0" y="64" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="16" y="64" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="32" y="64" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="48" y="64" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="64" y="64" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="80" y="64" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="96" y="64" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="112" y="64" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="128" y="64" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="144" y="64" width="13" height="13" rx="2.5" fill="#2563EB"/>
+        <rect x="0" y="80" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="16" y="80" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="32" y="80" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="48" y="80" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="64" y="80" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="80" y="80" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="96" y="80" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="112" y="80" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="128" y="80" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="144" y="80" width="13" height="13" rx="2.5" fill="#2563EB"/>
+        <rect x="0" y="96" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="16" y="96" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="32" y="96" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="48" y="96" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="64" y="96" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="80" y="96" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="96" y="96" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="112" y="96" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="128" y="96" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="144" y="96" width="13" height="13" rx="2.5" fill="#D1D5DB"/>
+        <rect x="0" y="112" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="16" y="112" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="32" y="112" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="48" y="112" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="64" y="112" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="80" y="112" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="96" y="112" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="112" y="112" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="128" y="112" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="144" y="112" width="13" height="13" rx="2.5" fill="#D1D5DB"/>
+        <rect x="0" y="128" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="16" y="128" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="32" y="128" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="48" y="128" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="64" y="128" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="80" y="128" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="96" y="128" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="112" y="128" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="128" y="128" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="144" y="128" width="13" height="13" rx="2.5" fill="#D1D5DB"/>
+        <rect x="0" y="144" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="16" y="144" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="32" y="144" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="48" y="144" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="64" y="144" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="80" y="144" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="96" y="144" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="112" y="144" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="128" y="144" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="144" y="144" width="13" height="13" rx="2.5" fill="#D1D5DB"/>
+    </g>
+
+    <g transform="translate(600, 62)">
+      <rect x="0" y="0" width="110" height="78" rx="14" fill="#EFF6FF" stroke="#BFDBFE" stroke-width="1"/>
+      <text x="55" y="34" text-anchor="middle" font-size="28px" font-weight="800" fill="#2563EB">65%</text>
+      <text x="55" y="54" text-anchor="middle" font-size="10px" font-weight="700" fill="#2563EB" text-transform="uppercase" letter-spacing="0.8px">successful</text>
+    </g>
+  </g>
+
+  <g transform="translate(30, 332)">
+    <rect x="0" y="0" width="760" height="214" rx="18" fill="#FFF7F7" stroke="#FEE2E2" stroke-width="1"/>
+    <rect x="24" y="42" width="220" height="130" rx="14" fill="#FFFFFF" stroke="#FECACA" stroke-width="1.2"/>
+    <rect x="24" y="42" width="5" height="130" rx="2.5" fill="#DC2626"/>
+    <text x="46" y="78" font-size="17.5px" font-weight="700" fill="#1E293B">Below average</text>
+    <text x="46" y="100" font-size="17.5px" font-weight="700" fill="#1E293B">on structured interview</text>
+    <text x="46" y="128" font-size="12px" font-weight="400" fill="#64748B">Bottom 50% of applicants</text>
+    <text x="46" y="152" font-size="12px" font-weight="600" fill="#DC2626">35 of 100 are successful</text>
+
+    <g transform="translate(260, 29)">
+        <rect x="0" y="0" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="16" y="0" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="32" y="0" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="48" y="0" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="64" y="0" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="80" y="0" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="96" y="0" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="112" y="0" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="128" y="0" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="144" y="0" width="13" height="13" rx="2.5" fill="#2563EB"/>
+        <rect x="0" y="16" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="16" y="16" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="32" y="16" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="48" y="16" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="64" y="16" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="80" y="16" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="96" y="16" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="112" y="16" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="128" y="16" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="144" y="16" width="13" height="13" rx="2.5" fill="#2563EB"/>
+        <rect x="0" y="32" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="16" y="32" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="32" y="32" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="48" y="32" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="64" y="32" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="80" y="32" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="96" y="32" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="112" y="32" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="128" y="32" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="144" y="32" width="13" height="13" rx="2.5" fill="#2563EB"/>
+        <rect x="0" y="48" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="16" y="48" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="32" y="48" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="48" y="48" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="64" y="48" width="13" height="13" rx="2.5" fill="#2563EB"/><rect x="80" y="48" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="96" y="48" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="112" y="48" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="128" y="48" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="144" y="48" width="13" height="13" rx="2.5" fill="#D1D5DB"/>
+        <rect x="0" y="64" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="16" y="64" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="32" y="64" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="48" y="64" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="64" y="64" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="80" y="64" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="96" y="64" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="112" y="64" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="128" y="64" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="144" y="64" width="13" height="13" rx="2.5" fill="#D1D5DB"/>
+        <rect x="0" y="80" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="16" y="80" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="32" y="80" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="48" y="80" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="64" y="80" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="80" y="80" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="96" y="80" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="112" y="80" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="128" y="80" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="144" y="80" width="13" height="13" rx="2.5" fill="#D1D5DB"/>
+        <rect x="0" y="96" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="16" y="96" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="32" y="96" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="48" y="96" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="64" y="96" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="80" y="96" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="96" y="96" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="112" y="96" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="128" y="96" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="144" y="96" width="13" height="13" rx="2.5" fill="#D1D5DB"/>
+        <rect x="0" y="112" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="16" y="112" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="32" y="112" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="48" y="112" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="64" y="112" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="80" y="112" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="96" y="112" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="112" y="112" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="128" y="112" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="144" y="112" width="13" height="13" rx="2.5" fill="#D1D5DB"/>
+        <rect x="0" y="128" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="16" y="128" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="32" y="128" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="48" y="128" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="64" y="128" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="80" y="128" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="96" y="128" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="112" y="128" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="128" y="128" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="144" y="128" width="13" height="13" rx="2.5" fill="#D1D5DB"/>
+        <rect x="0" y="144" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="16" y="144" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="32" y="144" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="48" y="144" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="64" y="144" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="80" y="144" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="96" y="144" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="112" y="144" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="128" y="144" width="13" height="13" rx="2.5" fill="#D1D5DB"/><rect x="144" y="144" width="13" height="13" rx="2.5" fill="#D1D5DB"/>
+    </g>
+
+    <g transform="translate(600, 62)">
+      <rect x="0" y="0" width="110" height="78" rx="14" fill="#FEF2F2" stroke="#FECACA" stroke-width="1"/>
+      <text x="55" y="34" text-anchor="middle" font-size="28px" font-weight="800" fill="#DC2626">35%</text>
+      <text x="55" y="54" text-anchor="middle" font-size="10px" font-weight="700" fill="#DC2626" text-transform="uppercase" letter-spacing="0.8px">successful</text>
+    </g>
+  </g>
+
+  <g transform="translate(210, 570)">
+    <rect x="0" y="0" width="14" height="14" rx="2.5" fill="#2563EB"/>
+    <text x="20" y="12" font-size="11px" font-weight="400" fill="#4B5563">Successful employee</text>
+    <rect x="155" y="0" width="14" height="14" rx="2.5" fill="#D1D5DB" stroke="#B0B5BD" stroke-width="0.5"/>
+    <text x="175" y="12" font-size="11px" font-weight="400" fill="#4B5563">Not successful</text>
+  </g>
+  <text x="410" y="620" text-anchor="middle" font-size="10.5px" font-weight="400" fill="#9CA3AF" font-style="italic">Each icon represents 1 applicant out of 100. Blue icons show the share who become successful employees.</text>
+</svg>
+</div>
+
+<p>Icon arrays work because the difference is visible at a glance. No calculation is required.</p>
+
+<h2>Expectancy Charts</h2>
+
+<p>Expectancy charts display the predicted distribution of outcomes across different levels of a predictor variable. Unlike the BESD, which collapses information into a single binary comparison, expectancy charts show the full range of expected outcomes.</p>
+
+<div class="svg-container">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 450" width="700" height="450" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+  <rect width="700" height="450" fill="#FFFFFF" rx="4"/>
+  <text x="350" y="30" text-anchor="middle" font-size="16px" font-weight="700" fill="#374151">Expectancy Chart: Test Score Quartile and Job Performance</text>
+  <text x="350" y="47" text-anchor="middle" font-size="11.5px" font-weight="400" fill="#6B7280">Selection test validity r = .30</text>
+  <line x1="100" y1="340" x2="660" y2="340" stroke="#E5E7EB" stroke-width="0.75"/>
+  <line x1="100" y1="285" x2="660" y2="285" stroke="#E5E7EB" stroke-width="0.75"/>
+  <line x1="100" y1="230" x2="660" y2="230" stroke="#E5E7EB" stroke-width="0.75"/>
+  <line x1="100" y1="175" x2="660" y2="175" stroke="#E5E7EB" stroke-width="0.75"/>
+  <line x1="100" y1="120" x2="660" y2="120" stroke="#E5E7EB" stroke-width="0.75"/>
+  <line x1="100" y1="65" x2="660" y2="65" stroke="#E5E7EB" stroke-width="0.75"/>
+  <line x1="100" y1="65" x2="100" y2="340" stroke="#D1D5DB" stroke-width="1"/>
+  <text x="92" y="344" text-anchor="end" font-size="10.5px" font-weight="400" fill="#6B7280">0%</text>
+  <text x="92" y="289" text-anchor="end" font-size="10.5px" font-weight="400" fill="#6B7280">10%</text>
+  <text x="92" y="234" text-anchor="end" font-size="10.5px" font-weight="400" fill="#6B7280">20%</text>
+  <text x="92" y="179" text-anchor="end" font-size="10.5px" font-weight="400" fill="#6B7280">30%</text>
+  <text x="92" y="124" text-anchor="end" font-size="10.5px" font-weight="400" fill="#6B7280">40%</text>
+  <text x="92" y="69" text-anchor="end" font-size="10.5px" font-weight="400" fill="#6B7280">50%</text>
+  <text transform="translate(22, 202) rotate(-90)" text-anchor="middle" font-size="11px" font-weight="600" fill="#374151">Expected % Who Are Top Performers</text>
+  <rect x="130" y="257.5" width="80" height="82.5" fill="#93C5FD" rx="3"/>
+  <text x="170" y="250" text-anchor="middle" font-size="12px" font-weight="700" fill="#9CA3AF">15%</text>
+  <rect x="270" y="202.5" width="80" height="137.5" fill="#60A5FA" rx="3"/>
+  <text x="310" y="195" text-anchor="middle" font-size="12px" font-weight="700" fill="#059669">25%</text>
+  <rect x="410" y="147.5" width="80" height="192.5" fill="#3B82F6" rx="3"/>
+  <text x="450" y="140" text-anchor="middle" font-size="12px" font-weight="700" fill="#2563EB">35%</text>
+  <rect x="550" y="92.5" width="80" height="247.5" fill="#2563EB" rx="3"/>
+  <text x="590" y="85" text-anchor="middle" font-size="12px" font-weight="700" fill="#2563EB">45%</text>
+  <text x="170" y="358" text-anchor="middle" font-size="10.5px" font-weight="400" fill="#6B7280">Bottom 25%</text>
+  <text x="310" y="358" text-anchor="middle" font-size="10.5px" font-weight="400" fill="#6B7280">Second</text>
+  <text x="310" y="370" text-anchor="middle" font-size="10.5px" font-weight="400" fill="#6B7280">Quartile</text>
+  <text x="450" y="358" text-anchor="middle" font-size="10.5px" font-weight="400" fill="#6B7280">Third</text>
+  <text x="450" y="370" text-anchor="middle" font-size="10.5px" font-weight="400" fill="#6B7280">Quartile</text>
+  <text x="590" y="358" text-anchor="middle" font-size="10.5px" font-weight="400" fill="#6B7280">Top 25%</text>
+  <text x="380" y="392" text-anchor="middle" font-size="11px" font-weight="600" fill="#374151">Test Score Quartile</text>
+  <line x1="100" y1="202.5" x2="660" y2="202.5" stroke="#DC2626" stroke-width="1.25" stroke-dasharray="6,4" opacity="0.7"/>
+  <text x="663" y="199" font-size="10px" font-weight="500" fill="#DC2626" text-anchor="start">Random</text>
+  <text x="663" y="210" font-size="10px" font-weight="500" fill="#DC2626" text-anchor="start">baseline</text>
+  <text x="663" y="221" font-size="10px" font-weight="500" fill="#DC2626" text-anchor="start">(25%)</text>
+  <text x="350" y="420" text-anchor="middle" font-size="10.5px" font-weight="400" fill="#6B7280" font-style="italic">Among applicants in the top quartile of test scores, approximately 45% are expected to be</text>
+  <text x="350" y="435" text-anchor="middle" font-size="10.5px" font-weight="400" fill="#6B7280" font-style="italic">top performers—compared to only 15% of those in the bottom quartile.</text>
+</svg>
+</div>
+
+<p>This format matters most when cut scores drive the decision: hiring thresholds, admissions criteria, and clinical screening benchmarks.</p>
+
+<h2>Putting It Together: One Effect, Four Translations</h2>
+
+<p>Consider a single, realistic scenario. A consulting firm has validated a structured interview against job performance and found a validity coefficient of <em>r</em> = .30. Here is how the same effect looks through each of the four translation lenses:</p>
+
+<ol>
+  <li><strong>BESD:</strong> "Among applicants who score above average on the structured interview, 65% become strong performers. Among those who score below average, only 35% do."</li>
+  <li><strong>Probability of Superiority:</strong> "If you randomly select one applicant who scored high on the interview and one who scored low, there is a 64% chance the high-scorer will be the better employee."</li>
+  <li><strong>Icon Array:</strong> A visual grid showing 65 filled vs. 35 unfilled icons for high-scorers, and 35 vs. 65 for low-scorers.</li>
+  <li><strong>Expectancy Chart:</strong> A bar chart showing that among applicants in the top quartile of interview scores, approximately 45% will be top performers, compared to only about 15% of those in the bottom quartile.</li>
+</ol>
+
+<p>Each translation emphasizes a different part of the same relationship. Which one to use depends on the audience and the decision.</p>
+
+<h2>Key Readings</h2>
+
+<ul class="reference-list">
+  <li><strong>Bosco, F. A., Aguinis, H., Singh, K., Field, J. G., & Pierce, C. A. (2015).</strong> Correlational effect size benchmarks. <em>Journal of Applied Psychology</em>, <em>100</em>(2), 431–449. Empirical analysis of 147,328 effect sizes showing Cohen's benchmarks are misaligned with actual research findings.</li>
+  <li><strong>Brooks, W., Dalal, D. K., & Nolan, K. P. (2014).</strong> Are common language effect sizes easier to understand than traditional effect sizes? <em>Journal of Applied Psychology</em>, <em>99</em>(2), 332–340. Experimental evidence that BESD and CLES are perceived as more understandable and valuable than traditional metrics.</li>
+  <li><strong>Cohen, J. (1988).</strong> <em>Statistical Power Analysis for the Behavioral Sciences</em> (2nd ed.). Lawrence Erlbaum. The origin of the small/medium/large benchmarks.</li>
+  <li><strong>Gigerenzer, G., & Hoffrage, U. (1995).</strong> How to improve Bayesian reasoning without instruction: Frequency formats. <em>Psychological Review</em>, <em>102</em>(4), 684–704. A classic on why frequencies improve probabilistic reasoning.</li>
+  <li><strong>Rosenthal, R., & Rubin, D. B. (1982).</strong> A simple, general purpose display of magnitude of experimental effect. <em>Journal of Educational Psychology</em>, <em>74</em>(2), 166–169. The original BESD paper.</li>
+  <li><strong>Rosenthal, R. (1990).</strong> How are we doing in soft psychology? <em>American Psychologist</em>, <em>45</em>(6), 775–777. Source for the aspirin example discussed in the introduction.</li>
+  <li><strong>Funder, D. C., & Ozer, D. J. (2019).</strong> Evaluating effect size in psychological research: Sense and nonsense. <em>Advances in Methods and Practices in Psychological Science</em>, <em>2</em>(2), 156–168. A practical guide to interpreting effect sizes.</li>
+  <li><strong>Gignac, G. E., & Szodorai, E. T. (2016).</strong> Effect size guidelines for individual differences researchers. <em>Personality and Individual Differences</em>, <em>102</em>, 74–78. Empirically-based guidelines for correlations.</li>
+  <li><strong>Hsu, L. M. (2004).</strong> Biases of success rate differences shown in binomial effect size displays. <em>Psychological Methods</em>, <em>9</em>(2), 183–197. A critique of BESD base-rate assumptions.</li>
+  <li><strong>Kraft, M. A. (2020).</strong> Interpreting effect sizes of education interventions. <em>Educational Researcher</em>, <em>49</em>(4), 241–253. Domain-specific benchmarks.</li>
+  <li><strong>Michal, A. L., & Shah, P. (2024).</strong> A practical significance bias in laypeople’s evaluation of scientific findings. <em>Psychological Science</em>, <em>35</em>(4), 315–327. Evidence that unreported effect magnitudes can be treated as practically important.</li>
+  <li><strong>Prentice, D. A., & Miller, D. T. (1992).</strong> When small effects are impressive. <em>Psychological Bulletin</em>, <em>112</em>(1), 160–164. A classic on why small effects matter.</li>
+  <li><strong>McGraw, K. O., & Wong, S. P. (1992).</strong> A common language effect size statistic. <em>Psychological Bulletin</em>, <em>111</em>(2), 361–365. The original CLES paper.</li>
+  <li><strong>Mastrich, Z., & Hernandez, I. (2021).</strong> Results everyone can understand: A review of common language effect size indicators to bridge the research-practice gap. <em>Health Psychology</em>, <em>40</em>(10), 727–736. Comprehensive review of CLES indicators.</li>
+  <li><strong>Ozer, D. J. (1985).</strong> Correlation and coefficient of determination. <em>Psychological Bulletin</em>, <em>97</em>(2), 307–315. A critique of variance-explained framing.</li>
+  <li><strong>Zhang, D. C. (2018).</strong> Utility of alternative effect size statistics and the development of a web-based calculator: Shiny-AESC. <em>Frontiers in Psychology</em>, <em>9</em>, 1221. The Effect Size Translator tool.</li>
+  <li><strong>Zhang, D. C., Highhouse, S., Brooks, M. E., & Zhang, Y. (2018).</strong> Communicating the validity of structured job interviews with graphical visual aids. <em>International Journal of Selection and Assessment</em>, <em>26</em>(4), 93–108. Visual format research.</li>
+</ul>
+
+<p>Effect size communication is part of the research, not an afterthought. The tools here make that work easier without distorting the statistic itself.</p>
+
+</body>
+</html>
