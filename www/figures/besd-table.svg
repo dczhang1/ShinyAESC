@@ -1,0 +1,153 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 480" width="700" height="480" font-family="'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif">
+  <defs>
+    <filter id="shadow" x="-2%" y="-2%" width="104%" height="108%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.08"/>
+    </filter>
+    <filter id="shadowCell" x="-3%" y="-3%" width="106%" height="112%">
+      <feDropShadow dx="0" dy="1" stdDeviation="2" flood-color="#000000" flood-opacity="0.06"/>
+    </filter>
+    <linearGradient id="blueGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3B82F6"/>
+      <stop offset="100%" stop-color="#2563EB"/>
+    </linearGradient>
+    <linearGradient id="redGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#EF4444" stop-opacity="0.85"/>
+      <stop offset="100%" stop-color="#DC2626" stop-opacity="0.85"/>
+    </linearGradient>
+    <linearGradient id="headerGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1E3A5F"/>
+      <stop offset="100%" stop-color="#1E293B"/>
+    </linearGradient>
+    <linearGradient id="rowLabelGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#F8FAFC"/>
+      <stop offset="100%" stop-color="#F1F5F9"/>
+    </linearGradient>
+    <linearGradient id="totalGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#F9FAFB"/>
+      <stop offset="100%" stop-color="#F3F4F6"/>
+    </linearGradient>
+    <pattern id="diagBlue" patternUnits="userSpaceOnUse" width="8" height="8" patternTransform="rotate(45)">
+      <line x1="0" y1="0" x2="0" y2="8" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
+    </pattern>
+    <pattern id="dotsRed" patternUnits="userSpaceOnUse" width="10" height="10">
+      <circle cx="5" cy="5" r="1.2" fill="rgba(255,255,255,0.15)"/>
+    </pattern>
+  </defs>
+
+  <!-- Background -->
+  <rect width="700" height="480" rx="12" fill="#FFFFFF" filter="url(#shadow)"/>
+
+  <!-- Title area -->
+  <text x="350" y="42" text-anchor="middle" font-size="20" font-weight="700" fill="#1E293B" letter-spacing="-0.3">Binomial Effect Size Display</text>
+  <text x="350" y="66" text-anchor="middle" font-size="15" font-weight="500" fill="#2563EB">r = .30</text>
+  <text x="350" y="88" text-anchor="middle" font-size="12.5" fill="#6B7280" font-weight="400">Success rates for applicants above vs. below average on a structured interview</text>
+
+  <!-- Thin divider under title -->
+  <line x1="80" y1="102" x2="620" y2="102" stroke="#E5E7EB" stroke-width="1"/>
+
+  <!-- Table structure: 4 columns, 3 data rows -->
+  <!-- Column positions: label=60-225, Succeed=225-370, Fail=370-515, Total=515-640 -->
+  <!-- Row positions: header=115-155, row1=160-235, row2=240-315, totalRow=320-395 -->
+
+  <!-- ===== HEADER ROW ===== -->
+  <rect x="60" y="115" width="580" height="40" rx="6" fill="url(#headerGrad)" filter="url(#shadowCell)"/>
+  <!-- Top-left corner cell (blank label) -->
+  <line x1="225" y1="115" x2="225" y2="155" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+  <text x="142" y="140" text-anchor="middle" font-size="12" font-weight="600" fill="rgba(255,255,255,0.7)">Interview</text>
+  <!-- Succeed header -->
+  <line x1="370" y1="115" x2="370" y2="155" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+  <!-- Checkmark icon for Succeed -->
+  <circle cx="278" cy="135" r="7" fill="none" stroke="rgba(255,255,255,0.5)" stroke-width="1.5"/>
+  <polyline points="274,135 277,138 283,132" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="305" y="140" text-anchor="middle" font-size="13.5" font-weight="600" fill="#FFFFFF">Succeed</text>
+  <!-- Fail header -->
+  <line x1="515" y1="115" x2="515" y2="155" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+  <!-- X icon for Fail -->
+  <line x1="418" y1="129" x2="426" y2="137" stroke="rgba(255,255,255,0.6)" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="426" y1="129" x2="418" y2="137" stroke="rgba(255,255,255,0.6)" stroke-width="1.8" stroke-linecap="round"/>
+  <text x="453" y="140" text-anchor="middle" font-size="13.5" font-weight="600" fill="#FFFFFF">Fail</text>
+  <!-- Total header -->
+  <text x="577" y="140" text-anchor="middle" font-size="13.5" font-weight="600" fill="rgba(255,255,255,0.75)">Total</text>
+
+  <!-- ===== ROW 1: Above average ===== -->
+  <!-- Row label -->
+  <rect x="60" y="162" width="165" height="73" rx="6" fill="url(#rowLabelGrad)" stroke="#E5E7EB" stroke-width="1" filter="url(#shadowCell)"/>
+  <text x="142" y="196" text-anchor="middle" font-size="12" font-weight="600" fill="#374151">Above Average</text>
+  <text x="142" y="212" text-anchor="middle" font-size="10.5" fill="#9CA3AF">on Interview</text>
+
+  <!-- Succeed cell - BLUE with diagonal pattern -->
+  <rect x="225" y="162" width="145" height="73" rx="6" fill="url(#blueGrad)" filter="url(#shadowCell)"/>
+  <rect x="225" y="162" width="145" height="73" rx="6" fill="url(#diagBlue)"/>
+  <!-- Percentage -->
+  <text x="297" y="199" text-anchor="middle" font-size="28" font-weight="700" fill="#FFFFFF">65%</text>
+  <!-- Count -->
+  <text x="297" y="220" text-anchor="middle" font-size="11" fill="rgba(255,255,255,0.7)" font-weight="500">n = 65</text>
+
+  <!-- Fail cell - RED with dots pattern -->
+  <rect x="370" y="162" width="145" height="73" rx="6" fill="url(#redGrad)" filter="url(#shadowCell)"/>
+  <rect x="370" y="162" width="145" height="73" rx="6" fill="url(#dotsRed)"/>
+  <!-- Percentage -->
+  <text x="442" y="199" text-anchor="middle" font-size="28" font-weight="700" fill="#FFFFFF">35%</text>
+  <!-- Count -->
+  <text x="442" y="220" text-anchor="middle" font-size="11" fill="rgba(255,255,255,0.7)" font-weight="500">n = 35</text>
+
+  <!-- Total cell - subdued -->
+  <rect x="515" y="162" width="125" height="73" rx="6" fill="url(#totalGrad)" stroke="#E5E7EB" stroke-width="1" filter="url(#shadowCell)"/>
+  <text x="577" y="205" text-anchor="middle" font-size="20" font-weight="600" fill="#9CA3AF">100</text>
+
+  <!-- ===== ROW 2: Below average ===== -->
+  <!-- Row label -->
+  <rect x="60" y="242" width="165" height="73" rx="6" fill="url(#rowLabelGrad)" stroke="#E5E7EB" stroke-width="1" filter="url(#shadowCell)"/>
+  <text x="142" y="276" text-anchor="middle" font-size="12" font-weight="600" fill="#374151">Below Average</text>
+  <text x="142" y="292" text-anchor="middle" font-size="10.5" fill="#9CA3AF">on Interview</text>
+
+  <!-- Succeed cell - BLUE with diagonal pattern -->
+  <rect x="225" y="242" width="145" height="73" rx="6" fill="url(#blueGrad)" filter="url(#shadowCell)"/>
+  <rect x="225" y="242" width="145" height="73" rx="6" fill="url(#diagBlue)"/>
+  <!-- Percentage -->
+  <text x="297" y="279" text-anchor="middle" font-size="28" font-weight="700" fill="#FFFFFF">35%</text>
+  <!-- Count -->
+  <text x="297" y="300" text-anchor="middle" font-size="11" fill="rgba(255,255,255,0.7)" font-weight="500">n = 35</text>
+
+  <!-- Fail cell - RED with dots pattern -->
+  <rect x="370" y="242" width="145" height="73" rx="6" fill="url(#redGrad)" filter="url(#shadowCell)"/>
+  <rect x="370" y="242" width="145" height="73" rx="6" fill="url(#dotsRed)"/>
+  <!-- Percentage -->
+  <text x="442" y="279" text-anchor="middle" font-size="28" font-weight="700" fill="#FFFFFF">65%</text>
+  <!-- Count -->
+  <text x="442" y="300" text-anchor="middle" font-size="11" fill="rgba(255,255,255,0.7)" font-weight="500">n = 65</text>
+
+  <!-- Total cell - subdued -->
+  <rect x="515" y="242" width="125" height="73" rx="6" fill="url(#totalGrad)" stroke="#E5E7EB" stroke-width="1" filter="url(#shadowCell)"/>
+  <text x="577" y="285" text-anchor="middle" font-size="20" font-weight="600" fill="#9CA3AF">100</text>
+
+  <!-- ===== DIFFERENCE INDICATOR ===== -->
+  <!-- Arrow and label showing 30 percentage point difference -->
+  <rect x="145" y="332" width="410" height="36" rx="18" fill="#F0FDF4" stroke="#059669" stroke-width="1.5"/>
+
+  <!-- Green accent indicator -->
+  <circle cx="170" cy="350" r="10" fill="#059669"/>
+  <text x="170" y="354" text-anchor="middle" font-size="11" font-weight="700" fill="#FFFFFF">!</text>
+
+  <text x="350" y="355" text-anchor="middle" font-size="13" font-weight="600" fill="#059669">
+    <tspan fill="#374151">Difference in success rate: </tspan>
+    <tspan font-weight="700" fill="#059669">30 percentage points</tspan>
+    <tspan fill="#374151"> (65% vs 35%)</tspan>
+  </text>
+
+  <!-- ===== LEGEND (colorblind-friendly) ===== -->
+  <rect x="60" y="385" width="580" height="48" rx="8" fill="#FAFAFA" stroke="#E5E7EB" stroke-width="1"/>
+
+  <!-- Succeed legend -->
+  <rect x="110" y="401" width="22" height="16" rx="3" fill="url(#blueGrad)"/>
+  <rect x="110" y="401" width="22" height="16" rx="3" fill="url(#diagBlue)"/>
+  <text x="140" y="413" font-size="11.5" fill="#374151" font-weight="500">Succeed = 65% (above avg) / 35% (below avg)</text>
+
+  <!-- Fail legend -->
+  <rect x="415" y="401" width="22" height="16" rx="3" fill="url(#redGrad)"/>
+  <rect x="415" y="401" width="22" height="16" rx="3" fill="url(#dotsRed)"/>
+  <text x="445" y="413" font-size="11.5" fill="#374151" font-weight="500">Fail = 35% / 65%</text>
+
+  <!-- Footer note -->
+  <text x="350" y="458" text-anchor="middle" font-size="10.5" fill="#9CA3AF" font-style="italic">BESD assumes equal base rates (50/50 split)</text>
+</svg>

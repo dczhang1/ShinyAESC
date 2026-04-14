@@ -37,6 +37,20 @@ get_sample_data_path <- function() {
   NULL
 }
 
+read_static_html_body <- function(path) {
+  if (!file.exists(path)) {
+    return(NULL)
+  }
+
+  raw_html <- paste(readLines(path, warn = FALSE, encoding = "UTF-8"), collapse = "\n")
+  body_html <- sub("(?is).*<body[^>]*>", "", raw_html, perl = TRUE)
+  body_html <- sub("(?is)</body>.*$", "", body_html, perl = TRUE)
+  body_html <- gsub("(?is)<style[^>]*>.*?</style>", "", body_html, perl = TRUE)
+  body_html <- gsub("(?is)<script[^>]*>.*?</script>", "", body_html, perl = TRUE)
+  body_html <- gsub("<table(\\s|>)", "<table class=\"table escape-article-table\"\\1", body_html, perl = TRUE)
+  body_html
+}
+
 # ============================================
 # UI COMPONENTS
 # ============================================
@@ -266,6 +280,7 @@ landing_page_ui <- function() {
           `aria-label` = "Landing sections",
           tags$a(class = "landing-nav-pill landing-nav-pill--ghost", href = "#landing-about", "About"),
           actionButton("nav_learn", "Learn", class = "landing-nav-pill landing-nav-pill--ghost"),
+          actionButton("nav_translator", "Translator", class = "landing-nav-pill landing-nav-pill--ghost"),
           actionButton(
             "nav_get_started",
             "Get Started",
@@ -673,7 +688,7 @@ landing_page_ui <- function() {
 
 learn_page_ui <- function() {
   div(
-    class = "landing-page learn-page",
+    class = "landing-page utility-page utility-page--learn",
     tags$header(
       class = "landing-nav",
       div(
@@ -690,48 +705,71 @@ learn_page_ui <- function() {
           role = "navigation",
           `aria-label` = "Learn page navigation",
           actionButton("learn_go_home", "Home", class = "landing-nav-pill landing-nav-pill--ghost"),
+          actionButton("learn_go_translator", "Translator", class = "landing-nav-pill landing-nav-pill--ghost"),
           actionButton("nav_get_started_learn", "Get Started", class = "landing-nav-pill landing-nav-pill--cta")
         )
       )
     ),
     div(
-      class = "learn-hero",
+      class = "utility-content-shell",
       div(
-        class = "learn-hero-inner",
-        h1(class = "learn-hero-title", "Interpretation Resources"),
-        p(
-          class = "learn-hero-subtitle",
-          "Learn how to read, interpret, and communicate effect sizes with confidence."
+        class = "utility-page-layout utility-page-layout--single",
+        div(
+          class = "utility-article-card",
+          div(
+            class = "utility-context-note",
+            tags$strong("Scope: "),
+            "This page explains why and how practical effect-size translations work. Use the Translator page when you want the quick interactive version."
+          ),
+          div(class = "escape-article", htmlOutput("learning_tool_content"))
+        )
+      ),
+      div(
+        class = "utility-back",
+        actionButton("learn_go_home_bottom", "Back to Home", class = "btn btn-outline-hero")
+      )
+    )
+  )
+}
+
+translator_page_ui <- function() {
+  div(
+    class = "landing-page utility-page utility-page--translator",
+    tags$header(
+      class = "landing-nav",
+      div(
+        class = "landing-nav-inner",
+        tags$a(
+          class = "landing-nav-brand",
+          href = "#",
+          `aria-label` = "ESCAPE, go to home",
+          onclick = "Shiny.setInputValue('translator_go_home', Date.now(), {priority: 'event'}); return false;",
+          "ESCAPE"
+        ),
+        tags$nav(
+          class = "landing-nav-links",
+          role = "navigation",
+          `aria-label` = "Translator page navigation",
+          actionButton("translator_go_home_nav", "Home", class = "landing-nav-pill landing-nav-pill--ghost"),
+          actionButton("translator_go_learn", "Learn", class = "landing-nav-pill landing-nav-pill--ghost"),
+          actionButton("nav_get_started_translator", "Get Started", class = "landing-nav-pill landing-nav-pill--cta")
         )
       )
     ),
     div(
-      class = "learn-sections",
+      class = "utility-content-shell",
       div(
-        class = "learn-section",
+        class = "translator-layout",
         div(
-          class = "learn-card",
-          div(class = "learn-card-body")
-        )
-      ),
-      div(
-        class = "learn-section",
-        div(
-          class = "learn-card",
-          div(class = "learn-card-body")
-        )
-      ),
-      div(
-        class = "learn-section",
-        div(
-          class = "learn-card",
-          div(class = "learn-card-body")
+          class = "translator-frame-card",
+          tags$iframe(
+            src = "effect-size-translator.html",
+            class = "translator-frame",
+            title = "Effect Size Translator",
+            loading = "eager"
+          )
         )
       )
-    ),
-    div(
-      class = "learn-back",
-      actionButton("learn_go_home_bottom", "Back to Home", class = "btn btn-outline-hero")
     )
   )
 }
@@ -896,7 +934,7 @@ analysis_ui <- function() {
         conditionalPanel(
           condition = "output.data_ready === 'yes'",
           navset_card_underline(
-            # Bookmark values: summary, traditional, practical, converter, help
+            # Bookmark values: summary, traditional, practical, help
             id = "main_tabs",
 
             # ---- Summary (getting started, overview, descriptives, data) ----
@@ -928,7 +966,7 @@ analysis_ui <- function() {
                               tags$li("Use Summary (Overview and Descriptives) for a quick read of your data."),
                               tags$li("Use Practical effect sizes for alternative (CLES, BESD) and graphical (expectancy, icon array) presentations."),
                               tags$li("Use Traditional effect sizes for classical indices and group summaries."),
-                              tags$li("Use the Converter tab when you only have a published r or d and need the other form (theoretical)."),
+                              tags$li("Use the Translator page from the main menu when you only have a published r or d and need a practical translation."),
                               tags$li("Export report from the sidebar when ready."),
                               tags$li("Open the Help tab for the app guide.")
                             )
@@ -1267,43 +1305,6 @@ analysis_ui <- function() {
               )
             ),
 
-            # ---- Converter (theoretical r ↔ d) ----
-            nav_panel(
-              title = tags$span(
-                tags$i(`data-lucide` = "arrow-left-right", style = "width: 14px; height: 14px; margin-right: 6px;"),
-                "Converter"
-              ),
-              value = "converter",
-              div(
-                class = "analysis-page",
-                div(
-                  class = "analysis-subsection",
-                  card(
-                    card_header("Effect Size Converter (Theoretical)"),
-                    card_body(
-                      class = "converter-controls-card",
-                      layout_columns(
-                        col_widths = c(4, 4, 4),
-                        selectInput("converter_input_type", "Input type", choices = c("Correlation (r)" = "r", "Cohen's d" = "d")),
-                        numericInput("converter_value", "Input value", value = 0.3, step = 0.01),
-                        uiOutput("converter_validity")
-                      ),
-                      tags$p(class = "text-muted", "Use this tab when you only have published summary effect sizes and need the other form.")
-                    )
-                  ),
-                  card(
-                    card_header("Converted Metrics"),
-                    card_body(
-                      class = "converter-output-card",
-                      tableOutput("converter_table"),
-                      tags$hr(),
-                      uiOutput("converter_interpretation")
-                    )
-                  )
-                )
-              )
-            ),
-
             # ---- Help (app guide + future interpretation / educational content) ----
             nav_panel(
               title = tags$span(
@@ -1359,7 +1360,7 @@ ui <- page_fillable(
 server <- function(input, output, session) {
   # --- App State ---
   app_state <- reactiveValues(
-    view = "landing", # "landing", "learn", or "analysis"
+    view = "landing",
     data_source = NULL, # "sample" or "uploaded"
     landing_file = NULL, # preserved file from landing upload (lost when DOM switches)
     guided_done = FALSE,
@@ -1408,6 +1409,10 @@ server <- function(input, output, session) {
     app_state$view <- "learn"
   })
 
+  observeEvent(input$nav_translator, {
+    app_state$view <- "translator"
+  })
+
   observeEvent(input$learn_go_home, {
     app_state$view <- "landing"
   })
@@ -1417,6 +1422,26 @@ server <- function(input, output, session) {
   })
 
   observeEvent(input$nav_get_started_learn, {
+    open_guided_from_landing()
+  })
+
+  observeEvent(input$learn_go_translator, {
+    app_state$view <- "translator"
+  })
+
+  observeEvent(input$translator_go_home, {
+    app_state$view <- "landing"
+  })
+
+  observeEvent(input$translator_go_home_nav, {
+    app_state$view <- "landing"
+  })
+
+  observeEvent(input$translator_go_learn, {
+    app_state$view <- "learn"
+  })
+
+  observeEvent(input$nav_get_started_translator, {
     open_guided_from_landing()
   })
 
@@ -1455,6 +1480,8 @@ server <- function(input, output, session) {
       landing_page_ui()
     } else if (app_state$view == "learn") {
       learn_page_ui()
+    } else if (app_state$view == "translator") {
+      translator_page_ui()
     } else {
       analysis_ui()
     }
@@ -2333,74 +2360,7 @@ server <- function(input, output, session) {
       tags$p(tags$strong("Primary question: "), paste0("How much does ", predictor_display_name(), " improve practical outcomes on ", criterion_display_name(), "?")),
       tags$p(
         tags$strong("Recommended path: "),
-        "Summary (Overview and Descriptives) → Traditional effect sizes (indices and group stats) → Practical effect sizes (alternative CLES/BESD; graphical expectancy and icon array) → Converter when you only have published r or d. Use Help for the app guide and interpretation resources as they are added."
-      )
-    )
-  })
-
-  converter_metrics <- reactive({
-    in_type <- input$converter_input_type
-    in_val <- input$converter_value
-    if (is.null(in_type) || is.null(in_val) || !is.finite(in_val)) {
-      return(NULL)
-    }
-
-    if (in_type == "r") {
-      if (in_val <= -1 || in_val >= 1) {
-        return(NULL)
-      }
-      r <- in_val
-      d <- r_to_d(r)
-    } else {
-      d <- in_val
-      r <- d_to_r(d)
-    }
-
-    if (!is.finite(r) || !is.finite(d)) {
-      return(NULL)
-    }
-    cles <- d_to_cles(d)
-    data.frame(
-      Metric = c("Correlation (r)", "Cohen's d", "CLES (Probability)", "BESD High Group Success", "BESD Low Group Success"),
-      Value = c(round(r, 3), round(d, 3), round(cles, 3), round(0.5 + r / 2, 3), round(0.5 - r / 2, 3))
-    )
-  })
-
-  output$converter_table <- renderTable(
-    {
-      cm <- converter_metrics()
-      validate(need(!is.null(cm), "Enter a valid effect size value. For r, use (-1, 1)."))
-      cm
-    },
-    digits = 3
-  )
-
-  output$converter_validity <- renderUI({
-    in_type <- input$converter_input_type
-    in_val <- input$converter_value
-    if (is.null(in_val)) {
-      return(tags$span(class = "text-muted", ""))
-    }
-    if (in_type == "r" && (in_val <= -1 || in_val >= 1)) {
-      return(tags$span(style = "color: var(--color-danger);", "For r input, value must be between -1 and 1 (exclusive)."))
-    }
-    tags$span(style = "color: var(--color-success);", "Input is valid.")
-  })
-
-  output$converter_interpretation <- renderUI({
-    cm <- converter_metrics()
-    req(!is.null(cm))
-    r_val <- as.numeric(cm$Value[cm$Metric == "Correlation (r)"])
-    cles_val <- as.numeric(cm$Value[cm$Metric == "CLES (Probability)"])
-    if (!is.finite(r_val) || !is.finite(cles_val)) {
-      return(NULL)
-    }
-    tags$p(
-      class = "mb-0 text-muted",
-      paste0(
-        "Interpretation: with r = ", round(r_val, 3), ", translated CLES is about ",
-        round(cles_val * 100, 1), "%, meaning roughly ",
-        round(cles_val * 100), " out of 100 random pairings favor the higher-scoring group."
+        "Summary (Overview and Descriptives) → Traditional effect sizes (indices and group stats) → Practical effect sizes (alternative CLES/BESD; graphical expectancy and icon array). Use the Translator page from the main menu when you only have published r or d. Use Help for the app guide and interpretation resources."
       )
     )
   })
@@ -2687,6 +2647,22 @@ server <- function(input, output, session) {
         )
       )
     }
+  })
+
+  output$learning_tool_content <- renderUI({
+    body_html <- read_static_html_body("www/learning-tool.html")
+
+    if (is.null(body_html)) {
+      return(
+        div(
+          class = "help-content",
+          h3("Learning tool unavailable"),
+          p("The source file `www/learning-tool.html` could not be loaded.")
+        )
+      )
+    }
+
+    HTML(body_html)
   })
 
   # --- Report Generation ---

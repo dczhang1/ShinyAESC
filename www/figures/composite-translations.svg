@@ -1,0 +1,248 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 620" width="800" height="620" font-family="'Inter', 'Helvetica Neue', Helvetica, Arial, sans-serif">
+  <defs>
+    <filter id="cardShadow" x="-2%" y="-2%" width="104%" height="104%">
+      <feDropShadow dx="0" dy="1" stdDeviation="2.5" flood-color="#374151" flood-opacity="0.1"/>
+    </filter>
+    <linearGradient id="headerGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#2563EB" stop-opacity="0.06"/>
+      <stop offset="100%" stop-color="#059669" stop-opacity="0.06"/>
+    </linearGradient>
+    <clipPath id="clipTopLeft"><rect x="16" y="110" width="374" height="228" rx="10"/></clipPath>
+    <clipPath id="clipTopRight"><rect x="410" y="110" width="374" height="228" rx="10"/></clipPath>
+    <clipPath id="clipBotLeft"><rect x="16" y="354" width="374" height="248" rx="10"/></clipPath>
+    <clipPath id="clipBotRight"><rect x="410" y="354" width="374" height="248" rx="10"/></clipPath>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="620" fill="#FFFFFF" rx="4"/>
+
+  <!-- Header area -->
+  <rect x="0" y="0" width="800" height="96" fill="url(#headerGrad)" rx="4"/>
+  <rect x="0" y="94" width="800" height="4" fill="#E5E7EB"/>
+  <line x1="0" y1="94" x2="800" y2="94" stroke="#D1D5DB" stroke-width="0.5"/>
+
+  <!-- Title -->
+  <text x="400" y="40" text-anchor="middle" font-size="22" font-weight="700" fill="#111827" letter-spacing="-0.3">One Effect, Four Translations (r&#160;=&#160;.30)</text>
+  <text x="400" y="66" text-anchor="middle" font-size="13.5" fill="#6B7280" font-weight="400">Structured interview validity for predicting job performance</text>
+  <rect x="352" y="76" width="96" height="3" rx="1.5" fill="#2563EB" opacity="0.5"/>
+
+  <!-- ==================== TOP LEFT: BESD ==================== -->
+  <g>
+    <rect x="16" y="110" width="374" height="228" rx="10" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1" filter="url(#cardShadow)"/>
+    <!-- Accent bar -->
+    <rect x="16" y="110" width="374" height="4" rx="2" fill="#2563EB"/>
+    <!-- Label -->
+    <text x="203" y="138" text-anchor="middle" font-size="11.5" fill="#9CA3AF" font-weight="600" letter-spacing="0.8" text-transform="uppercase">BINOMIAL EFFECT SIZE DISPLAY</text>
+
+    <!-- BESD 2x2 Table -->
+    <!-- Table header row -->
+    <text x="145" y="168" text-anchor="middle" font-size="11" fill="#6B7280" font-weight="600">Success</text>
+    <text x="265" y="168" text-anchor="middle" font-size="11" fill="#6B7280" font-weight="600">Failure</text>
+
+    <!-- Row labels -->
+    <text x="80" y="205" text-anchor="middle" font-size="11" fill="#374151" font-weight="600">High Score</text>
+    <text x="80" y="255" text-anchor="middle" font-size="11" fill="#374151" font-weight="600">Low Score</text>
+
+    <!-- Divider lines -->
+    <line x1="112" y1="174" x2="112" y2="272" stroke="#E5E7EB" stroke-width="0.75"/>
+    <line x1="110" y1="192" x2="310" y2="192" stroke="#E5E7EB" stroke-width="0.75"/>
+    <line x1="110" y1="232" x2="310" y2="232" stroke="#E5E7EB" stroke-width="0.75"/>
+
+    <!-- Cell values with background fills -->
+    <!-- High Score / Success = 65% -->
+    <rect x="116" y="180" width="58" height="44" rx="4" fill="#2563EB" opacity="0.1"/>
+    <text x="145" y="209" text-anchor="middle" font-size="20" font-weight="700" fill="#2563EB">65%</text>
+
+    <!-- High Score / Failure = 35% -->
+    <rect x="236" y="180" width="58" height="44" rx="4" fill="#DC2626" opacity="0.08"/>
+    <text x="265" y="209" text-anchor="middle" font-size="20" font-weight="700" fill="#9CA3AF">35%</text>
+
+    <!-- Low Score / Success = 35% -->
+    <rect x="116" y="236" width="58" height="44" rx="4" fill="#DC2626" opacity="0.08"/>
+    <text x="145" y="265" text-anchor="middle" font-size="20" font-weight="700" fill="#9CA3AF">35%</text>
+
+    <!-- Low Score / Failure = 65% -->
+    <rect x="236" y="236" width="58" height="44" rx="4" fill="#2563EB" opacity="0.1"/>
+    <text x="265" y="265" text-anchor="middle" font-size="20" font-weight="700" fill="#2563EB">65%</text>
+
+    <!-- Key stat badge -->
+    <rect x="133" y="300" width="140" height="28" rx="14" fill="#2563EB" opacity="0.08"/>
+    <text x="203" y="319" text-anchor="middle" font-size="13" font-weight="700" fill="#2563EB">65% vs 35%</text>
+  </g>
+
+  <!-- ==================== TOP RIGHT: Probability of Superiority ==================== -->
+  <g>
+    <rect x="410" y="110" width="374" height="228" rx="10" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1" filter="url(#cardShadow)"/>
+    <rect x="410" y="110" width="374" height="4" rx="2" fill="#059669"/>
+    <text x="597" y="138" text-anchor="middle" font-size="11.5" fill="#9CA3AF" font-weight="600" letter-spacing="0.8">PROBABILITY OF SUPERIORITY</text>
+
+    <!-- Person A (High Score) -->
+    <g transform="translate(510, 200)">
+      <circle cx="0" cy="-28" r="14" fill="#2563EB" opacity="0.15" stroke="#2563EB" stroke-width="1.5"/>
+      <circle cx="0" cy="-32" r="6" fill="#2563EB"/>
+      <path d="M-10,-24 Q-10,-14 0,-12 Q10,-14 10,-24" fill="#2563EB"/>
+      <text x="0" y="10" text-anchor="middle" font-size="10" fill="#374151" font-weight="500">High Score</text>
+    </g>
+
+    <!-- Person B (Low Score) -->
+    <g transform="translate(684, 200)">
+      <circle cx="0" cy="-28" r="14" fill="#DC2626" opacity="0.12" stroke="#DC2626" stroke-width="1.5"/>
+      <circle cx="0" cy="-32" r="6" fill="#DC2626"/>
+      <path d="M-10,-24 Q-10,-14 0,-12 Q10,-14 10,-24" fill="#DC2626"/>
+      <text x="0" y="10" text-anchor="middle" font-size="10" fill="#374151" font-weight="500">Low Score</text>
+    </g>
+
+    <!-- Arrow between people -->
+    <line x1="534" y1="172" x2="660" y2="172" stroke="#D1D5DB" stroke-width="1.5" stroke-dasharray="4,3"/>
+    <polygon points="658,168 666,172 658,176" fill="#D1D5DB"/>
+
+    <!-- 64% circle -->
+    <circle cx="597" cy="172" r="24" fill="#059669" opacity="0.1" stroke="#059669" stroke-width="1.5"/>
+    <text x="597" y="169" text-anchor="middle" font-size="16" font-weight="800" fill="#059669">64%</text>
+    <text x="597" y="181" text-anchor="middle" font-size="7.5" fill="#059669" font-weight="500">chance</text>
+
+    <!-- Key stat badge -->
+    <rect x="520" y="248" width="154" height="28" rx="14" fill="#059669" opacity="0.08"/>
+    <text x="597" y="267" text-anchor="middle" font-size="13" font-weight="700" fill="#059669">64% chance higher</text>
+    <text x="597" y="293" text-anchor="middle" font-size="10" fill="#9CA3AF">performance outcome</text>
+  </g>
+
+  <!-- ==================== BOTTOM LEFT: Icon Array ==================== -->
+  <g>
+    <rect x="16" y="354" width="374" height="248" rx="10" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1" filter="url(#cardShadow)"/>
+    <rect x="16" y="354" width="374" height="4" rx="2" fill="#DC2626"/>
+    <text x="203" y="382" text-anchor="middle" font-size="11.5" fill="#9CA3AF" font-weight="600" letter-spacing="0.8">ICON ARRAY</text>
+
+    <!-- Row 1: High Score group - 13 success (blue), 7 failure (red) out of 20 -->
+    <text x="42" y="412" text-anchor="start" font-size="10" fill="#374151" font-weight="600">High Score</text>
+
+    <!-- High Score icons: 13 filled (success), 7 outlined (failure) -->
+    <g transform="translate(42, 422)">
+      <!-- 13 success icons (filled circles) -->
+      <circle cx="0" cy="0" r="7" fill="#2563EB" opacity="0.75"/>
+      <circle cx="18" cy="0" r="7" fill="#2563EB" opacity="0.75"/>
+      <circle cx="36" cy="0" r="7" fill="#2563EB" opacity="0.75"/>
+      <circle cx="54" cy="0" r="7" fill="#2563EB" opacity="0.75"/>
+      <circle cx="72" cy="0" r="7" fill="#2563EB" opacity="0.75"/>
+      <circle cx="90" cy="0" r="7" fill="#2563EB" opacity="0.75"/>
+      <circle cx="108" cy="0" r="7" fill="#2563EB" opacity="0.75"/>
+      <circle cx="126" cy="0" r="7" fill="#2563EB" opacity="0.75"/>
+      <circle cx="144" cy="0" r="7" fill="#2563EB" opacity="0.75"/>
+      <circle cx="162" cy="0" r="7" fill="#2563EB" opacity="0.75"/>
+      <circle cx="180" cy="0" r="7" fill="#2563EB" opacity="0.75"/>
+      <circle cx="198" cy="0" r="7" fill="#2563EB" opacity="0.75"/>
+      <circle cx="216" cy="0" r="7" fill="#2563EB" opacity="0.75"/>
+      <!-- 7 failure icons (outlined) -->
+      <circle cx="234" cy="0" r="7" fill="#FEE2E2" stroke="#DC2626" stroke-width="1.5"/>
+      <circle cx="252" cy="0" r="7" fill="#FEE2E2" stroke="#DC2626" stroke-width="1.5"/>
+      <circle cx="270" cy="0" r="7" fill="#FEE2E2" stroke="#DC2626" stroke-width="1.5"/>
+      <circle cx="288" cy="0" r="7" fill="#FEE2E2" stroke="#DC2626" stroke-width="1.5"/>
+      <circle cx="306" cy="0" r="7" fill="#FEE2E2" stroke="#DC2626" stroke-width="1.5"/>
+      <circle cx="324" cy="0" r="7" fill="#FEE2E2" stroke="#DC2626" stroke-width="1.5"/>
+      <circle cx="342" cy="0" r="7" fill="#FEE2E2" stroke="#DC2626" stroke-width="1.5"/>
+    </g>
+
+    <!-- Row 2: Low Score group - 7 success (blue), 13 failure (red) out of 20 -->
+    <text x="42" y="466" text-anchor="start" font-size="10" fill="#374151" font-weight="600">Low Score</text>
+
+    <g transform="translate(42, 476)">
+      <!-- 7 success icons (filled blue) -->
+      <circle cx="0" cy="0" r="7" fill="#2563EB" opacity="0.75"/>
+      <circle cx="18" cy="0" r="7" fill="#2563EB" opacity="0.75"/>
+      <circle cx="36" cy="0" r="7" fill="#2563EB" opacity="0.75"/>
+      <circle cx="54" cy="0" r="7" fill="#2563EB" opacity="0.75"/>
+      <circle cx="72" cy="0" r="7" fill="#2563EB" opacity="0.75"/>
+      <circle cx="90" cy="0" r="7" fill="#2563EB" opacity="0.75"/>
+      <circle cx="108" cy="0" r="7" fill="#2563EB" opacity="0.75"/>
+      <!-- 13 failure icons (red) -->
+      <circle cx="126" cy="0" r="7" fill="#FEE2E2" stroke="#DC2626" stroke-width="1.5"/>
+      <circle cx="144" cy="0" r="7" fill="#FEE2E2" stroke="#DC2626" stroke-width="1.5"/>
+      <circle cx="162" cy="0" r="7" fill="#FEE2E2" stroke="#DC2626" stroke-width="1.5"/>
+      <circle cx="180" cy="0" r="7" fill="#FEE2E2" stroke="#DC2626" stroke-width="1.5"/>
+      <circle cx="198" cy="0" r="7" fill="#FEE2E2" stroke="#DC2626" stroke-width="1.5"/>
+      <circle cx="216" cy="0" r="7" fill="#FEE2E2" stroke="#DC2626" stroke-width="1.5"/>
+      <circle cx="234" cy="0" r="7" fill="#FEE2E2" stroke="#DC2626" stroke-width="1.5"/>
+      <circle cx="252" cy="0" r="7" fill="#FEE2E2" stroke="#DC2626" stroke-width="1.5"/>
+      <circle cx="270" cy="0" r="7" fill="#FEE2E2" stroke="#DC2626" stroke-width="1.5"/>
+      <circle cx="288" cy="0" r="7" fill="#FEE2E2" stroke="#DC2626" stroke-width="1.5"/>
+      <circle cx="306" cy="0" r="7" fill="#FEE2E2" stroke="#DC2626" stroke-width="1.5"/>
+      <circle cx="324" cy="0" r="7" fill="#FEE2E2" stroke="#DC2626" stroke-width="1.5"/>
+      <circle cx="342" cy="0" r="7" fill="#FEE2E2" stroke="#DC2626" stroke-width="1.5"/>
+    </g>
+
+    <!-- Legend -->
+    <circle cx="100" cy="516" r="5" fill="#2563EB" opacity="0.75"/>
+    <text x="112" y="520" font-size="9.5" fill="#6B7280">Success (65% / 35%)</text>
+    <circle cx="220" cy="516" r="5" fill="#FEE2E2" stroke="#DC2626" stroke-width="1.5"/>
+    <text x="232" y="520" font-size="9.5" fill="#6B7280">Failure (35% / 65%)</text>
+
+    <!-- Key stat badge -->
+    <rect x="125" y="548" width="156" height="28" rx="14" fill="#DC2626" opacity="0.08"/>
+    <text x="203" y="567" text-anchor="middle" font-size="13" font-weight="700" fill="#DC2626">Visual comparison</text>
+  </g>
+
+  <!-- ==================== BOTTOM RIGHT: Expectancy Chart ==================== -->
+  <g>
+    <rect x="410" y="354" width="374" height="248" rx="10" fill="#FFFFFF" stroke="#E5E7EB" stroke-width="1" filter="url(#cardShadow)"/>
+    <rect x="410" y="354" width="374" height="4" rx="2" fill="#F59E0B"/>
+    <text x="597" y="382" text-anchor="middle" font-size="11.5" fill="#9CA3AF" font-weight="600" letter-spacing="0.8">EXPECTANCY CHART</text>
+
+    <!-- Y-axis label -->
+    <text x="438" y="440" text-anchor="middle" font-size="9" fill="#9CA3AF" transform="rotate(-90, 438, 440)">% Successful</text>
+
+    <!-- Chart grid lines -->
+    <line x1="462" y1="400" x2="760" y2="400" stroke="#F3F4F6" stroke-width="0.75"/>
+    <line x1="462" y1="420" x2="760" y2="420" stroke="#F3F4F6" stroke-width="0.75"/>
+    <line x1="462" y1="440" x2="760" y2="440" stroke="#F3F4F6" stroke-width="0.75"/>
+    <line x1="462" y1="460" x2="760" y2="460" stroke="#F3F4F6" stroke-width="0.75"/>
+    <line x1="462" y1="480" x2="760" y2="480" stroke="#F3F4F6" stroke-width="0.75"/>
+    <line x1="462" y1="500" x2="760" y2="500" stroke="#F3F4F6" stroke-width="0.75"/>
+    <line x1="462" y1="520" x2="760" y2="520" stroke="#F3F4F6" stroke-width="0.75"/>
+    <!-- Base line -->
+    <line x1="462" y1="530" x2="760" y2="530" stroke="#9CA3AF" stroke-width="0.75"/>
+
+    <!-- Y-axis tick labels (approximate scale: 0% at y=530, 50% at y=400) -->
+    <text x="458" y="404" text-anchor="end" font-size="8.5" fill="#9CA3AF">50%</text>
+    <text x="458" y="444" text-anchor="end" font-size="8.5" fill="#9CA3AF">40%</text>
+    <text x="458" y="484" text-anchor="end" font-size="8.5" fill="#9CA3AF">30%</text>
+    <text x="458" y="524" text-anchor="end" font-size="8.5" fill="#9CA3AF">20%</text>
+    <text x="458" y="534" text-anchor="end" font-size="8.5" fill="#9CA3AF">0%</text>
+
+    <!-- Bars: Q1=15%, Q2=25%, Q3=35%, Q4=45% -->
+    <!-- Scale: 1% = (530-400)/50 = 2.6px per %, starting from 530 -->
+    <!-- But let's scale from a 15% baseline to show differences better -->
+    <!-- Better: use full scale 0-50%, so 1% = 2.6px -->
+
+    <!-- Q1: 15% → height = 15*2.6 = 39 → top at 530-39=491 -->
+    <rect x="482" y="491" width="52" height="39" rx="3" fill="#9CA3AF" opacity="0.5"/>
+    <text x="508" y="486" text-anchor="middle" font-size="11" font-weight="700" fill="#9CA3AF">15%</text>
+    <text x="508" y="546" text-anchor="middle" font-size="9.5" fill="#6B7280" font-weight="500">Q1</text>
+    <text x="508" y="557" text-anchor="middle" font-size="7.5" fill="#9CA3AF">(Bottom)</text>
+
+    <!-- Q2: 25% → height = 65 → top at 465 -->
+    <rect x="552" y="465" width="52" height="65" rx="3" fill="#059669" opacity="0.4"/>
+    <text x="578" y="460" text-anchor="middle" font-size="11" font-weight="700" fill="#059669">25%</text>
+    <text x="578" y="546" text-anchor="middle" font-size="9.5" fill="#6B7280" font-weight="500">Q2</text>
+
+    <!-- Q3: 35% → height = 91 → top at 439 -->
+    <rect x="622" y="439" width="52" height="91" rx="3" fill="#2563EB" opacity="0.45"/>
+    <text x="648" y="434" text-anchor="middle" font-size="11" font-weight="700" fill="#2563EB">35%</text>
+    <text x="648" y="546" text-anchor="middle" font-size="9.5" fill="#6B7280" font-weight="500">Q3</text>
+
+    <!-- Q4: 45% → height = 117 → top at 413 -->
+    <rect x="692" y="413" width="52" height="117" rx="3" fill="#2563EB" opacity="0.85"/>
+    <text x="718" y="408" text-anchor="middle" font-size="11" font-weight="700" fill="#2563EB">45%</text>
+    <text x="718" y="546" text-anchor="middle" font-size="9.5" fill="#6B7280" font-weight="500">Q4</text>
+    <text x="718" y="557" text-anchor="middle" font-size="7.5" fill="#9CA3AF">(Top)</text>
+
+    <!-- Trend arrow -->
+    <line x1="508" y1="493" x2="718" y2="415" stroke="#374151" stroke-width="1" stroke-dasharray="4,3" opacity="0.35"/>
+
+    <!-- Key stat badge -->
+    <rect x="527" y="568" width="140" height="28" rx="14" fill="#F59E0B" opacity="0.1"/>
+    <text x="597" y="587" text-anchor="middle" font-size="13" font-weight="700" fill="#B45309">45% vs 15%</text>
+  </g>
+
+  <!-- Footer note -->
+  <text x="400" y="614" text-anchor="middle" font-size="8.5" fill="#D1D5DB">All translations derive from r = .30 — structured interview validity coefficient (Schmidt &amp; Hunter, 1998)</text>
+</svg>

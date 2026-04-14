@@ -13,6 +13,7 @@
     initInsightMorph();
     initLivePreviewChartReveal();
     initLandingCiteBlocks();
+    initEffectSizeTranslator();
   });
 
   if (typeof Shiny !== 'undefined') {
@@ -30,6 +31,7 @@
         initLivePreviewChartReveal();
         initLandingCiteBlocks();
         initDragDropEnhancement();
+        initEffectSizeTranslator();
       }, 80);
     });
 
@@ -457,6 +459,116 @@
 
       syncPanels();
     });
+  }
+
+  function initEffectSizeTranslator() {
+    var slider = document.getElementById('translator-r-slider');
+    if (!slider) return;
+    if (slider.getAttribute('data-translator-init') === '1') {
+      updateEffectSizeTranslator(slider);
+      return;
+    }
+
+    slider.setAttribute('data-translator-init', '1');
+    slider.addEventListener('input', function() {
+      updateEffectSizeTranslator(slider);
+    });
+    updateEffectSizeTranslator(slider);
+  }
+
+  function updateEffectSizeTranslator(slider) {
+    var r = parseInt(slider.value, 10) / 100;
+    var d = translatorRToD(r);
+    var cles = translatorDToCles(d);
+    var successHigh = Math.round((0.5 + r / 2) * 100);
+    var successLow = Math.round((0.5 - r / 2) * 100);
+    var expectancy = calculateTranslatorExpectancy(r);
+
+    setText('translator-r-display', 'r = ' + r.toFixed(2));
+    setText('translator-d-display', d.toFixed(2));
+    setText('translator-cles-display', Math.round(cles * 100) + '%');
+
+    setText('translator-besd-above-success', successHigh + '%');
+    setText('translator-besd-above-fail', (100 - successHigh) + '%');
+    setText('translator-besd-below-success', successLow + '%');
+    setText('translator-besd-below-fail', (100 - successLow) + '%');
+    setText(
+      'translator-besd-description',
+      'Success rates when splitting at the median. A ' +
+        Math.abs(successHigh - successLow) +
+        '-percentage-point difference.'
+    );
+
+    setText('translator-icon-percent-high', successHigh + '%');
+    setText('translator-icon-percent-low', successLow + '%');
+    renderTranslatorIcons('translator-icon-array-high', successHigh);
+    renderTranslatorIcons('translator-icon-array-low', successLow);
+
+    setExpectancy('q4', expectancy[0]);
+    setExpectancy('q3', expectancy[1]);
+    setExpectancy('q2', expectancy[2]);
+    setExpectancy('q1', expectancy[3]);
+  }
+
+  function translatorNormalCdf(x) {
+    var a1 = 0.254829592;
+    var a2 = -0.284496736;
+    var a3 = 1.421413741;
+    var a4 = -1.453152027;
+    var a5 = 1.061405429;
+    var p = 0.3275911;
+    var sign = x < 0 ? -1 : 1;
+    x = Math.abs(x) / Math.sqrt(2);
+    var t = 1.0 / (1.0 + p * x);
+    var y =
+      1.0 -
+      (((((a5 * t + a4) * t + a3) * t + a2) * t + a1) * t * Math.exp(-x * x));
+    return 0.5 * (1.0 + sign * y);
+  }
+
+  function translatorRToD(r) {
+    return (2 * r) / Math.sqrt(1 - r * r);
+  }
+
+  function translatorDToCles(d) {
+    return translatorNormalCdf(d / Math.sqrt(2));
+  }
+
+  function calculateTranslatorExpectancy(r) {
+    var quartiles = [0.75, 0.5, 0.25, 0.0];
+    return quartiles.map(function(q) {
+      var predicted = 0.5 + r * (q - 0.5);
+      var expected = Math.round(predicted * 100);
+      return Math.max(5, Math.min(95, expected));
+    });
+  }
+
+  function renderTranslatorIcons(id, filledCount) {
+    var target = document.getElementById(id);
+    if (!target) return;
+    var html = '';
+    for (var i = 0; i < 100; i++) {
+      html +=
+        '<span class="translator-icon ' +
+        (i < filledCount ? 'translator-icon--filled' : 'translator-icon--empty') +
+        '"></span>';
+    }
+    target.innerHTML = html;
+  }
+
+  function setExpectancy(id, value) {
+    setText('translator-exp-value-' + id, value + '%');
+    var bar = document.getElementById('translator-exp-bar-' + id);
+    if (bar) {
+      bar.style.width = value + '%';
+    }
+  }
+
+  function setText(id, text) {
+    var el = document.getElementById(id);
+    if (el) {
+      el.textContent = text;
+    }
   }
 
 })();

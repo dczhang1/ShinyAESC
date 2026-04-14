@@ -1,0 +1,305 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 520" width="800" height="520" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+  <defs>
+    <style>
+      .title { font-size: 18px; font-weight: 700; fill: #111827; }
+      .subtitle { font-size: 12px; font-weight: 400; fill: #6B7280; }
+      .row-label { font-size: 12.5px; font-weight: 600; fill: #374151; }
+      .row-sublabel { font-size: 10.5px; font-weight: 400; fill: #9CA3AF; }
+      .pct-large { font-size: 32px; font-weight: 700; }
+      .pct-label { font-size: 10px; font-weight: 500; fill: #6B7280; text-transform: uppercase; letter-spacing: 0.5px; }
+      .legend-text { font-size: 11px; font-weight: 400; fill: #4B5563; }
+      .caption { font-size: 10.5px; font-weight: 400; fill: #9CA3AF; font-style: italic; }
+      .divider { stroke: #E5E7EB; stroke-width: 1; }
+      .ib { fill: #2563EB; }
+      .ig { fill: #D1D5DB; }
+    </style>
+  </defs>
+
+  <rect width="800" height="520" fill="#FFFFFF" rx="4"/>
+
+  <!-- Title -->
+  <text x="30" y="32" class="title">Icon Array: Structured Interview Outcomes</text>
+  <text x="30" y="50" class="subtitle">Effect size r = .30 — Success rates for above-average vs. below-average interview performers</text>
+  <line x1="30" y1="64" x2="770" y2="64" class="divider"/>
+
+  <!-- ===== ROW 1: ABOVE AVERAGE — 65 blue, 35 gray ===== -->
+  <text x="30" y="140" class="row-label">Above Average on</text>
+  <text x="30" y="156" class="row-label">Structured Interview</text>
+  <text x="30" y="174" class="row-sublabel">Top 50% of applicants</text>
+
+  <!-- Grid 1: 10x10 at (205,85), 16px spacing. 65 blue then 35 gray. -->
+  <!-- Row 0: all blue (icons 0–9) -->
+  <rect x="205" y="85" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="221" y="85" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="237" y="85" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="253" y="85" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="269" y="85" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="285" y="85" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="301" y="85" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="317" y="85" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="333" y="85" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="349" y="85" width="13" height="13" rx="2.5" class="ib"/>
+  <!-- Row 1: all blue (icons 10–19) -->
+  <rect x="205" y="101" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="221" y="101" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="237" y="101" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="253" y="101" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="269" y="101" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="285" y="101" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="301" y="101" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="317" y="101" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="333" y="101" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="349" y="101" width="13" height="13" rx="2.5" class="ib"/>
+  <!-- Row 2: all blue (icons 20–29) -->
+  <rect x="205" y="117" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="221" y="117" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="237" y="117" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="253" y="117" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="269" y="117" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="285" y="117" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="301" y="117" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="317" y="117" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="333" y="117" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="349" y="117" width="13" height="13" rx="2.5" class="ib"/>
+  <!-- Row 3: all blue (icons 30–39) -->
+  <rect x="205" y="133" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="221" y="133" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="237" y="133" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="253" y="133" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="269" y="133" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="285" y="133" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="301" y="133" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="317" y="133" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="333" y="133" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="349" y="133" width="13" height="13" rx="2.5" class="ib"/>
+  <!-- Row 4: all blue (icons 40–49) -->
+  <rect x="205" y="149" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="221" y="149" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="237" y="149" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="253" y="149" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="269" y="149" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="285" y="149" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="301" y="149" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="317" y="149" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="333" y="149" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="349" y="149" width="13" height="13" rx="2.5" class="ib"/>
+  <!-- Row 5: all blue (icons 50–59) -->
+  <rect x="205" y="165" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="221" y="165" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="237" y="165" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="253" y="165" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="269" y="165" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="285" y="165" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="301" y="165" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="317" y="165" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="333" y="165" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="349" y="165" width="13" height="13" rx="2.5" class="ib"/>
+  <!-- Row 6: 5 blue (60–64) then 5 gray (65–69) -->
+  <rect x="205" y="181" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="221" y="181" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="237" y="181" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="253" y="181" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="269" y="181" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="285" y="181" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="301" y="181" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="317" y="181" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="333" y="181" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="349" y="181" width="13" height="13" rx="2.5" class="ig"/>
+  <!-- Row 7: all gray (icons 70–79) -->
+  <rect x="205" y="197" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="221" y="197" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="237" y="197" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="253" y="197" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="269" y="197" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="285" y="197" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="301" y="197" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="317" y="197" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="333" y="197" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="349" y="197" width="13" height="13" rx="2.5" class="ig"/>
+  <!-- Row 8: all gray (icons 80–89) -->
+  <rect x="205" y="213" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="221" y="213" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="237" y="213" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="253" y="213" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="269" y="213" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="285" y="213" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="301" y="213" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="317" y="213" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="333" y="213" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="349" y="213" width="13" height="13" rx="2.5" class="ig"/>
+  <!-- Row 9: all gray (icons 90–99) -->
+  <rect x="205" y="229" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="221" y="229" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="237" y="229" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="253" y="229" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="269" y="229" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="285" y="229" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="301" y="229" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="317" y="229" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="333" y="229" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="349" y="229" width="13" height="13" rx="2.5" class="ig"/>
+
+  <!-- Percentage Row 1 -->
+  <line x1="370" y1="158" x2="390" y2="158" stroke="#2563EB" stroke-width="2" stroke-linecap="round"/>
+  <text x="395" y="164" class="pct-large" fill="#2563EB">65%</text>
+  <text x="395" y="182" class="pct-label">successful</text>
+
+  <!-- ===== DIVIDER ===== -->
+  <line x1="30" y1="255" x2="770" y2="255" class="divider" stroke-dasharray="4,3"/>
+
+  <!-- ===== ROW 2: BELOW AVERAGE — 35 blue, 65 gray ===== -->
+  <text x="30" y="330" class="row-label">Below Average on</text>
+  <text x="30" y="346" class="row-label">Structured Interview</text>
+  <text x="30" y="364" class="row-sublabel">Bottom 50% of applicants</text>
+
+  <!-- Grid 2: 10x10 at (205,280), 16px spacing. 35 blue then 65 gray. -->
+  <!-- Row 0: all blue (icons 0–9) -->
+  <rect x="205" y="280" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="221" y="280" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="237" y="280" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="253" y="280" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="269" y="280" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="285" y="280" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="301" y="280" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="317" y="280" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="333" y="280" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="349" y="280" width="13" height="13" rx="2.5" class="ib"/>
+  <!-- Row 1: all blue (icons 10–19) -->
+  <rect x="205" y="296" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="221" y="296" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="237" y="296" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="253" y="296" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="269" y="296" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="285" y="296" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="301" y="296" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="317" y="296" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="333" y="296" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="349" y="296" width="13" height="13" rx="2.5" class="ib"/>
+  <!-- Row 2: all blue (icons 20–29) -->
+  <rect x="205" y="312" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="221" y="312" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="237" y="312" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="253" y="312" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="269" y="312" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="285" y="312" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="301" y="312" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="317" y="312" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="333" y="312" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="349" y="312" width="13" height="13" rx="2.5" class="ib"/>
+  <!-- Row 3: 5 blue (30–34) then 5 gray (35–39) -->
+  <rect x="205" y="328" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="221" y="328" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="237" y="328" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="253" y="328" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="269" y="328" width="13" height="13" rx="2.5" class="ib"/>
+  <rect x="285" y="328" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="301" y="328" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="317" y="328" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="333" y="328" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="349" y="328" width="13" height="13" rx="2.5" class="ig"/>
+  <!-- Row 4: all gray (icons 40–49) -->
+  <rect x="205" y="344" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="221" y="344" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="237" y="344" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="253" y="344" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="269" y="344" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="285" y="344" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="301" y="344" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="317" y="344" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="333" y="344" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="349" y="344" width="13" height="13" rx="2.5" class="ig"/>
+  <!-- Row 5: all gray (icons 50–59) -->
+  <rect x="205" y="360" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="221" y="360" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="237" y="360" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="253" y="360" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="269" y="360" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="285" y="360" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="301" y="360" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="317" y="360" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="333" y="360" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="349" y="360" width="13" height="13" rx="2.5" class="ig"/>
+  <!-- Row 6: all gray (icons 60–69) -->
+  <rect x="205" y="376" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="221" y="376" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="237" y="376" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="253" y="376" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="269" y="376" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="285" y="376" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="301" y="376" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="317" y="376" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="333" y="376" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="349" y="376" width="13" height="13" rx="2.5" class="ig"/>
+  <!-- Row 7: all gray (icons 70–79) -->
+  <rect x="205" y="392" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="221" y="392" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="237" y="392" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="253" y="392" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="269" y="392" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="285" y="392" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="301" y="392" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="317" y="392" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="333" y="392" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="349" y="392" width="13" height="13" rx="2.5" class="ig"/>
+  <!-- Row 8: all gray (icons 80–89) -->
+  <rect x="205" y="408" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="221" y="408" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="237" y="408" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="253" y="408" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="269" y="408" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="285" y="408" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="301" y="408" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="317" y="408" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="333" y="408" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="349" y="408" width="13" height="13" rx="2.5" class="ig"/>
+  <!-- Row 9: all gray (icons 90–99) -->
+  <rect x="205" y="424" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="221" y="424" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="237" y="424" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="253" y="424" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="269" y="424" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="285" y="424" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="301" y="424" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="317" y="424" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="333" y="424" width="13" height="13" rx="2.5" class="ig"/>
+  <rect x="349" y="424" width="13" height="13" rx="2.5" class="ig"/>
+
+  <!-- Percentage Row 2 -->
+  <line x1="370" y1="352" x2="390" y2="352" stroke="#DC2626" stroke-width="2" stroke-linecap="round"/>
+  <text x="395" y="358" class="pct-large" fill="#DC2626">35%</text>
+  <text x="395" y="376" class="pct-label">successful</text>
+
+  <!-- ===== DIFFERENCE ANNOTATION BOX ===== -->
+  <rect x="500" y="155" width="255" height="200" rx="8" fill="#F9FAFB" stroke="#E5E7EB" stroke-width="1"/>
+  <text x="525" y="183" font-size="11" font-weight="600" fill="#374151">30 Percentage Points Difference</text>
+  <line x1="525" y1="191" x2="730" y2="191" stroke="#E5E7EB" stroke-width="1"/>
+
+  <circle cx="535" cy="214" r="5" fill="#2563EB"/>
+  <text x="548" y="218" font-size="11" font-weight="600" fill="#2563EB">65%</text>
+  <text x="585" y="218" font-size="11" fill="#6B7280">success for above-average</text>
+
+  <circle cx="535" cy="238" r="5" fill="#DC2626"/>
+  <text x="548" y="242" font-size="11" font-weight="600" fill="#DC2626">35%</text>
+  <text x="585" y="242" font-size="11" fill="#6B7280">success for below-average</text>
+
+  <line x1="525" y1="258" x2="730" y2="258" stroke="#E5E7EB" stroke-width="1"/>
+
+  <text x="525" y="278" font-size="10.5" font-weight="600" fill="#374151">Effect Size Context</text>
+  <text x="525" y="296" font-size="10" fill="#6B7280">r = .30 corresponds to a moderate</text>
+  <text x="525" y="310" font-size="10" fill="#6B7280">effect — typically the largest effect</text>
+  <text x="525" y="324" font-size="10" fill="#6B7280">found in personnel selection research.</text>
+  <text x="525" y="340" font-size="10" fill="#6B7280">BESD: 65% vs 35% success rates.</text>
+
+  <!-- ===== BOTTOM ===== -->
+  <line x1="30" y1="455" x2="770" y2="455" class="divider"/>
+
+  <!-- Legend -->
+  <rect x="30" y="468" width="14" height="14" rx="2.5" fill="#2563EB"/>
+  <text x="50" y="480" class="legend-text">Successful employee</text>
+  <rect x="200" y="468" width="14" height="14" rx="2.5" fill="#D1D5DB" stroke="#B0B5BD" stroke-width="0.5"/>
+  <text x="220" y="480" class="legend-text">Not successful</text>
+
+  <!-- Caption -->
+  <text x="30" y="505" class="caption">Each icon represents 1% of applicants. Blue icons show the percentage who become successful employees.</text>
+  <text x="30" y="517" class="caption">Binomial Effect Size Display (BESD) — Rosenthal &amp; Rubin (1982).</text>
+</svg>

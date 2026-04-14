@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 450" width="700" height="450" font-family="Inter, 'Helvetica Neue', Helvetica, Arial, sans-serif">
+  <defs>
+    <style>
+      .title { font-size: 16px; font-weight: 700; fill: #374151; }
+      .subtitle { font-size: 11.5px; font-weight: 400; fill: #6B7280; }
+      .axis-label { font-size: 11px; font-weight: 600; fill: #374151; }
+      .tick-label { font-size: 10.5px; font-weight: 400; fill: #6B7280; }
+      .bar-label { font-size: 12px; font-weight: 700; fill: #374151; }
+      .baseline-label { font-size: 10px; font-weight: 500; fill: #DC2626; }
+      .caption { font-size: 10.5px; font-weight: 400; fill: #6B7280; font-style: italic; }
+      .gridline { stroke: #E5E7EB; stroke-width: 0.75; }
+      .baseline { stroke: #DC2626; stroke-width: 1.25; stroke-dasharray: 6,4; opacity: 0.7; }
+    </style>
+  </defs>
+
+  <!-- Background -->
+  <rect width="700" height="450" fill="#FFFFFF" rx="4" />
+
+  <!-- Title -->
+  <text x="350" y="30" text-anchor="middle" class="title">Expectancy Chart: Test Score Quartile and Job Performance</text>
+  <text x="350" y="47" text-anchor="middle" class="subtitle">Selection test validity r = .30</text>
+
+  <!-- Chart area: left=100, top=65, right=660, bottom=340 -->
+  <!-- Chart width=560, chart height=275 -->
+  <!-- Y range: 0%–50%, scale: 275/50 = 5.5 px per % -->
+
+  <!-- Horizontal gridlines -->
+  <line x1="100" y1="340" x2="660" y2="340" class="gridline" />   <!-- 0% -->
+  <line x1="100" y1="285" x2="660" y2="285" class="gridline" />   <!-- 10% -->
+  <line x1="100" y1="230" x2="660" y2="230" class="gridline" />   <!-- 20% -->
+  <line x1="100" y1="175" x2="660" y2="175" class="gridline" />   <!-- 30% -->
+  <line x1="100" y1="120" x2="660" y2="120" class="gridline" />   <!-- 40% -->
+  <line x1="100" y1="65" x2="660" y2="65" class="gridline" />    <!-- 50% -->
+
+  <!-- Y-axis line -->
+  <line x1="100" y1="65" x2="100" y2="340" stroke="#D1D5DB" stroke-width="1" />
+
+  <!-- Y-axis tick labels -->
+  <text x="92" y="344" text-anchor="end" class="tick-label">0%</text>
+  <text x="92" y="289" text-anchor="end" class="tick-label">10%</text>
+  <text x="92" y="234" text-anchor="end" class="tick-label">20%</text>
+  <text x="92" y="179" text-anchor="end" class="tick-label">30%</text>
+  <text x="92" y="124" text-anchor="end" class="tick-label">40%</text>
+  <text x="92" y="69" text-anchor="end" class="tick-label">50%</text>
+
+  <!-- Y-axis title (rotated) -->
+  <text transform="translate(22, 202) rotate(-90)" text-anchor="middle" class="axis-label">Expected % Who Are Top Performers</text>
+
+  <!-- Bars: 4 bars across 560px width -->
+  <!-- Each section = 140px, bar width = 80px, gap on each side = 30px -->
+  <!-- Bar centers: 170, 310, 450, 590 -->
+  <!-- Bar x: 130, 270, 410, 550 -->
+
+  <!-- Bottom 25% — 15% — height = 15 * 5.5 = 82.5, y = 340 - 82.5 = 257.5 -->
+  <rect x="130" y="257.5" width="80" height="82.5" fill="#93C5FD" rx="3" ry="3" />
+  <text x="170" y="250" text-anchor="middle" class="bar-label">15%</text>
+
+  <!-- Second Quartile — 25% — height = 25 * 5.5 = 137.5, y = 340 - 137.5 = 202.5 -->
+  <rect x="270" y="202.5" width="80" height="137.5" fill="#60A5FA" rx="3" ry="3" />
+  <text x="310" y="195" text-anchor="middle" class="bar-label">25%</text>
+
+  <!-- Third Quartile — 35% — height = 35 * 5.5 = 192.5, y = 340 - 192.5 = 147.5 -->
+  <rect x="410" y="147.5" width="80" height="192.5" fill="#3B82F6" rx="3" ry="3" />
+  <text x="450" y="140" text-anchor="middle" class="bar-label">35%</text>
+
+  <!-- Top 25% — 45% — height = 45 * 5.5 = 247.5, y = 340 - 247.5 = 92.5 -->
+  <rect x="550" y="92.5" width="80" height="247.5" fill="#2563EB" rx="3" ry="3" />
+  <text x="590" y="85" text-anchor="middle" class="bar-label">45%</text>
+
+  <!-- X-axis tick labels -->
+  <text x="170" y="358" text-anchor="middle" class="tick-label">Bottom 25%</text>
+  <text x="310" y="358" text-anchor="middle" class="tick-label">Second</text>
+  <text x="310" y="370" text-anchor="middle" class="tick-label">Quartile</text>
+  <text x="450" y="358" text-anchor="middle" class="tick-label">Third</text>
+  <text x="450" y="370" text-anchor="middle" class="tick-label">Quartile</text>
+  <text x="590" y="358" text-anchor="middle" class="tick-label">Top 25%</text>
+
+  <!-- X-axis title -->
+  <text x="380" y="392" text-anchor="middle" class="axis-label">Test Score Quartile</text>
+
+  <!-- Random selection baseline at 25% — y = 340 - 25*5.5 = 340 - 137.5 = 202.5 -->
+  <line x1="100" y1="202.5" x2="660" y2="202.5" class="baseline" />
+  <text x="663" y="199" class="baseline-label" text-anchor="start">Random</text>
+  <text x="663" y="210" class="baseline-label" text-anchor="start">baseline</text>
+  <text x="663" y="221" class="baseline-label" text-anchor="start">(25%)</text>
+
+  <!-- Caption -->
+  <text x="350" y="420" text-anchor="middle" class="caption">Among applicants in the top quartile of test scores, approximately 45% are expected to be</text>
+  <text x="350" y="435" text-anchor="middle" class="caption">top performers—compared to only 15% of those in the bottom quartile.</text>
+
+</svg>

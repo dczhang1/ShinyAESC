@@ -5,62 +5,116 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Effect Size Translator — Interactive Tool</title>
   <style>
+    :root {
+      --forest-900: #0f2416;
+      --forest-700: #1a3d26;
+      --forest-600: #2d5a3d;
+      --forest-500: #3d7a52;
+      --gold-300: #e4c767;
+      --gold-100: #f9f3dc;
+      --cream-50: #fafaf7;
+      --sage-50: #f5f7f4;
+      --sage-100: #e5ebe7;
+      --ink-900: #141414;
+      --stone-600: #3a3835;
+      --stone-500: #5c5852;
+      --danger-500: #b4534a;
+      --shadow-sm: 0 8px 22px rgba(15, 36, 22, 0.06);
+      --shadow-md: 0 20px 44px rgba(15, 36, 22, 0.08);
+      --radius-lg: 18px;
+      --radius-md: 12px;
+    }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      line-height: 1.6;
-      color: #333;
-      max-width: 900px;
+      font-family: "Source Sans 3", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      line-height: 1.7;
+      color: var(--ink-900);
+      max-width: 980px;
       margin: 0 auto;
-      padding: 20px;
-      background: #fafafa;
+      padding: 32px 28px 56px;
+      background:
+        radial-gradient(circle at top left, rgba(228, 199, 103, 0.18), transparent 28%),
+        linear-gradient(180deg, var(--sage-50), var(--cream-50));
     }
-    h1 { font-size: 1.8em; margin-bottom: 0.5em; color: #111; }
-    h2 { font-size: 1.3em; margin: 1.5em 0 0.5em; color: #222; border-bottom: 1px solid #ddd; padding-bottom: 0.3em; }
-    p { margin: 0.8em 0; }
-    .intro { background: #fff; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+    h1 {
+      font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: clamp(2rem, 5vw, 3rem);
+      line-height: 1.05;
+      letter-spacing: -0.04em;
+      margin-bottom: 14px;
+      color: var(--forest-900);
+    }
+    h2 {
+      font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 1.3em;
+      margin: 1.5em 0 0.5em;
+      color: var(--forest-900);
+      border-bottom: 1px solid rgba(45, 90, 61, 0.12);
+      padding-bottom: 0.35em;
+    }
+    p { margin: 0.8em 0; color: var(--stone-600); }
+    .intro {
+      background: rgba(255,255,255,0.84);
+      padding: 24px 26px;
+      border-radius: var(--radius-lg);
+      margin-bottom: 24px;
+      border: 1px solid rgba(45, 90, 61, 0.1);
+      box-shadow: var(--shadow-sm);
+    }
     
     .slider-container {
-      background: #fff;
-      padding: 25px;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      background: rgba(255,255,255,0.92);
+      padding: 28px;
+      border-radius: 22px;
+      margin-bottom: 24px;
+      border: 1px solid rgba(45, 90, 61, 0.12);
+      box-shadow: var(--shadow-md);
     }
-    .slider-label { font-size: 1.1em; font-weight: 600; margin-bottom: 10px; display: block; }
-    .slider-value { font-size: 1.2em; font-weight: 700; color: #2563EB; }
+    .slider-label {
+      font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 1.15em;
+      font-weight: 600;
+      margin-bottom: 10px;
+      display: block;
+      color: var(--forest-900);
+    }
+    .slider-value { font-size: 1.2em; font-weight: 700; color: var(--forest-600); }
     input[type="range"] {
       width: 100%;
-      height: 8px;
-      border-radius: 4px;
-      background: #e5e7eb;
+      height: 12px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(45,90,61,0.18), rgba(228,199,103,0.35));
       outline: none;
       -webkit-appearance: none;
-      margin: 15px 0;
+      appearance: none;
+      margin: 18px 0 12px;
     }
     input[type="range"]::-webkit-slider-thumb {
       -webkit-appearance: none;
-      width: 24px;
-      height: 24px;
+      width: 26px;
+      height: 26px;
       border-radius: 50%;
-      background: #2563EB;
+      border: 2px solid #fff;
+      background: var(--forest-600);
       cursor: pointer;
-      box-shadow: 0 2px 6px rgba(37,99,235,0.4);
+      box-shadow: 0 8px 22px rgba(45,90,61,0.26);
     }
     input[type="range"]::-moz-range-thumb {
-      width: 24px;
-      height: 24px;
+      width: 26px;
+      height: 26px;
       border-radius: 50%;
-      background: #2563EB;
+      border: 2px solid #fff;
+      background: var(--forest-600);
       cursor: pointer;
-      border: none;
+      box-shadow: 0 8px 22px rgba(45,90,61,0.26);
     }
-    .slider-ticks { display: flex; justify-content: space-between; font-size: 0.7em; color: #666; }
+    .slider-ticks { display: flex; justify-content: space-between; font-size: 0.72em; color: var(--stone-500); }
     
     .translations-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
-      gap: 15px;
+      gap: 20px;
       margin-top: 20px;
     }
     @media (max-width: 700px) {
@@ -68,27 +122,29 @@
     }
     
     .translation-card {
-      background: #fff;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      background: rgba(255,255,255,0.92);
+      padding: 22px;
+      border-radius: 20px;
+      border: 1px solid rgba(45, 90, 61, 0.12);
+      box-shadow: var(--shadow-sm);
     }
     .translation-card h3 {
-      font-size: 0.9em;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      color: #666;
-      margin-bottom: 10px;
+      font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 1rem;
+      letter-spacing: -0.02em;
+      color: var(--forest-900);
+      margin-bottom: 12px;
     }
     .translation-card .value {
-      font-size: 1.4em;
+      font-family: "Space Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 2.15em;
       font-weight: 700;
-      color: #111;
+      color: var(--forest-700);
     }
     .translation-card .description {
-      font-size: 0.85em;
-      color: #666;
-      margin-top: 5px;
+      font-size: 0.92em;
+      color: var(--stone-600);
+      margin-top: 8px;
     }
     
     /* BESD Table */
@@ -101,11 +157,11 @@
     .besd-table th, .besd-table td {
       padding: 8px 12px;
       text-align: center;
-      border: 1px solid #e5e7eb;
+      border: 1px solid rgba(45, 90, 61, 0.12);
     }
-    .besd-table th { background: #f5f5f5; font-weight: 600; }
-    .besd-table .succeed { background: #dbeafe; color: #1e40af; }
-    .besd-table .fail { background: #fee2e1; color: #991b1b; }
+    .besd-table th { background: var(--sage-50); font-weight: 600; color: var(--forest-900); }
+    .besd-table .succeed { background: rgba(61,122,82,0.12); color: var(--forest-700); }
+    .besd-table .fail { background: rgba(180,83,74,0.12); color: var(--danger-500); }
     .besd-table .success-rate { font-weight: 700; }
     
     /* Icon Array */
@@ -120,21 +176,21 @@
     .icon-array-label {
       width: 80px;
       font-size: 0.8em;
-      color: #666;
+      color: var(--stone-500);
     }
     .icon-array-grid {
       display: flex;
       flex-wrap: wrap;
-      width: 200px;
-      gap: 2px;
+      width: 210px;
+      gap: 3px;
     }
     .icon-array-grid .icon {
-      width: 10px;
-      height: 10px;
-      border-radius: 2px;
+      width: 11px;
+      height: 11px;
+      border-radius: 3px;
     }
-    .icon-array-grid .icon.filled { background: #2563EB; }
-    .icon-array-grid .icon.empty { background: #e5e7eb; }
+    .icon-array-grid .icon.filled { background: var(--forest-600); }
+    .icon-array-grid .icon.empty { background: rgba(45, 90, 61, 0.14); }
     .icon-array-percent {
       width: 60px;
       text-align: right;
@@ -154,7 +210,7 @@
     .expectancy-label {
       width: 100px;
       font-size: 0.85em;
-      color: #555;
+      color: var(--stone-500);
     }
     .expectancy-bar-container {
       flex: 1;
@@ -165,21 +221,21 @@
     .expectancy-bar-track {
       flex: 1;
       height: 24px;
-      background: #f3f4f6;
-      border-radius: 4px;
+      background: rgba(45, 90, 61, 0.1);
+      border-radius: 999px;
       overflow: hidden;
     }
     .expectancy-bar-fill {
       height: 100%;
-      background: linear-gradient(90deg, #3B82F6, #2563EB);
-      border-radius: 4px;
+      background: linear-gradient(90deg, var(--forest-600), var(--gold-300));
+      border-radius: 999px;
       transition: width 0.15s ease;
     }
     .expectancy-value {
       width: 50px;
       font-weight: 700;
       font-size: 0.95em;
-      color: #2563EB;
+      color: var(--forest-700);
       text-align: right;
     }
     
@@ -189,7 +245,7 @@
       gap: 20px;
       margin-top: 15px;
       font-size: 0.85em;
-      color: #666;
+      color: var(--stone-500);
     }
     .legend-item { display: flex; align-items: center; gap: 5px; }
     .legend-color {
@@ -199,12 +255,39 @@
     }
     
     .info-note {
-      font-size: 0.85em;
-      color: #888;
-      margin-top: 20px;
-      padding: 10px;
-      background: #f9f9f9;
-      border-radius: 6px;
+      font-size: 0.9em;
+      color: var(--stone-600);
+      margin-top: 22px;
+      padding: 14px 16px;
+      background: rgba(249, 243, 220, 0.66);
+      border: 1px solid rgba(212, 175, 55, 0.24);
+      border-radius: 14px;
+    }
+
+    @media (max-width: 720px) {
+      body {
+        padding: 20px 16px 36px;
+      }
+      .slider-container,
+      .translation-card,
+      .intro {
+        padding: 18px;
+      }
+      .icon-array-row,
+      .expectancy-row {
+        display: block;
+      }
+      .icon-array-label,
+      .expectancy-label,
+      .icon-array-percent,
+      .expectancy-value {
+        width: auto;
+        text-align: left;
+      }
+      .icon-array-grid {
+        width: 100%;
+        margin: 8px 0;
+      }
     }
   </style>
 </head>
