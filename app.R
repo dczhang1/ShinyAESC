@@ -5,13 +5,18 @@
 # Load packages
 library(shiny)
 library(bslib)
-library(tidyverse)
+library(dplyr)
+library(ggplot2)
 library(readxl)
 library(haven)
 library(psych)
 library(DT)
+library(tibble)
 
-options(shiny.maxRequestSize = 10 * 1024^2)
+max_upload_mb <- 1
+max_dataset_rows <- 10000L
+
+options(shiny.maxRequestSize = max_upload_mb * 1024^2)
 
 # Source utility modules
 source("R/utils_theme.R")
@@ -61,6 +66,100 @@ sanitize_html <- function(x) {
   x <- gsub('"', "&quot;", x, fixed = TRUE)
   x <- gsub("'", "&#39;", x, fixed = TRUE)
   x
+}
+
+compact_upload_signature <- function(path, name = NULL) {
+  if (is.null(path) || !file.exists(path)) {
+    return(NULL)
+  }
+  info <- file.info(path)
+  file_name <- if (!is.null(name) && nzchar(name)) name else basename(path)
+  paste(file_name, info$size, as.numeric(info$mtime), sep = "::")
+}
+
+read_csv_frame <- function(path, select = NULL, n_max = NULL) {
+  args <- list(
+    input = path,
+    data.table = FALSE,
+    showProgress = FALSE
+  )
+  if (!is.null(select)) {
+    args$select <- select
+  }
+  if (!is.null(n_max)) {
+    args$nrows <- n_max
+  }
+  out <- do.call(data.table::fread, args)
+  as.data.frame(out, stringsAsFactors = FALSE)
+}
+
+read_excel_frame <- function(path, selected_cols = NULL, n_max = NULL) {
+  args <- list(path)
+  if (!is.null(n_max)) {
+    args$n_max <- n_max
+  }
+  out <- do.call(readxl::read_excel, args)
+  out <- as.data.frame(out, stringsAsFactors = FALSE)
+  if (!is.null(selected_cols)) {
+    keep <- intersect(selected_cols, names(out))
+    out <- out[, keep, drop = FALSE]
+  }
+  out
+}
+
+read_haven_frame <- function(path, reader, selected_cols = NULL, n_max = NULL) {
+  args <- list(path)
+  if (!is.null(selected_cols)) {
+    args$col_select <- dplyr::all_of(selected_cols)
+  }
+  if (!is.null(n_max)) {
+    args$n_max <- n_max
+  }
+
+  out <- tryCatch(
+    do.call(reader, args),
+    error = function(e) NULL
+  )
+
+  if (is.null(out)) {
+    fallback_args <- list(path)
+    if (!is.null(n_max)) {
+      fallback_args$n_max <- n_max
+    }
+    out <- do.call(reader, fallback_args)
+    out <- as.data.frame(out, stringsAsFactors = FALSE)
+    if (!is.null(selected_cols)) {
+      keep <- intersect(selected_cols, names(out))
+      out <- out[, keep, drop = FALSE]
+    }
+    return(out)
+  }
+
+  as.data.frame(out, stringsAsFactors = FALSE)
+}
+
+read_tabular_data <- function(path, ext, selected_cols = NULL, n_max = NULL) {
+  switch(ext,
+    csv = read_csv_frame(path, select = selected_cols, n_max = n_max),
+    xlsx = read_excel_frame(path, selected_cols = selected_cols, n_max = n_max),
+    sav = read_haven_frame(path, haven::read_sav, selected_cols = selected_cols, n_max = n_max),
+    sas7bdat = read_haven_frame(path, haven::read_sas, selected_cols = selected_cols, n_max = n_max),
+    NULL
+  )
+}
+
+normalize_analysis_frame <- function(df, predictor, criterion) {
+  if (is.null(df) || !all(c(predictor, criterion) %in% names(df))) {
+    return(NULL)
+  }
+
+  predictor_vals <- suppressWarnings(as.numeric(df[[predictor]]))
+  criterion_vals <- suppressWarnings(as.numeric(df[[criterion]]))
+  out <- data.frame(
+    Predictor = predictor_vals,
+    Criterion = criterion_vals
+  )
+  out[stats::complete.cases(out), , drop = FALSE]
 }
 
 # ============================================
@@ -868,6 +967,13 @@ analysis_ui <- function() {
               buttonLabel = tags$span(
                 tags$i(`data-lucide` = "folder-open", style = "width: 14px; height: 14px;")
               )
+            ),
+            p(
+              class = "text-muted small mt-2 mb-0",
+              paste0(
+                "Max upload: ", max_upload_mb, " MB and ",
+                format(max_dataset_rows, big.mark = ","), " rows. CSV is fastest."
+              )
             )
           ),
 
@@ -1527,64 +1633,133 @@ server <- function(input, output, session) {
   # --- Data Loading ---
   last_load_signature <- reactiveVal(NULL)
   last_load_error <- reactiveVal(NULL)
+  last_load_warning <- reactiveVal(NULL)
 
-  data_set <- reactive({
-    # Prefer preserved landing upload, then sidebar file
+  current_input_file <- reactive({
     if (!is.null(app_state$data_source) && app_state$data_source == "uploaded" && !is.null(app_state$landing_file)) {
-      inFile <- app_state$landing_file
-    } else if (!is.null(input$file1)) {
-      inFile <- input$file1
-    } else {
-      inFile <- NULL
+      return(app_state$landing_file)
+    }
+    if (!is.null(input$file1)) {
+      return(input$file1)
+    }
+    NULL
+  })
+
+  data_profile <- reactive({
+    if (app_state$view == "analysis" && identical(app_state$data_source, "sample")) {
+      sample_path <- get_sample_data_path()
+      if (is.null(sample_path)) {
+        return(NULL)
+      }
+      raw <- tryCatch(read_csv_frame(sample_path), error = function(e) NULL)
+      if (is.null(raw)) {
+        return(NULL)
+      }
+      last_load_error(NULL)
+      last_load_warning(NULL)
+      last_load_signature(compact_upload_signature(sample_path, "sampleData.csv"))
+      return(list(
+        mode = "sample",
+        path = sample_path,
+        ext = "csv",
+        name = "sampleData.csv",
+        nrow = nrow(raw),
+        ncol = ncol(raw),
+        column_names = names(raw)
+      ))
     }
 
+    inFile <- current_input_file()
     if (is.null(inFile)) {
-      # Use sample data only when sample mode is active
-      if (app_state$view == "analysis" && identical(app_state$data_source, "sample")) {
-        sample_path <- get_sample_data_path()
-        if (!is.null(sample_path)) {
-          return(read.csv(sample_path, header = TRUE))
-        }
-      }
       return(NULL)
     }
 
     ext <- tolower(tools::file_ext(inFile$name))
     if (!ext %in% c("csv", "xlsx", "sav", "sas7bdat")) {
       last_load_error("Unsupported file type. Please upload CSV, Excel, SPSS, or SAS files.")
+      last_load_warning(NULL)
       return(NULL)
     }
 
     tryCatch(
       {
-        df <- switch(ext,
-          csv = read.csv(inFile$datapath, header = TRUE, nrows = 1e6),
-          xlsx = readxl::read_excel(inFile$datapath, n_max = 1e6),
-          sav = haven::read_sav(inFile$datapath),
-          sas7bdat = haven::read_sas(inFile$datapath),
-          NULL
-        )
-        if (is.null(df)) {
+        preview <- read_tabular_data(inFile$datapath, ext, n_max = 200)
+        if (is.null(preview)) {
           last_load_error("Could not parse the file. Verify the file contents match the extension.")
           return(NULL)
         }
+
+        row_count <- if (ext == "csv" && ncol(preview) > 0) {
+          nrow(read_csv_frame(inFile$datapath, select = names(preview)[1]))
+        } else {
+          nrow(read_tabular_data(inFile$datapath, ext))
+        }
+
+        if (!is.na(row_count) && row_count > max_dataset_rows) {
+          last_load_error(
+            paste0(
+              "This dataset has ", format(row_count, big.mark = ","),
+              " rows. ESCAPE currently accepts up to ",
+              format(max_dataset_rows, big.mark = ","), " rows."
+            )
+          )
+          last_load_warning(NULL)
+          return(NULL)
+        }
+
         last_load_error(NULL)
-        sig <- paste0(inFile$name, "::", nrow(df), "::", as.numeric(file.info(inFile$datapath)$mtime))
-        last_load_signature(sig)
-        return(df)
+        if (ext %in% c("xlsx", "sav", "sas7bdat")) {
+          last_load_warning("Excel, SPSS, and SAS files are slower to parse than CSV. CSV is recommended for the fastest analysis.")
+        } else {
+          last_load_warning(NULL)
+        }
+        last_load_signature(compact_upload_signature(inFile$datapath, inFile$name))
+
+        list(
+          mode = "uploaded",
+          path = inFile$datapath,
+          ext = ext,
+          name = inFile$name,
+          nrow = row_count,
+          ncol = ncol(preview),
+          column_names = names(preview)
+        )
       },
       error = function(e) {
         last_load_error("Error loading file. Please check that the file is valid and try again.")
-        return(NULL)
+        last_load_warning(NULL)
+        NULL
       }
     )
   })
 
+  data_set <- reactive({
+    profile <- data_profile()
+    if (is.null(profile)) {
+      return(NULL)
+    }
+
+    tryCatch(
+      {
+        if (identical(profile$mode, "sample")) {
+          return(read_csv_frame(profile$path))
+        }
+        read_tabular_data(profile$path, profile$ext, n_max = 1000)
+      },
+      error = function(e) NULL
+    )
+  })
+
   observeEvent(last_load_signature(), ignoreNULL = TRUE, {
-    df <- data_set()
-    req(df)
+    profile <- data_profile()
+    req(profile)
+    msg <- if (!is.null(profile$nrow) && !is.na(profile$nrow)) {
+      paste("Loaded", profile$nrow, "rows from your file")
+    } else {
+      paste("Loaded", profile$name)
+    }
     session$sendCustomMessage("showToast", list(
-      message = paste("Loaded", nrow(df), "rows from your file"),
+      message = msg,
       type = "success",
       duration = 3000
     ))
@@ -1595,6 +1770,14 @@ server <- function(input, output, session) {
       message = last_load_error(),
       type = "error",
       duration = 5000
+    ))
+  })
+
+  observeEvent(last_load_warning(), ignoreNULL = TRUE, {
+    session$sendCustomMessage("showToast", list(
+      message = last_load_warning(),
+      type = "warning",
+      duration = 4500
     ))
   })
 
@@ -1614,7 +1797,8 @@ server <- function(input, output, session) {
     }
 
     df <- data_set()
-    if (is.null(df) || ncol(df) < 2) {
+    profile <- data_profile()
+    if (is.null(profile) || profile$ncol < 2) {
       return(list(
         ready = FALSE,
         message = "Your dataset needs at least 2 columns.",
@@ -1622,7 +1806,7 @@ server <- function(input, output, session) {
         criterion = NULL
       ))
     }
-    dsnames <- names(df)
+    dsnames <- profile$column_names
     pred <- input$guided_predictorVar
     crit <- input$guided_criterionVar
     if (is.null(pred) || !pred %in% dsnames) pred <- dsnames[1]
@@ -1640,20 +1824,39 @@ server <- function(input, output, session) {
       ))
     }
 
-    pred_is_numeric <- is_numeric_like(df[[pred]])
-    crit_is_numeric <- is_numeric_like(df[[crit]])
+    analysis_preview <- tryCatch(
+      {
+        if (identical(profile$mode, "sample")) {
+          df[, c(pred, crit), drop = FALSE]
+        } else {
+          read_tabular_data(profile$path, profile$ext, selected_cols = c(pred, crit), n_max = 500)
+        }
+      },
+      error = function(e) NULL
+    )
+    if (is.null(analysis_preview)) {
+      return(list(
+        ready = FALSE,
+        message = "Unable to inspect the selected columns. Please choose different variables.",
+        predictor = pred,
+        criterion = crit
+      ))
+    }
+
+    pred_is_numeric <- is_numeric_like(analysis_preview[[pred]])
+    crit_is_numeric <- is_numeric_like(analysis_preview[[crit]])
     if (!pred_is_numeric || !crit_is_numeric) {
       bad_vars <- character(0)
       if (!pred_is_numeric) {
         bad_vars <- c(
           bad_vars,
-          paste0("Predictor (X) `", pred, "` is type ", column_type_label(df[[pred]]), ".")
+          paste0("Predictor (X) `", pred, "` is type ", column_type_label(analysis_preview[[pred]]), ".")
         )
       }
       if (!crit_is_numeric) {
         bad_vars <- c(
           bad_vars,
-          paste0("Criterion (Y) `", crit, "` is type ", column_type_label(df[[crit]]), ".")
+          paste0("Criterion (Y) `", crit, "` is type ", column_type_label(analysis_preview[[crit]]), ".")
         )
       }
       return(list(
@@ -1689,10 +1892,10 @@ server <- function(input, output, session) {
 
   output$guided_step1_info <- renderUI({
     req(isTRUE(app_state$guided_step == 1), !isTRUE(app_state$guided_done))
-    df <- data_set()
     file_meta <- guided_file_meta()
     has_file <- !is.null(file_meta)
-    has_data <- !is.null(df)
+    profile <- data_profile()
+    has_data <- !is.null(profile)
     current_file <- if (!is.null(file_meta)) {
       file_meta$name
     } else if (!is.null(app_state$landing_file)) {
@@ -1705,9 +1908,9 @@ server <- function(input, output, session) {
     data_stats_detail <- if (has_data) {
       tagList(
         tags$span(class = "data-info-dot", "\u2022"),
-        tags$span(paste(nrow(df), "rows")),
+        tags$span(paste(profile$nrow, "rows")),
         tags$span(class = "data-info-dot", "\u2022"),
-        tags$span(paste(ncol(df), "columns"))
+        tags$span(paste(profile$ncol, "columns"))
       )
     } else if (has_file) {
       tagList(
@@ -1752,10 +1955,10 @@ server <- function(input, output, session) {
   })
 
   show_guided_wizard <- function() {
-    df <- data_set()
-    has_data <- !is.null(df)
-    has_two_cols <- has_data && ncol(df) >= 2
-    dsnames <- if (has_data) names(df) else character(0)
+    profile <- data_profile()
+    has_data <- !is.null(profile)
+    has_two_cols <- has_data && profile$ncol >= 2
+    dsnames <- if (has_data) profile$column_names else character(0)
 
     step <- app_state$guided_step
 
@@ -1777,6 +1980,13 @@ server <- function(input, output, session) {
           buttonLabel = tags$span(
             tags$i(`data-lucide` = "folder-open", style = "width: 14px; height: 14px; margin-right: 6px;"),
             "Choose file"
+          )
+        ),
+        tags$p(
+          class = "text-muted small mb-3",
+          paste0(
+            "Max upload: ", max_upload_mb, " MB and ",
+            format(max_dataset_rows, big.mark = ","), " rows. CSV is recommended for the fastest analysis."
           )
         ),
         uiOutput("guided_step1_info")
@@ -1880,7 +2090,7 @@ server <- function(input, output, session) {
     if (app_state$view != "analysis") {
       return("no")
     }
-    if (is.null(data_set())) {
+    if (is.null(data_profile())) {
       return("no")
     }
     "yes"
@@ -1898,7 +2108,7 @@ server <- function(input, output, session) {
     if (is.null(path)) {
       return(NULL)
     }
-    raw <- tryCatch(read.csv(path, header = TRUE), error = function(e) NULL)
+    raw <- tryCatch(read_csv_frame(path), error = function(e) NULL)
     if (is.null(raw) || ncol(raw) < 2) {
       return(NULL)
     }
@@ -1920,8 +2130,8 @@ server <- function(input, output, session) {
 
   # Data info display
   output$data_info <- renderUI({
-    df <- data_set()
-    if (is.null(df)) {
+    profile <- data_profile()
+    if (is.null(profile)) {
       return(NULL)
     }
 
@@ -1936,20 +2146,19 @@ server <- function(input, output, session) {
       div(class = "data-info-badge", source_text),
       div(
         class = "data-info-stats",
-        tags$span(paste(nrow(df), "rows")),
+        tags$span(paste(profile$nrow, "rows")),
         tags$span(class = "data-info-dot", "\u2022"),
-        tags$span(paste(ncol(df), "columns"))
+        tags$span(paste(profile$ncol, "columns"))
       )
     )
   })
 
-  # Effective predictor/criterion (default to first two columns when inputs not yet valid)
   effective_vars <- reactive({
-    df <- data_set()
-    if (is.null(df) || ncol(df) < 2) {
+    profile <- data_profile()
+    if (is.null(profile) || profile$ncol < 2) {
       return(list(predictor = NULL, criterion = NULL))
     }
-    dsnames <- names(df)
+    dsnames <- profile$column_names
     pred <- input$predictorVar
     crit <- input$criterionVar
     if (is.null(pred) || !pred %in% dsnames) pred <- dsnames[1]
@@ -1960,11 +2169,11 @@ server <- function(input, output, session) {
   # Keep sidebar selectors in sync with effective vars
   observe({
     ev <- effective_vars()
-    df <- data_set()
-    if (is.null(df) || is.null(ev$predictor)) {
+    profile <- data_profile()
+    if (is.null(profile) || is.null(ev$predictor)) {
       return(NULL)
     }
-    dsnames <- names(df)
+    dsnames <- profile$column_names
     if (!identical(input$predictorVar, ev$predictor)) {
       updateSelectInput(session, "predictorVar", choices = dsnames, selected = ev$predictor)
     }
@@ -2003,49 +2212,93 @@ server <- function(input, output, session) {
     if (is.null(v) || !nzchar(trimws(v))) ev$criterion else trimws(v)
   })
 
-  # Selected data (filtered); uses effective vars so chain never blocks on first paint
-  selected_data <- reactive({
-    req(data_set())
+  analysis_data <- reactive({
+    profile <- data_profile()
+    req(profile)
     ev <- effective_vars()
     req(ev$predictor, ev$criterion)
-    df <- data_set()
-    df %>%
-      select(Predictor = !!sym(ev$predictor), Criterion = !!sym(ev$criterion)) %>%
-      na.omit()
+    if (identical(profile$mode, "sample")) {
+      return(normalize_analysis_frame(read_csv_frame(profile$path), ev$predictor, ev$criterion))
+    }
+
+    if (identical(profile$ext, "csv")) {
+      return(normalize_analysis_frame(
+        read_csv_frame(profile$path, select = unique(c(ev$predictor, ev$criterion))),
+        ev$predictor,
+        ev$criterion
+      ))
+    }
+
+    normalize_analysis_frame(
+      read_tabular_data(profile$path, profile$ext),
+      ev$predictor,
+      ev$criterion
+    )
   })
 
-  # --- Calculations ---
+  analysis_signature <- reactive({
+    ev <- effective_vars()
+    paste(
+      last_load_signature(),
+      ev$predictor,
+      ev$criterion,
+      sep = "::"
+    )
+  })
+
   cutoff_x_input <- reactive(input$cutoff.X) |> debounce(250)
   cutoff_y_input <- reactive(input$cutoffInput) |> debounce(250)
   bins_input <- reactive(input$bins) |> debounce(250)
 
   validity_stats <- reactive({
-    df <- selected_data()
+    df <- analysis_data()
     calc_correlation(df$Predictor, df$Criterion)
   })
 
   cutoff_X_val <- reactive({
-    df <- selected_data()
+    df <- analysis_data()
     quantile(df$Predictor, probs = cutoff_x_input(), na.rm = TRUE)
   })
 
   df_exp <- reactive({
-    df <- selected_data()
+    df <- analysis_data()
     calc_expectancy(df, bins_input(), cutoff_y_input())
   })
 
-  df_cles <- reactive({
-    df <- selected_data()
-    co_X <- cutoff_X_val()
-    df %>%
-      mutate(
-        Group = case_when(
-          Predictor < co_X ~ "Below",
-          Predictor >= co_X ~ "Above",
-          TRUE ~ NA_character_
-        )
-      ) %>%
-      filter(!is.na(Group))
+  group_slices <- reactive({
+    df <- analysis_data()
+    cutoff_x <- cutoff_X_val()
+    above_idx <- df$Predictor >= cutoff_x
+    below_idx <- df$Predictor < cutoff_x
+    above_vals <- df$Criterion[above_idx]
+    below_vals <- df$Criterion[below_idx]
+    list(
+      above_vals = above_vals,
+      below_vals = below_vals,
+      n_above = length(above_vals),
+      n_below = length(below_vals)
+    )
+  })
+
+  group_summary <- reactive({
+    slices <- group_slices()
+    data.frame(
+      Group = c("Above", "Below"),
+      Mean = c(mean(slices$above_vals), mean(slices$below_vals)),
+      SD = c(sd(slices$above_vals), sd(slices$below_vals)),
+      n = c(slices$n_above, slices$n_below)
+    )
+  })
+
+  density_data <- reactive({
+    slices <- group_slices()
+    data.frame(
+      Criterion = c(slices$above_vals, slices$below_vals),
+      Group = c(
+        rep("Above", length(slices$above_vals)),
+        rep("Below", length(slices$below_vals))
+      )
+    )
   })
 
   effect_sizes <- reactive({
@@ -2063,25 +2316,9 @@ server <- function(input, output, session) {
     )
   })
 
-  group_slices <- reactive({
-    df <- df_cles()
-    above_vals <- df %>%
-      filter(Group == "Above") %>%
-      pull(Criterion)
-    below_vals <- df %>%
-      filter(Group == "Below") %>%
-      pull(Criterion)
-    list(
-      above_vals = above_vals,
-      below_vals = below_vals,
-      n_above = length(above_vals),
-      n_below = length(below_vals)
-    )
-  })
-
   # Set mean button
   observeEvent(input$setmean, {
-    df <- selected_data()
+    df <- analysis_data()
     mean_val <- round(mean(df$Criterion, na.rm = TRUE), 2)
     updateNumericInput(session, "cutoffInput", value = mean_val)
   })
@@ -2097,7 +2334,7 @@ server <- function(input, output, session) {
       return(NULL)
     }
     last_criterion_var(ev$criterion)
-    sd <- selected_data()
+    sd <- analysis_data()
     if (!is.null(sd) && nrow(sd) > 0) {
       updateNumericInput(session, "cutoffInput", value = round(mean(sd$Criterion, na.rm = TRUE), 2))
     }
@@ -2129,14 +2366,14 @@ server <- function(input, output, session) {
 
   output$overview_scatter <- renderPlot(
     {
-      p <- plot_scatter(selected_data(), predictor_display_name(), criterion_display_name())
+      p <- plot_scatter(analysis_data(), predictor_display_name(), criterion_display_name())
       print(p)
     },
     width = 560,
     height = 340,
     res = 96
   ) |> bindCache(
-    selected_data(),
+    analysis_signature(),
     predictor_display_name(),
     criterion_display_name()
   )
@@ -2151,7 +2388,7 @@ server <- function(input, output, session) {
     n_above <- slices$n_above
     n_below <- slices$n_below
     d_ci <- calc_d_ci(d, n_above, n_below)
-    r_ci <- calc_r_ci(r, nrow(selected_data()))
+    r_ci <- calc_r_ci(r, nrow(analysis_data()))
 
     r_strength <- interpret_correlation(r)
     d_magnitude <- if (!is.na(d)) interpret_cohens_d(d) else "unknown"
@@ -2200,9 +2437,10 @@ server <- function(input, output, session) {
   # --- Data Tab Outputs ---
 
   output$contents <- renderDT({
-    req(data_set())
+    df <- data_set()
+    req(df)
     datatable(
-      data_set(),
+      utils::head(df, 1000),
       options = list(
         scrollX = TRUE,
         pageLength = 10,
@@ -2211,7 +2449,7 @@ server <- function(input, output, session) {
       ),
       class = "display compact"
     )
-  })
+  }, server = TRUE)
 
   # --- Expectancy Tab Outputs ---
 
@@ -2229,9 +2467,10 @@ server <- function(input, output, session) {
     height = 420,
     res = 96
   ) |> bindCache(
-    df_exp(),
-    predictor_display_name(),
+    analysis_signature(),
+    bins_input(),
     cutoff_y_input(),
+    predictor_display_name(),
     criterion_display_name()
   )
 
@@ -2256,7 +2495,7 @@ server <- function(input, output, session) {
 
   output$descriptable <- renderTable(
     {
-      selected_data() %>%
+      analysis_data() %>%
         psych::describe() %>%
         as.data.frame() %>%
         select(n, mean, sd, median, min, max, skew, kurtosis)
@@ -2283,34 +2522,34 @@ server <- function(input, output, session) {
 
   output$histogram.X <- renderPlot(
     {
-      p <- plot_histogram(selected_data()$Predictor, fill_color = plot_colors$primary)
+      p <- plot_histogram(analysis_data()$Predictor, fill_color = plot_colors$primary)
       print(p)
     },
     width = 560,
     height = 340,
     res = 96
-  ) |> bindCache(selected_data()$Predictor)
+  ) |> bindCache(analysis_signature(), "predictor_hist")
 
   output$histogram.Y <- renderPlot(
     {
-      p <- plot_histogram(selected_data()$Criterion, fill_color = plot_colors$success)
+      p <- plot_histogram(analysis_data()$Criterion, fill_color = plot_colors$success)
       print(p)
     },
     width = 560,
     height = 340,
     res = 96
-  ) |> bindCache(selected_data()$Criterion)
+  ) |> bindCache(analysis_signature(), "criterion_hist")
 
   output$corplot <- renderPlot(
     {
-      p <- plot_scatter(selected_data(), predictor_display_name(), criterion_display_name())
+      p <- plot_scatter(analysis_data(), predictor_display_name(), criterion_display_name())
       print(p)
     },
     width = 720,
     height = 480,
     res = 96
   ) |> bindCache(
-    selected_data(),
+    analysis_signature(),
     predictor_display_name(),
     criterion_display_name()
   )
@@ -2319,17 +2558,13 @@ server <- function(input, output, session) {
 
   output$clestable <- renderTable(
     {
-      df_cles() %>%
-        group_by(Group) %>%
-        summarise(Mean = mean(Criterion), SD = sd(Criterion), n = n(), .groups = "drop")
+      group_summary()
     },
     digits = 3
   )
 
   output$cles <- renderTable({
-    stats <- df_cles() %>%
-      group_by(Group) %>%
-      summarise(m = mean(Criterion), s = sd(Criterion), n = n(), .groups = "drop")
+    stats <- group_summary()
 
     if (nrow(stats) < 2) {
       return(NULL)
@@ -2361,14 +2596,14 @@ server <- function(input, output, session) {
 
   output$histogram.overlap <- renderPlot(
     {
-      p <- plot_density_overlap(df_cles(), criterion_display_name(), predictor_display_name(), cutoff_X_val())
+      p <- plot_density_overlap(density_data(), criterion_display_name(), predictor_display_name(), cutoff_X_val())
       print(p)
     },
     width = 680,
     height = 380,
     res = 96
   ) |> bindCache(
-    df_cles(),
+    analysis_signature(),
     criterion_display_name(),
     predictor_display_name(),
     cutoff_X_val()
@@ -2376,7 +2611,7 @@ server <- function(input, output, session) {
 
   output$besd <- renderTable(
     {
-      df <- selected_data()
+      df <- analysis_data()
       calc_besd(df, cutoff_X_val(), cutoff_y_input(), predictor_display_name(), criterion_display_name())
     },
     rownames = TRUE,
@@ -2427,7 +2662,7 @@ server <- function(input, output, session) {
       )
     },
     content = function(file) {
-      p <- plot_scatter(selected_data(), predictor_display_name(), criterion_display_name())
+      p <- plot_scatter(analysis_data(), predictor_display_name(), criterion_display_name())
       ggplot2::ggsave(
         filename = file,
         plot = p,
@@ -2451,7 +2686,7 @@ server <- function(input, output, session) {
     },
     content = function(file) {
       p <- plot_histogram(
-        selected_data()$Predictor,
+        analysis_data()$Predictor,
         title = paste("Distribution of", predictor_display_name()),
         fill_color = plot_colors$primary
       )
@@ -2478,7 +2713,7 @@ server <- function(input, output, session) {
     },
     content = function(file) {
       p <- plot_histogram(
-        selected_data()$Criterion,
+        analysis_data()$Criterion,
         title = paste("Distribution of", criterion_display_name()),
         fill_color = plot_colors$success
       )
@@ -2534,7 +2769,7 @@ server <- function(input, output, session) {
       )
     },
     content = function(file) {
-      p <- plot_density_overlap(df_cles(), criterion_display_name(), predictor_display_name(), cutoff_X_val())
+      p <- plot_density_overlap(density_data(), criterion_display_name(), predictor_display_name(), cutoff_X_val())
       ggplot2::ggsave(
         filename = file,
         plot = p,
@@ -2710,12 +2945,12 @@ server <- function(input, output, session) {
   # --- Report Generation ---
 
   assemble_report_params <- function() {
-    req(selected_data())
+    req(analysis_data())
     pd <- predictor_display_name()
     cd <- criterion_display_name()
     pd_safe <- sanitize_html(pd)
     cd_safe <- sanitize_html(cd)
-    df <- selected_data()
+    df <- analysis_data()
     slices <- group_slices()
     above_vals <- slices$above_vals
     below_vals <- slices$below_vals
@@ -2790,7 +3025,7 @@ server <- function(input, output, session) {
       paste0("ESCAPE_Report_", Sys.Date(), ".html")
     },
     content = function(file) {
-      req(selected_data())
+      req(analysis_data())
       tempReport <- file.path(tempdir(), "report.Rmd")
 
       rmd_content <- '
